@@ -29,6 +29,23 @@ static void usage( const char *name ){
 	);
 }
 
+static const char *gpmfError( GPMF_ERROR err ){
+	switch(err){
+	case GPMF_OK : return "No problemo";
+	case GPMF_ERROR_MEMORY : return "NULL Pointer or insufficient memory";
+	case GPMF_ERROR_BAD_STRUCTURE : return "Non-complaint GPMF structure detected";
+	case GPMF_ERROR_BUFFER_END : return "reached the end of the provided buffer";
+	case GPMF_ERROR_FIND : return "Find failed to return the requested data, but structure is valid";
+	case GPMF_ERROR_LAST : return "reached the end of a search at the current nest level";
+	case GPMF_ERROR_TYPE_NOT_SUPPORTED : return "a needed TYPE tuple is missing or has unsupported elements";
+	case GPMF_ERROR_SCALE_NOT_SUPPORTED : return "scaling for an non-scaling type, e.g. scaling a FourCC field to a float";
+	case GPMF_ERROR_SCALE_COUNT : return "A SCAL tuple has a mismatching element count";
+	case GPMF_ERROR_UNKNOWN_TYPE : return "Potentially valid data with a new or unknown type";
+	case GPMF_ERROR_RESERVED : return "internal usage";
+	}
+	return "???";
+}
+
 int main(int ac, char **av){
 	uint8_t nvideo = 1;	/* which argument contains the video */
 	uint32_t* payload = NULL;
@@ -76,8 +93,30 @@ int main(int ac, char **av){
 		printf("*d* payloads : %u\n", payloads);
 
 	for( index = 0; index < payloads; index++ ){
+		GPMF_ERR ret;
 		double tstart = 0.0, tend = 0.0;	/* Timeframe of this payload */
-		payloadsize = GetPayloadSize(mp4handle, index);
 
+		payloadsize = GetPayloadSize(mp4handle, index);
+		payloadres = GetPayloadResource(mp4handle, payloadres, payloadsize);
+		payload = GetPayload(mp4handle, payloadres, index);
+
+		if(debug)
+			printf("*d* payload : %u ... ", index);
+
+		if(!payload){	
+				/* For the moment, crashing.
+				 * Let see in the future if a recovery is needed ...
+				 */
+			puts("*F* can't get Payload\n");
+			exit(EXIT_FAILURE);
+		}
+
+		if((ret = GetPayloadTime(mp4handle, index, &tstart, &tend)) != GPMF_OK){
+			printf("*F* can't get payload's time : %s\n", gpmfError(ret));
+			exit(EXIT_FAILURE);
+		}
+
+		if(debug)
+			printf("\tfrom %.3f to %.3f seconds\n", tstart, tend);
 	}
 }
