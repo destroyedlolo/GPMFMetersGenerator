@@ -1,7 +1,15 @@
 # GPMFMetersGenerator
 Generate skickers from GoPro's GPMF
 
-This "_test_" branch only extract GPS5 fields from GoPro generated MP4, as **gpmfdemo** is doing.
+## Usage
+
+```
+GPMFMetersGenerator [options] file.MP4
+```
+(launch GPMFMetersGenerator without argument to have a list of reconized options)
+
+A directory with the same name of the mp4 file (without it's extention) will be created to
+hold resulting images.
 
 ## Installation
 
