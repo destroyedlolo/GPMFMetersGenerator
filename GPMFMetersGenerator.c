@@ -53,6 +53,7 @@ int main(int ac, char **av){
 	size_t payloadres = 0;
 	GPMF_stream metadata_stream, * ms = &metadata_stream;
 
+		 /* Read arguments */
 	if(ac < 2){
 		usage(av[0]);
 		exit(EXIT_FAILURE);
@@ -73,6 +74,7 @@ int main(int ac, char **av){
 		nvideo++;
 	}
 
+		/* Open and validate the file */
 	size_t mp4handle = OpenMP4Source(av[nvideo], MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
 	if(!mp4handle){
 		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", av[nvideo]);
@@ -87,8 +89,25 @@ int main(int ac, char **av){
 		exit(EXIT_FAILURE);
 	}
 	if(verbose)
-		printf("Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
+		printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
 
+
+		/* Determine target directory name */
+	int len = strlen(av[nvideo]) + strlen("img0123456.png") + 1;
+	char targetDir[ len ];						/* Where files will be created */
+	strcpy(targetDir, av[nvideo]);
+	char *targetFile = strrchr(targetDir, '.');	/* target file name */
+	if(!targetFile){
+		printf("*F* Video filename doesn't have extension");
+		exit(EXIT_FAILURE);
+	}
+	*(targetFile++) = '/';
+	*targetFile = 0;
+	if(verbose || debug)
+		printf("*I* images will be generated in '%s'\n", targetDir);
+
+
+		/* Reading data */
 	uint32_t index, payloads = GetNumberPayloads(mp4handle);
 	if(debug)
 		printf("*d* payloads : %u\n", payloads);
