@@ -23,7 +23,7 @@ double nextsample=-1;
 	 *
 	 * -> false if a gap is detected
 	 */
-bool addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d ){
+double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d ){
 	double ret=0;
 
 		/* Min / Max */
@@ -63,7 +63,7 @@ bool addSample( double sec, double lat, double lgt, double alt, double s2d, doub
 		/* Store sample if needed */
 	if(nextsample < 0 || sec >= nextsample){
 		if(nextsample >= 0 && sec > nextsample + SAMPLE/2)	/* Drifting */
-			ret = sec - (nextsample + SAMPLE/4);
+			ret = sec - (nextsample + SAMPLE/2);
 
 		nextsample = sec + SAMPLE;
 		
