@@ -122,8 +122,8 @@ int main(int ac, char **av){
 			exit(EXIT_FAILURE);
 		}
 
-		if(debug)
-			printf("\tfrom %.3f to %.3f seconds\n", tstart, tend);
+		if(verbose || debug)
+			printf("from %.3f to %.3f seconds\n", tstart, tend);
 
 		while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT)){
 			if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT))
