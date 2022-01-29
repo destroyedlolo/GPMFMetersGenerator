@@ -18,6 +18,8 @@
 
 #include <stdbool.h>
 
+extern bool verbose, debug;
+
 struct GPMFdata {
 	struct GPMFdata *next;
 	double latitude, longitude;
@@ -30,7 +32,7 @@ extern struct GPMFdata min, max;
 extern struct GPMFdata *first, *last;
 
 	/* Delay b/w sample */
-#define SAMPLE 1.0/8.0
+#define SAMPLE (1.0/8.0)
 
 extern bool addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d );
 

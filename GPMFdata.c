@@ -24,7 +24,7 @@ double nextsample=-1;
 	 * -> false if a gap is detected
 	 */
 bool addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d ){
-	bool ret=true;
+	double ret=0;
 
 		/* Min / Max */
 	if(nextsample < 0){	/* First data */
@@ -62,8 +62,13 @@ bool addSample( double sec, double lat, double lgt, double alt, double s2d, doub
 
 		/* Store sample if needed */
 	if(nextsample < 0 || sec >= nextsample){
+		if(nextsample >= 0 && sec > nextsample + SAMPLE/2)	/* Drifting */
+			ret = sec - (nextsample + SAMPLE/4);
+
 		nextsample = sec + SAMPLE;
-printf("sec: %f, next:%f\n", sec, nextsample);
+		
+		if(debug)
+			printf("accepted : %f, next:%f\n", sec, nextsample);
 	}
 
 	return ret;

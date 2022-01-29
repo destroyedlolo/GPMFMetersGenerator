@@ -145,7 +145,7 @@ int main(int ac, char **av){
 			exit(EXIT_FAILURE);
 		}
 
-		if(verbose || debug)
+		if(debug)
 			printf("from %.3f to %.3f seconds\n", tstart, tend);
 
 
@@ -196,6 +196,7 @@ int main(int ac, char **av){
 				){
 					if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
 						for(i = 0; i < samples; i++){
+							double drift;
 
 							if(debug)
 								printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
@@ -207,14 +208,17 @@ int main(int ac, char **av){
 									tmpbuffer[i*elements + 0]	/* speed3d */
 								);
 
-							addSample(
+							if(!!(drift = addSample(
 								tstart + i*tstep,
 								tmpbuffer[i*elements + 0],	/* latitude */
 								tmpbuffer[i*elements + 1],	/* longitude */
 								tmpbuffer[i*elements + 2],	/* altitude */
 								tmpbuffer[i*elements + 3],	/* speed2d */
 								tmpbuffer[i*elements + 0]	/* speed3d */
-							);
+							))){
+								if(verbose)
+									printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
+							}
 						}
 					}
 
