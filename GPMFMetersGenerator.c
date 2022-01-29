@@ -51,6 +51,7 @@ int main(int ac, char **av){
 	uint32_t* payload = NULL;
 	uint32_t payloadsize = 0;
 	size_t payloadres = 0;
+	GPMF_stream metadata_stream, * ms = &metadata_stream;
 
 	if(ac < 2){
 		usage(av[0]);
@@ -94,7 +95,7 @@ int main(int ac, char **av){
 
 	for( index = 0; index < payloads; index++ ){
 		GPMF_ERR ret;
-		double tstart = 0.0, tend = 0.0;	/* Timeframe of this payload */
+		double tstart, tend;	/* Timeframe of this payload */
 
 		payloadsize = GetPayloadSize(mp4handle, index);
 		payloadres = GetPayloadResource(mp4handle, payloadres, payloadsize);
@@ -116,7 +117,115 @@ int main(int ac, char **av){
 			exit(EXIT_FAILURE);
 		}
 
+		if((ret = GPMF_Init(ms, payload, payloadsize)) != GPMF_OK){
+			printf("*F* can't init GPMF : %s\n", gpmfError(ret));
+			exit(EXIT_FAILURE);
+		}
+
 		if(debug)
 			printf("\tfrom %.3f to %.3f seconds\n", tstart, tend);
+
+		while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT)){
+			if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT))
+				continue;
+
+			char* rawdata = (char*)GPMF_RawData(ms);
+			uint32_t key = GPMF_Key(ms);
+			GPMF_SampleType type = GPMF_Type(ms);
+			uint32_t samples = GPMF_Repeat(ms);
+			uint32_t elements = GPMF_ElementsInStruct(ms);
+
+			if(debug)
+				printf("*d* %u samples, %u elements\n", samples, elements);
+
+			if(samples){
+#define MAX_UNITS	64
+#define MAX_UNITLEN	8
+				char units[MAX_UNITS][MAX_UNITLEN] = { "" };
+				uint32_t unit_samples = 1;
+
+				char complextype[MAX_UNITS] = { "" };
+				uint32_t type_samples = 1;
+
+				uint32_t buffersize = samples * elements * sizeof(double);
+				GPMF_stream find_stream;
+				double *ptr, *tmpbuffer = (double*)malloc(buffersize);
+
+				uint32_t i, j;
+
+				if(!tmpbuffer){
+					puts("*F* Can't allocate temporary buffer\n");
+					exit(EXIT_FAILURE);
+				}
+
+				GPMF_CopyState(ms, &find_stream);
+				if(
+					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_SI_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT) ||
+					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT)
+				){
+					char *data = (char*)GPMF_RawData(&find_stream);
+					uint32_t ssize = GPMF_StructSize(&find_stream);
+					if (ssize > MAX_UNITLEN - 1) ssize = MAX_UNITLEN - 1;
+					unit_samples = GPMF_Repeat(&find_stream);
+
+					for(i = 0; i < unit_samples && i < MAX_UNITS; i++){
+						memcpy(units[i], data, ssize);
+						units[i][ssize] = 0;
+						data += ssize;
+					}
+
+						/* Search for TYPE if Complex */
+					GPMF_CopyState(ms, &find_stream);
+					type_samples = 0;
+					if(GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_TYPE, GPMF_CURRENT_LEVEL | GPMF_TOLERANT)){
+						char* data = (char*)GPMF_RawData(&find_stream);
+						uint32_t ssize = GPMF_StructSize(&find_stream);
+						if(ssize > MAX_UNITLEN - 1) ssize = MAX_UNITLEN - 1;
+						type_samples = GPMF_Repeat(&find_stream);
+
+						for(i = 0; i < type_samples && i < MAX_UNITS; i++)
+							complextype[i] = data[i];
+
+					}
+
+					if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
+						ptr = tmpbuffer;
+						int pos = 0;
+						for(i = 0; i < samples; i++){
+							if(verbose)
+								printf("\t%c%c%c%c ", PRINTF_4CC(key));
+							
+							for (j = 0; j < elements; j++){
+								if(type == GPMF_TYPE_STRING_ASCII){
+									if(verbose)
+										printf("(char)%c", rawdata[pos]);
+									pos++;
+									ptr++;
+								} else if(type_samples == 0){ /* no TYPE structure */
+									if(verbose)
+										printf("(no type)%.3f%s, ", *ptr++, units[j % unit_samples]);
+								} else if(complextype[j] != 'F'){
+									if(verbose)
+										printf("(F)%.3f%s, ", *ptr++, units[j % unit_samples]);
+									pos += GPMF_SizeofType((GPMF_SampleType)complextype[j]);
+								} else if (type_samples && complextype[j] == GPMF_TYPE_FOURCC){
+									ptr++;
+									if(verbose)
+										printf("(4CC)%c%c%c%c, ", rawdata[pos], rawdata[pos + 1], rawdata[pos + 2], rawdata[pos + 3]);
+									pos += GPMF_SizeofType((GPMF_SampleType)complextype[j]);
+								}
+							}
+
+							if(verbose)
+								puts("");
+						}
+					}
+
+				}
+
+				free(tmpbuffer);
+			}
+		}
+		GPMF_ResetState(ms);
 	}
 }
