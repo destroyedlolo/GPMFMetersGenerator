@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 	/* Minimum and maximum data */
 struct GPMFdata min, max;
@@ -61,14 +62,33 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 	}
 
 		/* Store sample if needed */
-	if(nextsample < 0 || sec >= nextsample){
-		if(nextsample >= 0 && sec > nextsample + SAMPLE/2)	/* Drifting */
+	if(!first || sec >= nextsample){
+		if(first && sec > nextsample + SAMPLE/2)	/* Drifting */
 			ret = sec - (nextsample + SAMPLE/2);
 
 		nextsample = sec + SAMPLE;
-		
 		if(debug)
 			printf("accepted : %f, next:%f\n", sec, nextsample);
+
+		struct GPMFdata *nv = malloc( sizeof(struct GPMFdata) );
+		if(!nv){
+			puts("*F* out of memory");
+			exit(EXIT_FAILURE);
+		}
+
+			/* Insert the new sample */
+		if(!first)
+			first = nv;
+		else
+			last->next = nv;
+
+		nv->latitude = lat;
+		nv->longitude = lgt;
+		nv->altitude = alt;
+		nv->spd2d = s2d;
+		nv->spd3d = s3d;
+	
+		last = nv;
 	}
 
 	return ret;
