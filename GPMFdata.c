@@ -99,11 +99,11 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 void dumpSample( void ){
 	if(verbose || debug){
 		puts("min/max :");
-		printf("\tLatitude : %.3f deg - %.3f deg\n", min.latitude, max.latitude);
-		printf("\tLongitude : %.3f deg - %.3f deg\n", min.longitude, max.longitude);
-		printf("\tAltitude : %.3f m - %.3f m\n", min.altitude, max.altitude);
-		printf("\tSpeed2d : %.3f km/h - %.3f km/h\n", min.spd2d * 3.6, max.spd2d * 3.6);
-		printf("\tSpeed3d : %.3f km/h - %.3f km/h\n", min.spd3d * 3.6, max.spd3d * 3.6);
+		printf("\tLatitude : %.3f deg - %.3f deg (%.3f)\n", min.latitude, max.latitude, max.latitude - min.latitude);
+		printf("\tLongitude : %.3f deg - %.3f deg (%.3f)\n", min.longitude, max.longitude, max.longitude - min.longitude);
+		printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", min.altitude, max.altitude, max.altitude - min.altitude);
+		printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd2d * 3.6, max.spd2d * 3.6, (max.spd2d - min.spd2d) * 3.6);
+		printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd3d * 3.6, max.spd3d * 3.6, (max.spd3d - min.spd3d) * 3.6);
 	}
 
 	struct GPMFdata *p;
