@@ -25,7 +25,7 @@ bool debug = false;
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
 	puts(
-		"\nGPMFMetersGenerator v1.0\n"
+		"\nGPMFMetersGenerator v0.1\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-v : turn verbose on\n"
@@ -205,7 +205,7 @@ int main(int ac, char **av){
 									tmpbuffer[i*elements + 1],	/* longitude */
 									tmpbuffer[i*elements + 2],	/* altitude */
 									tmpbuffer[i*elements + 3],	/* speed2d */
-									tmpbuffer[i*elements + 0]	/* speed3d */
+									tmpbuffer[i*elements + 4]	/* speed3d */
 								);
 
 							if(!!(drift = addSample(
@@ -214,7 +214,7 @@ int main(int ac, char **av){
 								tmpbuffer[i*elements + 1],	/* longitude */
 								tmpbuffer[i*elements + 2],	/* altitude */
 								tmpbuffer[i*elements + 3],	/* speed2d */
-								tmpbuffer[i*elements + 0]	/* speed3d */
+								tmpbuffer[i*elements + 4]	/* speed3d */
 							))){
 								if(verbose)
 									printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
@@ -229,4 +229,6 @@ int main(int ac, char **av){
 		}
 		GPMF_ResetState(ms);
 	}
+
+	dumpSample();
 }

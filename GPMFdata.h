@@ -35,5 +35,5 @@ extern struct GPMFdata *first, *last;
 #define SAMPLE (1.0/8.0)
 
 extern double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d );
-
+extern void dumpSample( void );
 #endif

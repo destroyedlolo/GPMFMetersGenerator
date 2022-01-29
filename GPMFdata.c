@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 	/* Minimum and maximum data */
 struct GPMFdata min, max;
@@ -82,6 +83,7 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 		else
 			last->next = nv;
 
+		nv->next = NULL;
 		nv->latitude = lat;
 		nv->longitude = lgt;
 		nv->altitude = alt;
@@ -93,3 +95,31 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 
 	return ret;
 }
+
+void dumpSample( void ){
+	if(verbose || debug){
+		puts("min/max :");
+		printf("\tLatitude : %.3f deg - %.3f deg\n", min.latitude, max.latitude);
+		printf("\tLongitude : %.3f deg - %.3f deg\n", min.longitude, max.longitude);
+		printf("\tAltitude : %.3f m - %.3f m\n", min.altitude, max.altitude);
+		printf("\tSpeed2d : %.3f km/h - %.3f km/h\n", min.spd2d * 3.6, max.spd2d * 3.6);
+		printf("\tSpeed3d : %.3f km/h - %.3f km/h\n", min.spd3d * 3.6, max.spd3d * 3.6);
+	}
+
+	struct GPMFdata *p;
+	uint32_t num = 0;
+	for(p = first; p; p = p->next){
+		if(debug){
+			printf("%p (next: %p)\n", p, p->next);
+			printf("\tLatitude : %.3f deg\n", p->latitude);
+			printf("\tLongitude : %.3f deg\n", p->longitude);
+			printf("\tAltitude : %.3f m\n", p->altitude);
+			printf("\tSpeed2d : %.3f km/h\n", p->spd2d * 3.6);
+			printf("\tSpeed3d : %.3f km/h\n", p->spd3d * 3.6);
+		}
+		num++;
+	}
+
+	printf("%u memorised samples\n", num);
+}
+
