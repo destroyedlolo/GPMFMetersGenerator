@@ -15,6 +15,8 @@
 #include "gpmf-parser/GPMF_utils.h"
 #include "gpmf-parser/demo/GPMF_mp4reader.h"
 
+#include "GPMFdata.h"
+
 	/* Configuration */
 
 bool verbose = false;
@@ -23,6 +25,8 @@ bool debug = false;
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
 	puts(
+		"\nGPMFMetersGenerator v1.0\n"
+		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
@@ -114,7 +118,7 @@ int main(int ac, char **av){
 
 	for( index = 0; index < payloads; index++ ){
 		GPMF_ERR ret;
-		double tstart, tend;	/* Timeframe of this payload */
+		double tstart, tend, tstep;	/* Timeframe of this payload */
 
 		payloadsize = GetPayloadSize(mp4handle, index);
 		payloadres = GetPayloadResource(mp4handle, payloadres, payloadsize);
@@ -144,33 +148,30 @@ int main(int ac, char **av){
 		if(verbose || debug)
 			printf("from %.3f to %.3f seconds\n", tstart, tend);
 
+
 		while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT)){
 			if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT))
 				continue;
 
-			char* rawdata = (char*)GPMF_RawData(ms);
-			uint32_t key = GPMF_Key(ms);
-			GPMF_SampleType type = GPMF_Type(ms);
 			uint32_t samples = GPMF_Repeat(ms);
 			uint32_t elements = GPMF_ElementsInStruct(ms);
 
 			if(debug)
 				printf("*d* %u samples, %u elements\n", samples, elements);
-
+	
 			if(samples){
 #define MAX_UNITS	64
 #define MAX_UNITLEN	8
 				char units[MAX_UNITS][MAX_UNITLEN] = { "" };
 				uint32_t unit_samples = 1;
 
-				char complextype[MAX_UNITS] = { "" };
-				uint32_t type_samples = 1;
-
 				uint32_t buffersize = samples * elements * sizeof(double);
 				GPMF_stream find_stream;
-				double *ptr, *tmpbuffer = (double*)malloc(buffersize);
+				double *tmpbuffer = (double*)malloc(buffersize);
 
-				uint32_t i, j;
+				uint32_t i;
+
+				tstep = (tend - tstart)/samples;
 
 				if(!tmpbuffer){
 					puts("*F* Can't allocate temporary buffer\n");
@@ -193,24 +194,21 @@ int main(int ac, char **av){
 						data += ssize;
 					}
 
-						/* Search for TYPE if Complex */
-					GPMF_CopyState(ms, &find_stream);
-					type_samples = 0;
-					if(GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_TYPE, GPMF_CURRENT_LEVEL | GPMF_TOLERANT)){
-						char* data = (char*)GPMF_RawData(&find_stream);
-						uint32_t ssize = GPMF_StructSize(&find_stream);
-						if(ssize > MAX_UNITLEN - 1) ssize = MAX_UNITLEN - 1;
-						type_samples = GPMF_Repeat(&find_stream);
-
-						for(i = 0; i < type_samples && i < MAX_UNITS; i++)
-							complextype[i] = data[i];
-
-					}
 
 					if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
-						ptr = tmpbuffer;
-						int pos = 0;
 						for(i = 0; i < samples; i++){
+
+							printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
+								tstart + i*tstep,
+								tmpbuffer[i*elements + 0],	/* latitude */
+								tmpbuffer[i*elements + 1],	/* longitude */
+								tmpbuffer[i*elements + 2],	/* altitude */
+								tmpbuffer[i*elements + 3],	/* speed2d */
+								tmpbuffer[i*elements + 0]	/* speed3d */
+							);
+
+
+#if 0
 							if(verbose)
 								printf("\t%c%c%c%c ", PRINTF_4CC(key));
 							
@@ -237,6 +235,7 @@ int main(int ac, char **av){
 
 							if(verbose)
 								puts("");
+#endif
 						}
 					}
 

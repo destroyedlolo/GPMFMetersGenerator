@@ -8,9 +8,12 @@ gotoall: all
 cc=gcc -Wall -O2
 opts=
 
+GPMFdata.o : GPMFdata.c GPMFdata.h Makefile 
+	$(cc) -c -o GPMFdata.o GPMFdata.c $(opts) 
+
 GPMFMetersGenerator.o : GPMFMetersGenerator.c \
   gpmf-parser/GPMF_parser.h gpmf-parser/GPMF_utils.h \
-  gpmf-parser/demo/GPMF_mp4reader.h Makefile 
+  gpmf-parser/demo/GPMF_mp4reader.h GPMFdata.h Makefile 
 	$(cc) -c -o GPMFMetersGenerator.o GPMFMetersGenerator.c \
   $(opts) 
 
@@ -29,9 +32,10 @@ gpmf-parser/demo/GPMF_mp4reader.o : gpmf-parser/demo/GPMF_mp4reader.c \
 
 GPMFMetersGenerator : gpmf-parser/demo/GPMF_mp4reader.o \
   gpmf-parser/GPMF_utils.o gpmf-parser/GPMF_parser.o \
-  GPMFMetersGenerator.o Makefile 
+  GPMFMetersGenerator.o GPMFdata.o Makefile 
 	 $(cc) -o GPMFMetersGenerator \
   gpmf-parser/demo/GPMF_mp4reader.o gpmf-parser/GPMF_utils.o \
-  gpmf-parser/GPMF_parser.o GPMFMetersGenerator.o $(opts) 
+  gpmf-parser/GPMF_parser.o GPMFMetersGenerator.o GPMFdata.o $(opts) \
+  
 
 all: GPMFMetersGenerator 
