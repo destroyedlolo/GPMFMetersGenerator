@@ -159,11 +159,13 @@ int main(int ac, char **av){
 			if(debug)
 				printf("*d* %u samples, %u elements\n", samples, elements);
 	
+			if(elements != 5){
+				printf("*E* Malformed GPMF : 5 elements experted by sample, got %d.\n", elements);
+				continue;
+			}
+
 			if(samples){
-#define MAX_UNITS	64
-#define MAX_UNITLEN	8
-				char units[MAX_UNITS][MAX_UNITLEN] = { "" };
-				uint32_t unit_samples = 1;
+				uint32_t type_samples = 1;
 
 				uint32_t buffersize = samples * elements * sizeof(double);
 				GPMF_stream find_stream;
@@ -179,22 +181,19 @@ int main(int ac, char **av){
 				}
 
 				GPMF_CopyState(ms, &find_stream);
+				type_samples = 0;
+				if(GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_TYPE, GPMF_CURRENT_LEVEL | GPMF_TOLERANT))
+					type_samples = GPMF_Repeat(&find_stream);
+
+				if(type_samples){
+					printf("*E* Malformed GPMF : type_samples expected to be 0, got %d.\n", type_samples);
+					continue;
+				}
+
 				if(
 					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_SI_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT) ||
 					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT)
 				){
-					char *data = (char*)GPMF_RawData(&find_stream);
-					uint32_t ssize = GPMF_StructSize(&find_stream);
-					if (ssize > MAX_UNITLEN - 1) ssize = MAX_UNITLEN - 1;
-					unit_samples = GPMF_Repeat(&find_stream);
-
-					for(i = 0; i < unit_samples && i < MAX_UNITS; i++){
-						memcpy(units[i], data, ssize);
-						units[i][ssize] = 0;
-						data += ssize;
-					}
-
-
 					if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
 						for(i = 0; i < samples; i++){
 
@@ -207,35 +206,6 @@ int main(int ac, char **av){
 								tmpbuffer[i*elements + 0]	/* speed3d */
 							);
 
-
-#if 0
-							if(verbose)
-								printf("\t%c%c%c%c ", PRINTF_4CC(key));
-							
-							for (j = 0; j < elements; j++){
-								if(type == GPMF_TYPE_STRING_ASCII){
-									if(verbose)
-										printf("(char)%c", rawdata[pos]);
-									pos++;
-									ptr++;
-								} else if(type_samples == 0){ /* no TYPE structure */
-									if(verbose)
-										printf("(no type)%.3f%s, ", *ptr++, units[j % unit_samples]);
-								} else if(complextype[j] != 'F'){
-									if(verbose)
-										printf("(F)%.3f%s, ", *ptr++, units[j % unit_samples]);
-									pos += GPMF_SizeofType((GPMF_SampleType)complextype[j]);
-								} else if (type_samples && complextype[j] == GPMF_TYPE_FOURCC){
-									ptr++;
-									if(verbose)
-										printf("(4CC)%c%c%c%c, ", rawdata[pos], rawdata[pos + 1], rawdata[pos + 2], rawdata[pos + 3]);
-									pos += GPMF_SizeofType((GPMF_SampleType)complextype[j]);
-								}
-							}
-
-							if(verbose)
-								puts("");
-#endif
 						}
 					}
 
