@@ -197,7 +197,17 @@ int main(int ac, char **av){
 					if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
 						for(i = 0; i < samples; i++){
 
-							printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
+							if(debug)
+								printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
+									tstart + i*tstep,
+									tmpbuffer[i*elements + 0],	/* latitude */
+									tmpbuffer[i*elements + 1],	/* longitude */
+									tmpbuffer[i*elements + 2],	/* altitude */
+									tmpbuffer[i*elements + 3],	/* speed2d */
+									tmpbuffer[i*elements + 0]	/* speed3d */
+								);
+
+							addSample(
 								tstart + i*tstep,
 								tmpbuffer[i*elements + 0],	/* latitude */
 								tmpbuffer[i*elements + 1],	/* longitude */
@@ -205,7 +215,6 @@ int main(int ac, char **av){
 								tmpbuffer[i*elements + 3],	/* speed2d */
 								tmpbuffer[i*elements + 0]	/* speed3d */
 							);
-
 						}
 					}
 
