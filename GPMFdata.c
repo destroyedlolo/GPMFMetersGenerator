@@ -22,8 +22,6 @@ double nextsample=-1;
 	 * Min and Max are always took in account
 	 * The sample is stored only if its took at least SAMPLE seconds after the
 	 * last stored sample.
-	 *
-	 * -> false if a gap is detected
 	 */
 double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d ){
 	double ret=0;

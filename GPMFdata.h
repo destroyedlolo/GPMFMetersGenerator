@@ -34,6 +34,16 @@ extern struct GPMFdata *first, *last;
 	/* Delay b/w sample */
 #define SAMPLE (1.0/8.0)
 
+	/* Add a new sample
+	 * -> sec : timestamp
+	 * -> ... : data to store
+	 *
+	 * <- not 0 if drift detected
+	 */
 extern double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d );
+
+	/* Dump stored data 
+	 * relies on global verbose and debug
+	 */
 extern void dumpSample( void );
 #endif
