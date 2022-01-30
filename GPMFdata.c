@@ -8,15 +8,15 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 
 	/* Minimum and maximum data */
 struct GPMFdata min, max;
 
 	/* Pointers to dynamic data */
 struct GPMFdata *first=NULL, *last=NULL;
+uint32_t samples_count = 0;
 
-double nextsample=-1;
+double nextsample=-1;	/* Next sample timestamp to consider */
 
 	/* Add a new sample
 	 * Min and Max are always took in account
@@ -88,6 +88,7 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 		nv->spd2d = s2d;
 		nv->spd3d = s3d;
 	
+		samples_count++;
 		last = nv;
 	}
 
@@ -105,7 +106,6 @@ void dumpSample( void ){
 	}
 
 	struct GPMFdata *p;
-	uint32_t num = 0;
 	for(p = first; p; p = p->next){
 		if(debug){
 			printf("%p (next: %p)\n", p, p->next);
@@ -115,9 +115,8 @@ void dumpSample( void ){
 			printf("\tSpeed2d : %.3f km/h\n", p->spd2d * 3.6);
 			printf("\tSpeed3d : %.3f km/h\n", p->spd3d * 3.6);
 		}
-		num++;
 	}
 
-	printf("%u memorised samples\n", num);
+	printf("%u memorised samples\n", samples_count);
 }
 

@@ -16,11 +16,13 @@
 #include "gpmf-parser/demo/GPMF_mp4reader.h"
 
 #include "GPMFdata.h"
+#include "AltitudeGraphic.h"
 
 	/* Configuration */
 
 bool verbose = false;
 bool debug = false;
+bool altitude = true;
 
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
@@ -28,6 +30,7 @@ static void usage( const char *name ){
 		"\nGPMFMetersGenerator v0.1\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
+		"-a : disable altitude gfx generation\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
 	);
@@ -65,6 +68,9 @@ int main(int ac, char **av){
 
 	while( nvideo < ac && *av[nvideo] == '-' ){
 		switch( av[nvideo][1] ){
+		case 'a':
+			altitude = false;
+			break;
 		case 'v':
 			verbose = true;
 			break;
@@ -231,4 +237,7 @@ int main(int ac, char **av){
 	}
 
 	dumpSample();
+
+	if(altitude)
+		GenerateAltitudeGfx( targetDir, targetFile, -1 );	// TEST !!
 }

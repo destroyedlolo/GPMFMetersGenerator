@@ -17,6 +17,7 @@
 #define GPMFDATA_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 extern bool verbose, debug;
 
@@ -30,6 +31,7 @@ struct GPMFdata {
 
 extern struct GPMFdata min, max;
 extern struct GPMFdata *first, *last;
+extern uint32_t samples_count;	/* how many samples */
 
 	/* Delay b/w sample */
 #define SAMPLE (1.0/8.0)
