@@ -16,6 +16,25 @@
 
 void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 
+		/*
+		 * Initialise Cairo
+		 */
+	cairo_status_t err;
+	cairo_text_extents_t extents;
+
+	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX_W, GFX_H);
+	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
+		puts("*F* Can't create Cairo's surface");
+		exit(EXIT_FAILURE);
+	}
+
+	cairo_t *cr = cairo_create(srf);
+
+	cairo_font_face_t *font = cairo_toy_font_face_create("", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_set_font_size(cr, 10);
+	cairo_text_extents(cr, "8888", &extents);
+	int offx = extents.x_advance + 5;
+
 	/* 
 	 * compute scales 
 	 */
@@ -24,7 +43,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	int max_h = (((int)max.altitude)/50 + 1)*50;
 	int range_h = max_h - min_h;
 	double scale_h = (double)GFX_H/(double)range_h;
-	double scale_w = (double)GFX_W/(double)samples_count;
+	double scale_w = (double)(GFX_W - offx)/(double)samples_count;
 	int delta_h = ((range_h/5)/50)*50;
 	if(!delta_h)
 		delta_h = range_h/5;
@@ -52,16 +71,9 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	 */
 
 	int i;
-	cairo_status_t err;
-
-		/* fully transparent surface created by default */
-	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX_W, GFX_H);
-	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
-		puts("*F* Can't create Cairo's surface");
-		exit(EXIT_FAILURE);
-	}
-
-	cairo_t *cr = cairo_create(srf);
+	cairo_set_source_rgba(cr, 0,0,0, 0.25);	/* Dark background */
+	cairo_rectangle(cr, 0,0, GFX_W, GFX_H);
+	cairo_fill(cr);
 
 		/* Draw iso level lines */
 	cairo_set_source_rgba(cr, 1,1,1, 0.75);	/* Set white color */
@@ -69,7 +81,12 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 
 	for(i = min_h; i <= max_h; i += delta_h){
 		int y = GFX_H - (i-min_h)*scale_h;
+		char t[6];
+		sprintf(t, "%5d", i);
+
 		cairo_move_to(cr, 0, y);
+		cairo_show_text(cr, t);
+		cairo_move_to(cr, offx, y);
 		cairo_line_to(cr, GFX_W, y);
 	}
 	cairo_stroke(cr);
@@ -78,7 +95,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_set_line_width(cr, 2);
 	for(i = 0, p = first; i < samples_count; i++, p=p->next){
-		int x = i*scale_w;
+		int x = offx + i*scale_w;
 		int y = GFX_H - (p->altitude - min_h)*scale_h;
 
 		if(!i)	/* First plot */
@@ -95,5 +112,6 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 
 		/* Cleaning */
 	cairo_destroy(cr);
+	cairo_font_face_destroy(font);
 	cairo_surface_destroy(srf);
 }
