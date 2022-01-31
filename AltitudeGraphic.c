@@ -24,6 +24,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	int max_h = (((int)max.altitude)/50 + 1)*50;
 	int range_h = max_h - min_h;
 	double scale_h = (double)GFX_H/(double)range_h;
+	double scale_w = (double)GFX_W/(double)samples_count;
 	int delta_h = ((range_h/5)/50)*50;
 	if(!delta_h)
 		delta_h = range_h/5;
@@ -39,8 +40,8 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 			min.altitude, min_h,
 			max.altitude, max_h
 		);
-		printf("*D* range : %d, vert scale : %f, delta line : %d (%d)\n",
-			range_h, scale_h, delta_h, range_h/delta_h
+		printf("*D* range : %d, horiz scale : %f, vert scale : %f, delta line : %d (%d)\n",
+			range_h, scale_w, scale_h, delta_h, range_h/delta_h
 		);
 	}
 
@@ -70,8 +71,22 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 		int y = GFX_H - (i-min_h)*scale_h;
 		cairo_move_to(cr, 0, y);
 		cairo_line_to(cr, GFX_W, y);
-		cairo_stroke(cr);
 	}
+	cairo_stroke(cr);
+
+	struct GPMFdata *p;
+	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_set_line_width(cr, 2);
+	for(i = 0, p = first; i < samples_count; i++, p=p->next){
+		int x = i*scale_w;
+		int y = GFX_H - (p->altitude - min_h)*scale_h;
+
+		if(!i)	/* First plot */
+			cairo_move_to(cr, x, y);
+		else
+			cairo_line_to(cr, x, y);
+	}
+	cairo_stroke(cr);
 
 	if((err = cairo_surface_write_to_png(srf, "/tmp/tst.png")) != CAIRO_STATUS_SUCCESS){
 		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));
