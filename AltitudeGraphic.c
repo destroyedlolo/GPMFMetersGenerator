@@ -10,6 +10,7 @@
 #include <cairo.h>
 #include <errno.h>
 #include <string.h>
+#include <math.h>
 
 #define GFX_W	600
 #define GFX_H	300
@@ -40,7 +41,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	int posLabel = GFX_W - extents.x_advance - 55;
 
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size(cr, 10);
+	cairo_set_font_size(cr, 15);
 	cairo_text_extents(cr, "8888", &extents);
 	int offx = extents.x_advance + 5;
 
@@ -119,6 +120,12 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 			cairo_line_to(cr, x, y);
 	}
 	cairo_stroke(cr);
+
+		/* Display the spot */
+	cairo_arc(cr, offx + index*scale_w, GFX_H - (current->altitude - min_h)*scale_h , 5, 0, 2 * M_PI);
+	cairo_stroke_preserve(cr);
+	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	cairo_fill(cr);
 
 	sprintf(filename, "alt%07d.png", index);
 	if(debug)
