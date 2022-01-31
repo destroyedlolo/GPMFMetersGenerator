@@ -13,7 +13,7 @@
  * -> filename : pointer to the filename only
  * -> index : which is the current index  (-1 : none)
  */
-extern bool GenerateAllAltitudeGfx( const char *fulltarget, char *filename );
-extern void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index );
+extern bool GenerateAllAltitudeGfx( const char *fulltarget );
+extern void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *);
 
 #endif

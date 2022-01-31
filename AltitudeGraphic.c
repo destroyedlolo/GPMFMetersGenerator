@@ -14,7 +14,10 @@
 #define GFX_W	600
 #define GFX_H	300
 
-void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
+bool GenerateAllAltitudeGfx( const char *fulltarget ){
+}
+
+void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
 
 		/*
 		 * Initialise Cairo
@@ -30,7 +33,13 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 
 	cairo_t *cr = cairo_create(srf);
 
-	cairo_font_face_t *font = cairo_toy_font_face_create("", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(cr, 35);
+	cairo_text_extents(cr, "8888", &extents);
+	int offy = extents.height + 5;
+	int posLabel = GFX_W - extents.x_advance - 55;
+
+	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size(cr, 10);
 	cairo_text_extents(cr, "8888", &extents);
 	int offx = extents.x_advance + 5;
@@ -42,7 +51,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	int min_h = (((int)min.altitude)/50)*50;
 	int max_h = (((int)max.altitude)/50 + 1)*50;
 	int range_h = max_h - min_h;
-	double scale_h = (double)GFX_H/(double)range_h;
+	double scale_h = (double)(GFX_H - offy)/(double)range_h;
 	double scale_w = (double)(GFX_W - offx)/(double)samples_count;
 	int delta_h = ((range_h/5)/50)*50;
 	if(!delta_h)
@@ -66,8 +75,6 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 
 	/*
 	 * Generate image
-	 *
-	 *AF* Add margins
 	 */
 
 	int i;
@@ -76,12 +83,12 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	cairo_fill(cr);
 
 		/* Draw iso level lines */
+	char t[8];
 	cairo_set_source_rgba(cr, 1,1,1, 0.75);	/* Set white color */
 	cairo_set_line_width(cr, 1);
 
 	for(i = min_h; i <= max_h; i += delta_h){
 		int y = GFX_H - (i-min_h)*scale_h;
-		char t[6];
 		sprintf(t, "%5d", i);
 
 		cairo_move_to(cr, 0, y);
@@ -91,8 +98,16 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	}
 	cairo_stroke(cr);
 
-	struct GPMFdata *p;
+		/* Display the label */
 	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(cr, 35);
+	cairo_move_to(cr, posLabel, offy);
+	sprintf(t, "%5d m", (int)current->altitude);
+	cairo_show_text(cr, t);
+	cairo_stroke(cr);
+
+	struct GPMFdata *p;
 	cairo_set_line_width(cr, 2);
 	for(i = 0, p = first; i < samples_count; i++, p=p->next){
 		int x = offx + i*scale_w;
@@ -105,13 +120,16 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index ){
 	}
 	cairo_stroke(cr);
 
-	if((err = cairo_surface_write_to_png(srf, "/tmp/tst.png")) != CAIRO_STATUS_SUCCESS){
+	sprintf(filename, "alt%07d.png", index);
+	if(debug)
+		printf("*D* Writing '%s'\n", fulltarget);
+
+	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
 		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 
 		/* Cleaning */
 	cairo_destroy(cr);
-	cairo_font_face_destroy(font);
 	cairo_surface_destroy(srf);
 }
