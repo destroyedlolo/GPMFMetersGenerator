@@ -238,6 +238,11 @@ int main(int ac, char **av){
 
 	dumpSample();
 
+	if(!samples_count){
+		puts("*W* No data");
+		exit(EXIT_SUCCESS);
+	}
+
 	if(altitude)
 		GenerateAltitudeGfx( targetDir, targetFile, -1 );	// TEST !!
 }
