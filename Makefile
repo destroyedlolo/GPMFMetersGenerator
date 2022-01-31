@@ -6,7 +6,7 @@ gotoall: all
 
 #The compiler (may be customized for compiler's options).
 cc=gcc -Wall -O2
-opts=
+opts=$(shell pkg-config --cflags cairo freetype2 ) $(shell pkg-config --libs cairo freetype2 )
 
 AltitudeGraphic.o : AltitudeGraphic.c AltitudeGraphic.h GPMFdata.h \
   Makefile 
