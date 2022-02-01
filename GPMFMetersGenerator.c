@@ -20,12 +20,14 @@
 
 #include "GPMFdata.h"
 #include "AltitudeGraphic.h"
+#include "SpeedGraphic.h"
 
 	/* Configuration */
 
 bool verbose = false;
 bool debug = false;
 bool altitude = true;
+bool speed = true;
 bool force = false;
 
 static void usage( const char *name ){
@@ -35,6 +37,8 @@ static void usage( const char *name ){
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
+		"-s : disable speed gfx generation\n"
+		"-3 : uses 3d speed (2d by default)\n"
 		"-F ! don't fail if the target directory exists\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
@@ -75,6 +79,12 @@ int main(int ac, char **av){
 		switch( av[nvideo][1] ){
 		case 'a':
 			altitude = false;
+			break;
+		case 's':
+			speed = false;
+			break;
+		case '3':
+			s3d = true;
 			break;
 		case 'F':
 			force = true;
@@ -275,4 +285,7 @@ int main(int ac, char **av){
 
 	if(altitude)
 		GenerateAllAltitudeGfx( targetDir, targetFile );
+
+	if(speed)
+		GenerateAllSpeedGfx( targetDir, targetFile );
 }
