@@ -95,6 +95,19 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
+	double val = transforme(/*(s3d ? current->spd3d : current->spd2d)*/ 70 * scale);
+
+	cairo_set_line_width(cr, 13);
+	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2 - 15, transforme(0), val );
+	cairo_stroke(cr);
+
+	cairo_set_source_rgb(cr, 1,1,1);
+	cairo_set_line_width(cr, 10);
+	cairo_arc(cr, cos( val ) * (GFX_SZ/2 - 15) + GFX_SZ/2, sin( val ) * (GFX_SZ/2 - 15) + GFX_SZ/2, 10, 0, 2 * M_PI);
+	cairo_stroke_preserve(cr);
+	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
+	cairo_fill(cr);
 
 	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
 		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));
