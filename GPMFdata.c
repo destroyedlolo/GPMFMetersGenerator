@@ -65,7 +65,7 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 		if(first && sec > nextsample + SAMPLE/2)	/* Drifting */
 			ret = sec - (nextsample + SAMPLE/2);
 
-		nextsample = sec + SAMPLE;
+		nextsample += SAMPLE;
 		if(debug)
 			printf("accepted : %f, next:%f\n", sec, nextsample);
 
