@@ -62,12 +62,6 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	if(!delta_h)
 		delta_h = range_h/5;
 
-	if(!delta_h){
-		if(verbose || debug)
-			puts("*W* Same altitude, graphics not generated");
-		return;
-	}
-
 #if 0	/* remove noise */
 	if(debug){
 		printf("*D* Normalized min: %.3f -> %d, max: %.3f -> %d\n",
