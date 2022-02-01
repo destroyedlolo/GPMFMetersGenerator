@@ -6,7 +6,7 @@ gotoall: all
 
 #The compiler (may be customized for compiler's options).
 cc=gcc -Wall -O2
-opts=$(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
+opts=-lm $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
 
 AltitudeGraphic.o : AltitudeGraphic.c AltitudeGraphic.h GPMFdata.h \
   Makefile 
