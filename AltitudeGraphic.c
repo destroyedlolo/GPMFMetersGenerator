@@ -68,6 +68,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 		return;
 	}
 
+#if 0	/* remove noise */
 	if(debug){
 		printf("*D* Normalized min: %.3f -> %d, max: %.3f -> %d\n",
 			min.altitude, min_h,
@@ -77,6 +78,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 			range_h, scale_w, scale_h, delta_h, range_h/delta_h
 		);
 	}
+#endif
 
 	/*
 	 * Generate image
@@ -133,7 +135,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 
 	sprintf(filename, "alt%07d.png", index);
 	if(debug)
-		printf("*D* Writing '%s'\n", fulltarget);
+		printf("*D* Writing '%s'\r", fulltarget);
 
 	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
 		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));
