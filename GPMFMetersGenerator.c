@@ -10,6 +10,9 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <dirent.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 #include "gpmf-parser/GPMF_parser.h"
 #include "gpmf-parser/GPMF_utils.h"
@@ -23,6 +26,7 @@
 bool verbose = false;
 bool debug = false;
 bool altitude = true;
+bool force = false;
 
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
@@ -31,6 +35,7 @@ static void usage( const char *name ){
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
+		"-F ! don't fail if the target directory exists\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
 	);
@@ -70,6 +75,9 @@ int main(int ac, char **av){
 		switch( av[nvideo][1] ){
 		case 'a':
 			altitude = false;
+			break;
+		case 'F':
+			force = true;
 			break;
 		case 'v':
 			verbose = true;
@@ -111,6 +119,28 @@ int main(int ac, char **av){
 		printf("*F* Video filename doesn't have extension");
 		exit(EXIT_FAILURE);
 	}
+
+		/* Create the target directory */
+	*targetFile = 0;
+	if(!force){
+		DIR* dir = opendir(targetDir);
+		if(dir){
+			closedir(dir);
+			printf("*F* '%s' alreay exists\n", targetDir);
+			exit(EXIT_FAILURE);
+		} else if(errno != ENOENT){
+			perror(targetDir);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	if(mkdir(targetDir, S_IRWXU | S_IRWXG | S_IRWXO) == -1){
+		perror(targetDir);
+		if(!force)
+			exit(EXIT_FAILURE);
+	}
+
+		/* done with directory */
 	*(targetFile++) = '/';
 	*targetFile = 0;
 	if(verbose || debug)
@@ -244,5 +274,5 @@ int main(int ac, char **av){
 	}
 
 	if(altitude)
-		GenerateAltitudeGfx( targetDir, targetFile, -1 );	// TEST !!
+		GenerateAllAltitudeGfx( targetDir, targetFile );
 }

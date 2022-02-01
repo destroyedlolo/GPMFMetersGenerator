@@ -15,7 +15,11 @@
 #define GFX_W	600
 #define GFX_H	300
 
-bool GenerateAllAltitudeGfx( const char *fulltarget ){
+void GenerateAllAltitudeGfx( const char *fulltarget, char *filename ){
+	int i;
+	struct GPMFdata *p;
+	for(i = 0, p = first; i < samples_count; i++, p=p->next)
+		GenerateAltitudeGfx(fulltarget, filename, i, p);
 }
 
 void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
