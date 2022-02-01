@@ -31,8 +31,8 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 		min.latitude = max.latitude = lat;
 		min.longitude = max.longitude = lgt;
 		min.altitude = max.altitude = alt;
-		min.spd2d = max.spd2d = s2d;
-		min.spd3d = max.spd3d = s3d;
+		min.spd2d = max.spd2d = s2d * 3.6;
+		min.spd3d = max.spd3d = s3d * 3.6;
 	} else {
 		if(lat < min.latitude)
 			min.latitude = lat;
@@ -50,14 +50,14 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 			max.altitude = alt;
 
 		if(s2d < min.spd2d)
-			min.spd2d = s2d;
+			min.spd2d = s2d * 3.6;
 		if(s2d > max.spd2d)
-			max.spd2d = s2d;
+			max.spd2d = s2d * 3.6;
 
 		if(s3d < min.spd3d)
-			min.spd3d = s3d;
+			min.spd3d = s3d * 3.6;
 		if(s3d > max.spd3d)
-			max.spd3d = s3d;
+			max.spd3d = s3d * 3.6;
 	}
 
 		/* Store sample if needed */
@@ -85,8 +85,8 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 		nv->latitude = lat;
 		nv->longitude = lgt;
 		nv->altitude = alt;
-		nv->spd2d = s2d;
-		nv->spd3d = s3d;
+		nv->spd2d = s2d * 3.6;
+		nv->spd3d = s3d * 3.6;
 	
 		samples_count++;
 		last = nv;
@@ -101,8 +101,8 @@ void dumpSample( void ){
 		printf("\tLatitude : %.3f deg - %.3f deg (%.3f)\n", min.latitude, max.latitude, max.latitude - min.latitude);
 		printf("\tLongitude : %.3f deg - %.3f deg (%.3f)\n", min.longitude, max.longitude, max.longitude - min.longitude);
 		printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", min.altitude, max.altitude, max.altitude - min.altitude);
-		printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd2d * 3.6, max.spd2d * 3.6, (max.spd2d - min.spd2d) * 3.6);
-		printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd3d * 3.6, max.spd3d * 3.6, (max.spd3d - min.spd3d) * 3.6);
+		printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd2d, max.spd2d, max.spd2d - min.spd2d);
+		printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd3d, max.spd3d, max.spd3d - min.spd3d);
 	}
 
 	struct GPMFdata *p;
