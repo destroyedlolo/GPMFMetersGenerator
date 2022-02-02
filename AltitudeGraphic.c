@@ -122,9 +122,9 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	cairo_stroke(cr);
 
 		/* Display the spot */
-	cairo_arc(cr, offx + index*scale_w, GFX_H - (current->altitude - min_h)*scale_h , 5, 0, 2 * M_PI);
+	cairo_arc(cr, offx + index*scale_w, GFX_H - (current->altitude - min_h)*scale_h , 8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
-	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
 
 	sprintf(filename, "alt%07d.png", index);
