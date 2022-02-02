@@ -17,13 +17,10 @@
 bool s3d = false;
 
 void GenerateAllSpeedGfx( const char *fulltarget, char *filename ){
-#if 0
 	int i;
 	struct GPMFdata *p;
 	for(i = 0, p = first; i < samples_count; i++, p=p->next)
 		GenerateSpeedGfx(fulltarget, filename, i, p);
-#endif
-	GenerateSpeedGfx("/tmp/tst.png", filename, 0, first);
 }
 
 static double transforme( double angle ){
@@ -49,9 +46,9 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	 * compute scales 
 	 */
 	int range = (((int)(s3d ? max.spd3d : max.spd2d))/10 + 1)*10;
-	double scale = (double)(3/2)* M_PI/(double)range;
+	double scale = 3.0/2.0* M_PI/(double)range;
 
-#if 1	/* remove noise */
+#if 0	/* remove noise */
 	if(debug){
 		printf("*D* Normalized min: %.3f -> 0, max: %.3f -> %d\n",
 			(s3d ? min.spd3d : min.spd2d),
@@ -95,7 +92,7 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-	double val = transforme(/*(s3d ? current->spd3d : current->spd2d)*/ 70 * scale);
+	double val = transforme((s3d ? current->spd3d : current->spd2d) * scale);
 
 	cairo_set_line_width(cr, 13);
 	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
@@ -108,6 +105,10 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
+
+	sprintf(filename, "spd%07d.png", index);
+	if(verbose)
+		printf("*D* Writing '%s'\r", fulltarget);
 
 	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
 		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));

@@ -128,7 +128,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	cairo_fill(cr);
 
 	sprintf(filename, "alt%07d.png", index);
-	if(debug)
+	if(verbose)
 		printf("*D* Writing '%s'\r", fulltarget);
 
 	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
