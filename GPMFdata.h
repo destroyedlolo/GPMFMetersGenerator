@@ -34,7 +34,7 @@ extern struct GPMFdata *first, *last;
 extern uint32_t samples_count;	/* how many samples */
 
 	/* Delay b/w sample */
-#define SAMPLE (1.0/8.0)
+#define SAMPLE (1.0/9.0)
 
 	/* Add a new sample
 	 * -> sec : timestamp
