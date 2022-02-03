@@ -38,7 +38,8 @@ static void usage( const char *name ){
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
 		"-s : disable speed gfx generation\n"
-		"-3 : uses 3d speed (2d by default)\n"
+		"+3 : uses 3d speed (2d by default)\n"
+		"+b : generate both 2d and 3d\n"
 		"-F ! don't fail if the target directory exists\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
@@ -75,30 +76,42 @@ int main(int ac, char **av){
 		exit(EXIT_FAILURE);
 	}
 
-	while( nvideo < ac && *av[nvideo] == '-' ){
-		switch( av[nvideo][1] ){
-		case 'a':
-			altitude = false;
-			break;
-		case 's':
-			speed = false;
-			break;
-		case '3':
-			s3d = true;
-			break;
-		case 'F':
-			force = true;
-			break;
-		case 'v':
-			verbose = true;
-			break;
-		case 'd':
-			debug = true;
-			break;
-		default :
-			usage(av[0]);
-			exit(EXIT_FAILURE);
-		}
+	while( nvideo < ac && (*av[nvideo] == '-' || *av[nvideo] == '+') ){
+		if(*av[nvideo] == '-')
+			switch( av[nvideo][1] ){
+			case 'a':
+				altitude = false;
+				break;
+			case 's':
+				speed = false;
+				break;
+			case 'F':
+				force = true;
+				break;
+			case 'v':
+				verbose = true;
+				break;
+			case 'd':
+				debug = true;
+				break;
+			default :
+				usage(av[0]);
+				exit(EXIT_FAILURE);
+			}
+		else
+			switch( av[nvideo][1] ){
+			case '3':
+				s3d = true;
+				break;
+			case 'b':
+				sboth = true;
+				s3d = true;	/* both implies to have 3d as well */
+				break;
+			default :
+				usage(av[0]);
+				exit(EXIT_FAILURE);
+			}
+			
 		nvideo++;
 	}
 
@@ -288,4 +301,7 @@ int main(int ac, char **av){
 
 	if(speed)
 		GenerateAllSpeedGfx( targetDir, targetFile );
+
+	if(verbose)
+		puts("");
 }

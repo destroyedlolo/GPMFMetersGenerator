@@ -9,6 +9,7 @@
 #include "GPMFdata.h"
 
 extern bool s3d;
+extern bool sboth;
 
 /* Generate speed graphics
  * -> fulltarget : absolute target name (including directory)

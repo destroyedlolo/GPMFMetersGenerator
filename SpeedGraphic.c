@@ -15,6 +15,7 @@
 #define GFX_SZ	300
 
 bool s3d = false;
+bool sboth = false;
 
 void GenerateAllSpeedGfx( const char *fulltarget, char *filename ){
 	int i;
@@ -45,7 +46,14 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	/* 
 	 * compute scales 
 	 */
-	int range = (((int)(s3d ? max.spd3d : max.spd2d))/10 + 1)*10;
+	int range;
+	if(sboth){
+		range = (max.spd3d/10 + 1)*10;
+		int range2 = (max.spd2d/10 + 1)*10;
+		if(range2 > range)
+			range = range2;
+	} else
+		range = (((int)(s3d ? max.spd3d : max.spd2d))/10 + 1)*10;
 	double scale = 3.0/2.0* M_PI/(double)range;
 
 #if 0	/* remove noise */
@@ -85,15 +93,47 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, 65);
+	if(sboth)
+		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);	/* Set white color */
+	else
+		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	char t[8];
 	sprintf(t, "%6.1f", (s3d ? current->spd3d : current->spd2d));
 	cairo_text_extents(cr, t, &extents);
-	cairo_move_to(cr, 245 - extents.x_advance, 170);
+	cairo_move_to(cr, 245 - extents.x_advance, 170 - (sboth ? 25:0));
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-	double val = transforme((s3d ? current->spd3d : current->spd2d) * scale);
+	if(sboth){
+		cairo_set_source_rgb(cr, 0.2, 0.8, 0.2);
+		sprintf(t, "%6.1f", current->spd2d);
+		cairo_text_extents(cr, t, &extents);
+		cairo_move_to(cr, 245 - extents.x_advance, 200);
+		cairo_show_text(cr, t);
+		cairo_stroke(cr);
+	}
 
+	double val;
+	if(sboth){
+		val = transforme(current->spd2d * scale);
+
+		cairo_set_line_width(cr, 13);
+		cairo_set_source_rgb(cr, 0.3, 0.6, 0.4);
+		cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2 - 35, transforme(0), val );
+		cairo_stroke(cr);
+
+		cairo_set_source_rgb(cr, 1,1,1);
+		cairo_set_line_width(cr, 10);
+		cairo_arc(cr, cos( val ) * (GFX_SZ/2 - 35) + GFX_SZ/2, sin( val ) * (GFX_SZ/2 - 35) + GFX_SZ/2, 10, 0, 2 * M_PI);
+		cairo_stroke_preserve(cr);
+		cairo_set_source_rgb(cr, 0.2, 0.8, 0.2);
+		cairo_fill(cr);
+		cairo_stroke(cr);
+	}
+
+	val = transforme((s3d ? current->spd3d : current->spd2d) * scale);
+
+	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_set_line_width(cr, 13);
 	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2 - 15, transforme(0), val );
@@ -105,6 +145,7 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
+	cairo_stroke(cr);
 
 	sprintf(filename, "spd%07d.png", index);
 	if(verbose)
