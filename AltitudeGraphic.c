@@ -47,7 +47,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size(cr, 15);
 	cairo_text_extents(cr, "8888", &extents);
-	int offx = extents.x_advance + 5;
+	int offx = extents.x_advance + 10;
 
 	/* 
 	 * compute scales 
@@ -92,7 +92,7 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 		int y = GFX_H - (i-min_h)*scale_h;
 		sprintf(t, "%5d", i);
 
-		cairo_move_to(cr, 0, y);
+		cairo_move_to(cr, 3, y);
 		cairo_show_text(cr, t);
 		cairo_move_to(cr, offx, y);
 		cairo_line_to(cr, GFX_W, y);
