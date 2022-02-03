@@ -1,5 +1,5 @@
 /* SpeedGraphic
- * Generate speed graphics
+ * Generate speed-o-meter graphics
  *
  */
 
@@ -43,9 +43,9 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 
 	cairo_t *cr = cairo_create(srf);
 
-	/* 
-	 * compute scales 
-	 */
+		/* 
+		 * compute scales 
+		 */
 	int range;
 	if(sboth){
 		range = (max.spd3d/10 + 1)*10;
@@ -64,6 +64,10 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 		);
 	}
 #endif
+
+		/*
+		 * Generate image
+		 */
 
 		/* Background */
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2, 0, 2 * M_PI);

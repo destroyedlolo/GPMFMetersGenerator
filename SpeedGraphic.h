@@ -1,5 +1,5 @@
 /* SpeedGraphic
- * Generate speed graphics
+ * Generate speed-o-meter graphics
  *
  */
 

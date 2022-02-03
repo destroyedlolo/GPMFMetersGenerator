@@ -25,6 +25,10 @@ GPMFMetersGenerator.o : GPMFMetersGenerator.c \
 SpeedGraphic.o : SpeedGraphic.c SpeedGraphic.h GPMFdata.h Makefile 
 	$(cc) -c -o SpeedGraphic.o SpeedGraphic.c $(opts) 
 
+SpeedTracker.o : SpeedTracker.c SpeedTracker.h SpeedGraphic.h \
+  GPMFdata.h Makefile 
+	$(cc) -c -o SpeedTracker.o SpeedTracker.c $(opts) 
+
 gpmf-parser/GPMF_parser.o : gpmf-parser/GPMF_parser.c Makefile 
 	$(cc) -c -o gpmf-parser/GPMF_parser.o \
   gpmf-parser/GPMF_parser.c $(opts) 
@@ -39,11 +43,12 @@ gpmf-parser/demo/GPMF_mp4reader.o : gpmf-parser/demo/GPMF_mp4reader.c \
   gpmf-parser/demo/GPMF_mp4reader.c $(opts) 
 
 GPMFMetersGenerator : gpmf-parser/demo/GPMF_mp4reader.o \
-  gpmf-parser/GPMF_utils.o gpmf-parser/GPMF_parser.o SpeedGraphic.o \
-  GPMFMetersGenerator.o GPMFdata.o AltitudeGraphic.o Makefile 
+  gpmf-parser/GPMF_utils.o gpmf-parser/GPMF_parser.o SpeedTracker.o \
+  SpeedGraphic.o GPMFMetersGenerator.o GPMFdata.o AltitudeGraphic.o \
+  Makefile 
 	 $(cc) -o GPMFMetersGenerator \
   gpmf-parser/demo/GPMF_mp4reader.o gpmf-parser/GPMF_utils.o \
-  gpmf-parser/GPMF_parser.o SpeedGraphic.o GPMFMetersGenerator.o \
-  GPMFdata.o AltitudeGraphic.o $(opts) 
+  gpmf-parser/GPMF_parser.o SpeedTracker.o SpeedGraphic.o \
+  GPMFMetersGenerator.o GPMFdata.o AltitudeGraphic.o $(opts) 
 
 all: GPMFMetersGenerator 

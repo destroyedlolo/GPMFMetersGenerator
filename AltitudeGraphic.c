@@ -49,9 +49,9 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	cairo_text_extents(cr, "8888", &extents);
 	int offx = extents.x_advance + 10;
 
-	/* 
-	 * compute scales 
-	 */
+		/* 
+		 * compute scales 
+		 */
 
 	int min_h = (((int)min.altitude)/50)*50;
 	int max_h = (((int)max.altitude)/50 + 1)*50;
@@ -74,9 +74,9 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	}
 #endif
 
-	/*
-	 * Generate image
-	 */
+		/*
+		 * Generate image
+		 */
 
 	int i;
 	cairo_set_source_rgba(cr, 0,0,0, 0.25);	/* Dark background */

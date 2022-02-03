@@ -28,18 +28,20 @@ bool verbose = false;
 bool debug = false;
 bool altitude = true;
 bool speed = true;
+bool stracker = true;
 bool force = false;
 
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.1\n"
+		"\nGPMFMetersGenerator v0.3\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
-		"-s : disable speed gfx generation\n"
+		"-s : disable speed-o-meter generation\n"
 		"+3 : uses 3d speed (2d by default)\n"
-		"+b : generate both 2d and 3d\n"
+		"+b : generate both 2d and 3d (in tracker, 3d will be displayed) \n"
+		"-t : disable speed tracker"
 		"-F ! don't fail if the target directory exists\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
@@ -84,6 +86,9 @@ int main(int ac, char **av){
 				break;
 			case 's':
 				speed = false;
+				break;
+			case 't':
+				stracker = false;
 				break;
 			case 'F':
 				force = true;
@@ -301,6 +306,9 @@ int main(int ac, char **av){
 
 	if(speed)
 		GenerateAllSpeedGfx( targetDir, targetFile );
+
+	if(stracker)
+		GenerateAllSpeedTrkGfx( targetDir, targetFile );
 
 	if(verbose)
 		puts("");
