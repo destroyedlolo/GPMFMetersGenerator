@@ -49,10 +49,10 @@ static void generateBackGround(){
 	range_x = max_x - min_x;
 	range_y = max_y - min_y;
 
-	scale = (double)GFX/(double)((range_x > range_y) ? range_x : range_y);
+	scale = (double)(GFX-10)/(double)((range_x > range_y) ? range_x : range_y);
 
-	off_x = (GFX - range_x * scale)/2;
-	off_y = (GFX - range_y * scale)/2;
+	off_x = (GFX - 20 - range_x * scale)/2 + 0;
+	off_y = (GFX - 20 - range_y * scale)/2 + 0;
 
 	printf("min: (%d,%d), max: (%d,%d) -> (%d, %d) (scale: %.2f)\n",
 		min_x, min_y, max_x, max_y, range_x, range_y, scale
@@ -83,25 +83,57 @@ static void generateBackGround(){
 	}
 	cairo_stroke(cr);
 
-cairo_surface_write_to_png(background, "/tmp/tst.png");
-
 		/* Cleaning */
 	cairo_destroy(cr);
 }
 
 void GenerateAllPathGfx( const char *fulltarget, char *filename ){
-	generateBackGround();
-#if 0
 	int i;
 	struct GPMFdata *p;
+
+	generateBackGround();
 	for(i = 0, p = first; i < samples_count; i++, p=p->next)
 		GeneratePathGfx(fulltarget, filename, i, p);
-#endif
-		GeneratePathGfx(fulltarget, filename, 0, first);
 
 		/* Cleaning */
 	cairo_surface_destroy(background);
 }
 
 void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX, GFX);
+	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
+		puts("*F* Can't create Cairo's surface");
+		exit(EXIT_FAILURE);
+	}
+
+	cairo_t *cr = cairo_create(srf);
+	cairo_set_source_surface(cr, background, 0, 0);
+	cairo_rectangle(cr, 0, 0, GFX, GFX);
+	cairo_fill(cr);
+	cairo_stroke(cr);
+
+	cairo_set_source_rgb(cr, 1,1,1);
+	int x,y;
+	posXY(current->latitude, current->longitude, &x, &y);
+	x = off_x + (x-min_x) * scale;
+	y = off_y + GFX - (y-min_y)*scale;
+
+	cairo_arc(cr, x, y, 5, 0, 2 * M_PI);
+	cairo_stroke_preserve(cr);
+	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
+	cairo_fill(cr);
+
+	sprintf(filename, "trk%07d.png", index);
+	if(verbose)
+		printf("*D* Writing '%s'\r", fulltarget);
+	
+	cairo_status_t err;
+	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
+		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+		/* Cleaning */
+	cairo_destroy(cr);
+	cairo_surface_destroy(srf);
 }
