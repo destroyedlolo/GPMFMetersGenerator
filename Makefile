@@ -18,7 +18,7 @@ GPMFdata.o : GPMFdata.c GPMFdata.h Makefile
 GPMFMetersGenerator.o : GPMFMetersGenerator.c \
   gpmf-parser/GPMF_parser.h gpmf-parser/GPMF_utils.h \
   gpmf-parser/demo/GPMF_mp4reader.h GPMFdata.h AltitudeGraphic.h \
-  SpeedGraphic.h PathGraphic.h Makefile 
+  SpeedGraphic.h SpeedTracker.h PathGraphic.h Makefile 
 	$(cc) -c -o GPMFMetersGenerator.o GPMFMetersGenerator.c \
   $(opts) 
 

@@ -21,6 +21,7 @@
 #include "GPMFdata.h"
 #include "AltitudeGraphic.h"
 #include "SpeedGraphic.h"
+#include "SpeedTracker.h"
 #include "PathGraphic.h"
 
 	/* Configuration */
@@ -44,7 +45,7 @@ static void usage( const char *name ){
 		"-s : disable speed-o-meter generation\n"
 		"+3 : uses 3d speed (2d by default)\n"
 		"+b : generate both 2d and 3d (in tracker, 3d will be displayed) \n"
-		"-t : disable speed tracker"
+		"-t : disable speed tracker\n"
 		"-F ! don't fail if the target directory exists\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
