@@ -101,8 +101,8 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 void dumpSample( void ){
 	if(verbose || debug){
 		puts("min/max :");
-		printf("\tLatitude : %.3f deg - %.3f deg (%.3f)\n", min.latitude, max.latitude, max.latitude - min.latitude);
-		printf("\tLongitude : %.3f deg - %.3f deg (%.3f)\n", min.longitude, max.longitude, max.longitude - min.longitude);
+		printf("\tLatitude : %f deg - %f deg (%f)\n", min.latitude, max.latitude, max.latitude - min.latitude);
+		printf("\tLongitude : %f deg - %f deg (%f)\n", min.longitude, max.longitude, max.longitude - min.longitude);
 		printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", min.altitude, max.altitude, max.altitude - min.altitude);
 		printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd2d, max.spd2d, max.spd2d - min.spd2d);
 		printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd3d, max.spd3d, max.spd3d - min.spd3d);

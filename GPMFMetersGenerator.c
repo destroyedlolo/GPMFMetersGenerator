@@ -21,6 +21,7 @@
 #include "GPMFdata.h"
 #include "AltitudeGraphic.h"
 #include "SpeedGraphic.h"
+#include "PathGraphic.h"
 
 	/* Configuration */
 
@@ -29,15 +30,17 @@ bool debug = false;
 bool altitude = true;
 bool speed = true;
 bool stracker = true;
+bool path = true;
 bool force = false;
 
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.3\n"
+		"\nGPMFMetersGenerator v0.4\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
+		"-p : disable path generation\n"
 		"-s : disable speed-o-meter generation\n"
 		"+3 : uses 3d speed (2d by default)\n"
 		"+b : generate both 2d and 3d (in tracker, 3d will be displayed) \n"
@@ -83,6 +86,9 @@ int main(int ac, char **av){
 			switch( av[nvideo][1] ){
 			case 'a':
 				altitude = false;
+				break;
+			case 'p':
+				path = false;
 				break;
 			case 's':
 				speed = false;
@@ -310,6 +316,9 @@ int main(int ac, char **av){
 	if(stracker)
 		GenerateAllSpeedTrkGfx( targetDir, targetFile );
 
+	if(path)
+		GenerateAllPathGfx( targetDir, targetFile );
+		
 	if(verbose)
 		puts("");
 }
