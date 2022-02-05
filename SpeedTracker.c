@@ -14,7 +14,7 @@
 #include <math.h>
 
 #define GFX_W	600
-#define GFX_H	300
+#define GFX_H	200
 
 void GenerateAllSpeedTrkGfx( const char *fulltarget, char *filename ){
 	int i;
