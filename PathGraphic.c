@@ -97,6 +97,10 @@ void GenerateAllPathGfx( const char *fulltarget, char *filename ){
 
 		/* Cleaning */
 	cairo_surface_destroy(background);
+
+		/* Generate video */
+	if(video)
+		generateVideo(fulltarget, filename, "pth", "path");
 }
 
 void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
@@ -123,7 +127,7 @@ void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct 
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
 
-	sprintf(filename, "trk%07d.png", index);
+	sprintf(filename, "pth%07d.png", index);
 	if(verbose)
 		printf("*D* Writing '%s'\r", fulltarget);
 	

@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #include "gpmf-parser/GPMF_parser.h"
 #include "gpmf-parser/GPMF_utils.h"
@@ -33,11 +34,35 @@ bool speed = true;
 bool stracker = true;
 bool path = true;
 bool force = false;
+bool video = false;
 
+	/* Helpers */
+void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname){
+	*filename = 0;
+
+	char buf[1024];
+	sprintf(buf, "ffmpeg -framerate 9 -i %s%s%%07d.png -vcodec png %s%s.mov",
+		fulltarget, iname, fulltarget, vname
+	);
+
+	int ret = system(buf);
+	if(ret){
+		printf("*E* returned %d error code\n", ret);
+		return;
+	}
+
+		/* remove images */
+	sprintf(buf,"rm %s%s*.png", fulltarget, iname);
+	ret = system(buf);
+	if(ret)
+		printf("*E* returned %d error code\n", ret);
+}
+
+	/* main */
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.4\n"
+		"\nGPMFMetersGenerator v0.5\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
@@ -46,7 +71,8 @@ static void usage( const char *name ){
 		"+3 : uses 3d speed (2d by default)\n"
 		"+b : generate both 2d and 3d (in tracker, 3d will be displayed) \n"
 		"-t : disable speed tracker\n"
-		"-F ! don't fail if the target directory exists\n"
+		"-F : don't fail if the target directory exists\n"
+		"+V : Generate video and clean images\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
 	);
@@ -118,6 +144,9 @@ int main(int ac, char **av){
 			case 'b':
 				sboth = true;
 				s3d = true;	/* both implies to have 3d as well */
+				break;
+			case 'V':
+				video = true;
 				break;
 			default :
 				usage(av[0]);
@@ -323,3 +352,4 @@ int main(int ac, char **av){
 	if(verbose)
 		puts("");
 }
+

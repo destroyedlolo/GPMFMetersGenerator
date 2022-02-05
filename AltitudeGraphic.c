@@ -20,6 +20,10 @@ void GenerateAllAltitudeGfx( const char *fulltarget, char *filename ){
 	struct GPMFdata *p;
 	for(i = 0, p = first; i < samples_count; i++, p=p->next)
 		GenerateAltitudeGfx(fulltarget, filename, i, p);
+
+		/* Generate video */
+	if(video)
+		generateVideo(fulltarget, filename, "alt", "altitude");
 }
 
 void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
