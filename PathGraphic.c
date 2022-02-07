@@ -49,14 +49,15 @@ static void generateBackGround(){
 	range_x = max_x - min_x;
 	range_y = max_y - min_y;
 
-	scale = (double)(GFX-10)/(double)((range_x > range_y) ? range_x : range_y);
+	scale = (double)(GFX-20)/(double)((range_x > range_y) ? range_x : range_y);
 
-	off_x = (GFX - 20 - range_x * scale)/2 + 0;
-	off_y = (GFX - 20 - range_y * scale)/2 + 0;
+	off_x = (GFX - range_x * scale)/2;
+	off_y = (GFX - range_y * scale)/2;
 
-	printf("min: (%d,%d), max: (%d,%d) -> (%d, %d) (scale: %.2f)\n",
-		min_x, min_y, max_x, max_y, range_x, range_y, scale
-	);
+	if(debug)
+		printf("*D* min: (%d,%d), max: (%d,%d) -> (%d, %d) (scale: %.f) => off (%d,%d)\n",
+			min_x, min_y, max_x, max_y, range_x, range_y, scale, off_x, off_y
+		);
 
 	background = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX, GFX);
 	if(cairo_surface_status(background) != CAIRO_STATUS_SUCCESS){
@@ -74,7 +75,7 @@ static void generateBackGround(){
 
 		posXY(p->latitude, p->longitude, &x, &y);
 		x = off_x + (x-min_x) * scale;
-		y = off_y + GFX - (y-min_y)*scale;
+		y = GFX - off_y - (y-min_y)*scale;
 
 		if(p == first)
 			cairo_move_to(cr, x, y);
@@ -120,7 +121,7 @@ void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct 
 	int x,y;
 	posXY(current->latitude, current->longitude, &x, &y);
 	x = off_x + (x-min_x) * scale;
-	y = off_y + GFX - (y-min_y)*scale;
+	y = GFX - off_y - (y-min_y)*scale;
 
 	cairo_arc(cr, x, y, 5, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
