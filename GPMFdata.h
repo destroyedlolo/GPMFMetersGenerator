@@ -10,7 +10,7 @@
  *
  * The frequency of reception of GPS data (18.18...Hz) causes a temporal drift of 
  * data arrival. Since it is not useful to have so much data, and to facilitate post
- * processing, only 8 samples / seconds are kept. 
+ * processing, only 9 samples / seconds are kept. 
  */
 
 #ifndef GPMFDATA_H
