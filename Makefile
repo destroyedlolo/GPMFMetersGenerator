@@ -27,7 +27,7 @@ GpxHelper.o : GpxHelper.c Shared.h GpxHelper.h Makefile
 	$(cc) -c -o GpxHelper.o GpxHelper.c $(opts) 
 
 PathGraphic.o : PathGraphic.c Shared.h PathGraphic.h GPMFdata.h \
-  Makefile 
+  GpxHelper.h Makefile 
 	$(cc) -c -o PathGraphic.o PathGraphic.c $(opts) 
 
 SpeedGraphic.o : SpeedGraphic.c SpeedGraphic.h GPMFdata.h Shared.h \
