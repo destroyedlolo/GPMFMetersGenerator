@@ -8,6 +8,8 @@
 
 #include "GPMFdata.h"
 
+#include "Shared.h"
+
 extern bool s3d;
 extern bool sboth;
 

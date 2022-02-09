@@ -3,6 +3,7 @@
  *
  */
 
+#include "Shared.h"
 #include "GPMFdata.h"
 
 #include <stddef.h>

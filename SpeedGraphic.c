@@ -102,7 +102,7 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, 65);
 	if(sboth)
-		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);	/* Set white color */
+		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	else
 		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	char t[8];
@@ -141,7 +141,6 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 
 	val = transforme((s3d ? current->spd3d : current->spd2d) * scale);
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_set_line_width(cr, 13);
 	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2 - 15, transforme(0), val );

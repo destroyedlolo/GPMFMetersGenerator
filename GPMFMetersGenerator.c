@@ -19,11 +19,13 @@
 #include "gpmf-parser/GPMF_utils.h"
 #include "gpmf-parser/demo/GPMF_mp4reader.h"
 
+#include "Shared.h"
 #include "GPMFdata.h"
 #include "AltitudeGraphic.h"
 #include "SpeedGraphic.h"
 #include "SpeedTracker.h"
 #include "PathGraphic.h"
+#include "GpxHelper.h"
 
 	/* Configuration */
 
@@ -62,7 +64,7 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.5\n"
+		"\nGPMFMetersGenerator v0.6\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
@@ -73,6 +75,7 @@ static void usage( const char *name ){
 		"-t : disable speed tracker\n"
 		"-F : don't fail if the target directory exists\n"
 		"+V : Generate video and clean images\n"
+		"+G<file> : load a GPX file\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
 	);
@@ -147,6 +150,9 @@ int main(int ac, char **av){
 				break;
 			case 'V':
 				video = true;
+				break;
+			case 'G':
+				loadGPX(av[nvideo]+2);
 				break;
 			default :
 				usage(av[0]);

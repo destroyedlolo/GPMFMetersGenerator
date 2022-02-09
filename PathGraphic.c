@@ -3,7 +3,9 @@
  *
  */
 
+#include "Shared.h"
 #include "PathGraphic.h"
+#include "GpxHelper.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,8 +45,13 @@ static void generateBackGround(){
 		/*
 		 * compute limits, scales
 		 */
-	posXY( min.latitude, min.longitude, &min_x, &min_y);
-	posXY( max.latitude, max.longitude, &max_x, &max_y);
+	if(Gpx){
+		posXY( minGpx.latitude, minGpx.longitude, &min_x, &min_y);
+		posXY( maxGpx.latitude, maxGpx.longitude, &max_x, &max_y);
+	} else {
+		posXY( min.latitude, min.longitude, &min_x, &min_y);
+		posXY( max.latitude, max.longitude, &max_x, &max_y);
+	}
 
 	range_x = max_x - min_x;
 	range_y = max_y - min_y;
@@ -67,10 +74,36 @@ static void generateBackGround(){
 
 	cairo_t *cr = cairo_create(background);
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
-	cairo_set_line_width(cr, 2);
+		/* Draw GPX gfx */
+	if(Gpx){
+		struct GpxData *p;
+
+		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+		cairo_set_line_width(cr, 2);
+
+		for(p = Gpx; p; p = p->next){
+			int x,y;
+
+			posXY(p->latitude, p->longitude, &x, &y);
+			x = off_x + (x-min_x) * scale;
+			y = GFX - off_y - (y-min_y)*scale;
+
+			if(p == Gpx)
+				cairo_move_to(cr, x, y);
+			else
+				cairo_line_to(cr, x, y);
+		}
+		cairo_stroke(cr);
+	}
+
+		/* Draw GPMF gfx */
+	if(Gpx)
+		cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	else
+		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_set_line_width(cr, 3);
 	struct GPMFdata *p;
-	for(p = first; p; p=p->next){
+	for(p = first; p; p = p->next){
 		int x,y;
 
 		posXY(p->latitude, p->longitude, &x, &y);
