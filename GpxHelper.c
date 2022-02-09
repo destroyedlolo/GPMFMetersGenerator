@@ -120,6 +120,16 @@ void loadGPX(const char *file){
 				minGpx.longitude = maxGpx.longitude = lon;
 
 				firstGpx = nv;
+			} else {
+				if(lat < minGpx.latitude)
+					minGpx.latitude = lat;
+				if(lat > maxGpx.latitude)
+					maxGpx.latitude = lat;
+	
+				if(lon < minGpx.longitude)
+					minGpx.longitude = lon;
+				if(lon > maxGpx.longitude)
+					maxGpx.longitude = lon;
 			}
 
 			nv->latitude = lat;
