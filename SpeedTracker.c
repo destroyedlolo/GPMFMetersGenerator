@@ -4,6 +4,7 @@
  * See include file for description
  */
 
+#include "Shared.h"
 #include "SpeedTracker.h"
 
 #include <stdio.h>

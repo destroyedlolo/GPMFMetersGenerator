@@ -3,6 +3,7 @@
  *
  */
 
+#include "Shared.h"
 #include "PathGraphic.h"
 
 #include <stdio.h>

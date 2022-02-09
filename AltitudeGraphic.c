@@ -3,6 +3,7 @@
  *
  */
 
+#include "Shared.h"
 #include "AltitudeGraphic.h"
 
 #include <stdio.h>

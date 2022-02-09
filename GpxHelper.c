@@ -6,6 +6,7 @@
  * <trkpt ...> tags and don't check it is enclosed in <gpx ...> and <trk> tags
  */
 
+#include "Shared.h"
 #include "GpxHelper.h"
 
 #include <stdio.h>
@@ -131,4 +132,13 @@ void loadGPX(const char *file){
 
 
 	fclose(f);
+
+#if 0
+	for( struct GpxData *p = Gpx; p; p = p->next )
+		printf("%p -> (%f %f)\n", p, p->latitude, p->longitude);
+#endif
+	if(debug){
+		printf("*D* GPX latitude : %f -> %f (%f)\n", minGpx.latitude, maxGpx.latitude, maxGpx.latitude - minGpx.latitude);
+		printf("*D* GPX longitude : %f -> %f (%f)\n", minGpx.longitude, maxGpx.longitude, maxGpx.longitude - minGpx.longitude);
+	}
 }

@@ -8,30 +8,33 @@ gotoall: all
 cc=gcc -Wall -O2
 opts=-lm $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
 
-AltitudeGraphic.o : AltitudeGraphic.c AltitudeGraphic.h GPMFdata.h \
-  Makefile 
+AltitudeGraphic.o : AltitudeGraphic.c Shared.h AltitudeGraphic.h \
+  GPMFdata.h Makefile 
 	$(cc) -c -o AltitudeGraphic.o AltitudeGraphic.c $(opts) 
 
-GPMFdata.o : GPMFdata.c GPMFdata.h Makefile 
+GPMFdata.o : GPMFdata.c Shared.h GPMFdata.h Makefile 
 	$(cc) -c -o GPMFdata.o GPMFdata.c $(opts) 
 
 GPMFMetersGenerator.o : GPMFMetersGenerator.c \
   gpmf-parser/GPMF_parser.h gpmf-parser/GPMF_utils.h \
-  gpmf-parser/demo/GPMF_mp4reader.h GPMFdata.h AltitudeGraphic.h \
-  SpeedGraphic.h SpeedTracker.h PathGraphic.h GpxHelper.h Makefile 
+  gpmf-parser/demo/GPMF_mp4reader.h Shared.h GPMFdata.h \
+  AltitudeGraphic.h SpeedGraphic.h SpeedTracker.h PathGraphic.h \
+  GpxHelper.h Makefile 
 	$(cc) -c -o GPMFMetersGenerator.o GPMFMetersGenerator.c \
   $(opts) 
 
-GpxHelper.o : GpxHelper.c GpxHelper.h Makefile 
+GpxHelper.o : GpxHelper.c Shared.h GpxHelper.h Makefile 
 	$(cc) -c -o GpxHelper.o GpxHelper.c $(opts) 
 
-PathGraphic.o : PathGraphic.c PathGraphic.h GPMFdata.h Makefile 
+PathGraphic.o : PathGraphic.c Shared.h PathGraphic.h GPMFdata.h \
+  Makefile 
 	$(cc) -c -o PathGraphic.o PathGraphic.c $(opts) 
 
-SpeedGraphic.o : SpeedGraphic.c SpeedGraphic.h GPMFdata.h Makefile 
+SpeedGraphic.o : SpeedGraphic.c SpeedGraphic.h GPMFdata.h Shared.h \
+  Makefile 
 	$(cc) -c -o SpeedGraphic.o SpeedGraphic.c $(opts) 
 
-SpeedTracker.o : SpeedTracker.c SpeedTracker.h SpeedGraphic.h \
+SpeedTracker.o : SpeedTracker.c Shared.h SpeedTracker.h SpeedGraphic.h \
   GPMFdata.h Makefile 
 	$(cc) -c -o SpeedTracker.o SpeedTracker.c $(opts) 
 

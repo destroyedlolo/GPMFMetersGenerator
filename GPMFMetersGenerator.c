@@ -19,6 +19,7 @@
 #include "gpmf-parser/GPMF_utils.h"
 #include "gpmf-parser/demo/GPMF_mp4reader.h"
 
+#include "Shared.h"
 #include "GPMFdata.h"
 #include "AltitudeGraphic.h"
 #include "SpeedGraphic.h"
