@@ -16,6 +16,9 @@
 
 #define BUFFLEN	1024
 
+struct GpxData minGpx, maxGpx;
+struct GpxData *firstGpx = NULL, *Gpx = NULL;
+
 char buff[BUFFLEN];
 char *pbuff;	/* Pointer inside the buffer */
 
@@ -88,6 +91,7 @@ static bool lookFor(FILE *f, const char *string){
 
 void loadGPX(const char *file){
 	FILE *f;
+	double lat, lon;
 
 	if(!(f = fopen(file, "r"))){
 		perror(file);
@@ -101,7 +105,28 @@ void loadGPX(const char *file){
 		if(!readUptoChar(f, '>'))
 			break;
 
-puts(buff);
+		if(sscanf(buff, "<trkpt lat=\"%lf\" lon=\"%lf\">", &lat, &lon) != 2)
+			puts("*E* can't read values");
+		else {
+			struct GpxData *nv = malloc(sizeof(struct GpxData ));
+			if(!nv){
+				puts("*F* out of memory");
+				exit(EXIT_FAILURE);
+			}
+
+			if(!firstGpx){
+				minGpx.latitude = maxGpx.latitude = lat;
+				minGpx.longitude = maxGpx.longitude = lon;
+
+				firstGpx = nv;
+			}
+
+			nv->latitude = lat;
+			nv->longitude = lon;
+			nv->next = Gpx;
+
+			Gpx = nv;
+		}
 	}
 
 
