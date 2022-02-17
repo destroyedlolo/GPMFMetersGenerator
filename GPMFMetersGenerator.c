@@ -64,7 +64,7 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.6\n"
+		"\nGPMFMetersGenerator v0.7\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"

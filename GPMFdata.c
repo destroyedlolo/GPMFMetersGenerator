@@ -17,7 +17,7 @@ struct GPMFdata min, max;
 struct GPMFdata *first=NULL, *last=NULL;
 uint32_t samples_count = 0;
 
-double nextsample=-1;	/* Next sample timestamp to consider */
+double nextsample=0;	/* Next sample timestamp to consider */
 
 	/* Add a new sample
 	 * Min and Max are always took in account
@@ -31,7 +31,7 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 	s3d *= 3.6;
 
 		/* Min / Max */
-	if(nextsample < 0){	/* First data */
+	if(!first){	/* First data */
 		min.latitude = max.latitude = lat;
 		min.longitude = max.longitude = lgt;
 		min.altitude = max.altitude = alt;
