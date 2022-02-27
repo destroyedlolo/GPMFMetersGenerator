@@ -62,9 +62,9 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 
 	/* main */
 static void usage( const char *name ){
-	printf("%s [opts] video.mp4\n", name);
+	printf("%s [opts] video.mp4 [other video ...]\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.7\n"
+		"\nGPMFMetersGenerator v0.8\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
@@ -162,25 +162,7 @@ int main(int ac, char **av){
 		nvideo++;
 	}
 
-		/* Open and validate the file */
-	size_t mp4handle = OpenMP4Source(av[nvideo], MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
-	if(!mp4handle){
-		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", av[nvideo]);
-		exit(EXIT_FAILURE);
-	}
-
-		/* Get framerate and number of frames */
-	uint32_t fr_num, fr_dem;
-	uint32_t frames = GetVideoFrameRateAndCount(mp4handle, &fr_num, &fr_dem);
-	if(!frames){
-		puts("*F* Can't get frame count (incorrect MP4 ?)");
-		exit(EXIT_FAILURE);
-	}
-	if(verbose)
-		printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
-
-
-		/* Determine target directory name */
+		/* Determine target directory name from the 1st video */
 	int len = strlen(av[nvideo]) + strlen("img0123456.png") + 1;
 	char targetDir[ len ];						/* Where files will be created */
 	strcpy(targetDir, av[nvideo]);
@@ -215,6 +197,24 @@ int main(int ac, char **av){
 	*targetFile = 0;
 	if(verbose || debug)
 		printf("*I* images will be generated in '%s'\n", targetDir);
+
+
+		/* Open and validate the file */
+	size_t mp4handle = OpenMP4Source(av[nvideo], MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
+	if(!mp4handle){
+		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", av[nvideo]);
+		exit(EXIT_FAILURE);
+	}
+
+		/* Get framerate and number of frames */
+	uint32_t fr_num, fr_dem;
+	uint32_t frames = GetVideoFrameRateAndCount(mp4handle, &fr_num, &fr_dem);
+	if(!frames){
+		puts("*F* Can't get frame count (incorrect MP4 ?)");
+		exit(EXIT_FAILURE);
+	}
+	if(verbose)
+		printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
 
 
 		/* Reading data */
