@@ -14,10 +14,19 @@
 struct GPMFdata min, max;
 
 	/* Pointers to dynamic data */
-struct GPMFdata *first=NULL, *last=NULL;
+struct GPMFdata *first = NULL, *last = NULL;
 uint32_t samples_count = 0;
 
-double nextsample=0;	/* Next sample timestamp to consider */
+static double nextsample=0;	/* Next sample timestamp to consider */
+static double voffset=0;	/* Video time offset */
+static double lastTS;		/* Last sample timestamp */
+
+	/* New video
+	 * Reset video offset
+	 */
+void newVideo( void ){
+	voffset += lastTS;
+}
 
 	/* Add a new sample
 	 * Min and Max are always took in account
@@ -65,6 +74,8 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 	}
 
 		/* Store sample if needed */
+	lastTS = sec;
+	sec += voffset;
 	if(!first || sec >= nextsample){
 		if(first && sec > nextsample + SAMPLE/2)	/* Drifting */
 			ret = sec - (nextsample + SAMPLE/2);

@@ -33,6 +33,11 @@ extern uint32_t samples_count;	/* how many samples */
 	/* Delay b/w sample */
 #define SAMPLE (1.0/9.0)
 
+
+	/* We are starting a new video
+	 */
+extern void newVideo( void );
+
 	/* Add a new sample
 	 * -> sec : timestamp
 	 * -> ... : data to store
