@@ -3,6 +3,7 @@
  * Generate images sequence from GPMF' meters
  *
  * 26/01/2022 - Starting development
+ * 28/02/2022 - Handle multipart video
  */
 
 #include <stdlib.h>
@@ -43,7 +44,7 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 	*filename = 0;
 
 	char buf[1024];
-	sprintf(buf, "ffmpeg -framerate 9 -i %s%s%%07d.png -vcodec png %s%s.mov",
+	sprintf(buf, "ffmpeg -y -framerate 9 -i %s%s%%07d.png -vcodec png %s%s.mov",
 		fulltarget, iname, fulltarget, vname
 	);
 
@@ -211,7 +212,8 @@ int main(int ac, char **av){
 	uint8_t vidx;
 
 	for(vidx = 0; nvideo+vidx < ac; vidx++){
-
+		newVideo();
+		
 			/* Open and validate the file */
 		if(verbose)
 			printf("*I* Reading '%s'\n", av[nvideo+vidx]);
