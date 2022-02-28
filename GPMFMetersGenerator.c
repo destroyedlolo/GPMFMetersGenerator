@@ -162,6 +162,11 @@ int main(int ac, char **av){
 		nvideo++;
 	}
 
+	if(nvideo == ac){
+		printf("*F* No Video provided\n");
+		exit(EXIT_FAILURE);
+	}
+
 		/* Determine target directory name from the 1st video */
 	int len = strlen(av[nvideo]) + strlen("img0123456.png") + 1;
 	char targetDir[ len ];						/* Where files will be created */
@@ -199,6 +204,11 @@ int main(int ac, char **av){
 		printf("*I* images will be generated in '%s'\n", targetDir);
 
 
+		/****
+		 * Read videos
+		 ****/
+	uint32_t fr_num1=0, fr_dem1;	/* First videos informations */
+	
 		/* Open and validate the file */
 	size_t mp4handle = OpenMP4Source(av[nvideo], MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
 	if(!mp4handle){
