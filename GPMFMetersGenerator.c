@@ -163,7 +163,7 @@ int main(int ac, char **av){
 	}
 
 	if(nvideo == ac){
-		printf("*F* No Video provided\n");
+		puts("*F* No Video provided");
 		exit(EXIT_FAILURE);
 	}
 
@@ -208,142 +208,155 @@ int main(int ac, char **av){
 		 * Read videos
 		 ****/
 	uint32_t fr_num1=0, fr_dem1;	/* First videos informations */
-	
-		/* Open and validate the file */
-	size_t mp4handle = OpenMP4Source(av[nvideo], MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
-	if(!mp4handle){
-		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", av[nvideo]);
-		exit(EXIT_FAILURE);
-	}
+	uint8_t vidx;
 
-		/* Get framerate and number of frames */
-	uint32_t fr_num, fr_dem;
-	uint32_t frames = GetVideoFrameRateAndCount(mp4handle, &fr_num, &fr_dem);
-	if(!frames){
-		puts("*F* Can't get frame count (incorrect MP4 ?)");
-		exit(EXIT_FAILURE);
-	}
-	if(verbose)
-		printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
+	for(vidx = 0; nvideo+vidx < ac; vidx++){
+
+			/* Open and validate the file */
+		if(verbose)
+			printf("*I* Reading '%s'\n", av[nvideo+vidx]);
+
+		size_t mp4handle = OpenMP4Source(av[nvideo+vidx], MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
+		if(!mp4handle){
+			printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", av[nvideo+vidx]);
+			exit(EXIT_FAILURE);
+		}
+
+			/* Get framerate and number of frames */
+		uint32_t fr_num, fr_dem;
+		uint32_t frames = GetVideoFrameRateAndCount(mp4handle, &fr_num, &fr_dem);
+		if(!frames){
+			puts("*F* Can't get frame count (incorrect MP4 ?)");
+			exit(EXIT_FAILURE);
+		}
+		if(verbose)
+			printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
+
+		if(!fr_num1){
+			fr_num1 = fr_num;
+			fr_dem1 = fr_dem;
+		} else if(fr_num1 != fr_num || fr_dem1 != fr_dem){
+			puts("*F* Not the same frame rate");
+			exit(EXIT_FAILURE);
+		}
 
 
-		/* Reading data */
-	uint32_t index, payloads = GetNumberPayloads(mp4handle);
-	if(debug)
-		printf("*d* payloads : %u\n", payloads);
-
-	for( index = 0; index < payloads; index++ ){
-		GPMF_ERR ret;
-		double tstart, tend, tstep;	/* Timeframe of this payload */
-
-		payloadsize = GetPayloadSize(mp4handle, index);
-		payloadres = GetPayloadResource(mp4handle, payloadres, payloadsize);
-		payload = GetPayload(mp4handle, payloadres, index);
-
+			/* Reading data */
+		uint32_t index, payloads = GetNumberPayloads(mp4handle);
 		if(debug)
-			printf("*d* payload : %u ... ", index);
+			printf("*d* payloads : %u\n", payloads);
 
-		if(!payload){	
-				/* For the moment, crashing.
-				 * Let see in the future if a recovery is needed ...
-				 */
-			puts("*F* can't get Payload\n");
-			exit(EXIT_FAILURE);
-		}
+		for(index = 0; index < payloads; index++){
+			GPMF_ERR ret;
+			double tstart, tend, tstep;	/* Timeframe of this payload */
 
-		if((ret = GetPayloadTime(mp4handle, index, &tstart, &tend)) != GPMF_OK){
-			printf("*F* can't get payload's time : %s\n", gpmfError(ret));
-			exit(EXIT_FAILURE);
-		}
-
-		if((ret = GPMF_Init(ms, payload, payloadsize)) != GPMF_OK){
-			printf("*F* can't init GPMF : %s\n", gpmfError(ret));
-			exit(EXIT_FAILURE);
-		}
-
-		if(debug)
-			printf("from %.3f to %.3f seconds\n", tstart, tend);
-
-
-		while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT)){
-			if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT))
-				continue;
-
-			uint32_t samples = GPMF_Repeat(ms);
-			uint32_t elements = GPMF_ElementsInStruct(ms);
+			payloadsize = GetPayloadSize(mp4handle, index);
+			payloadres = GetPayloadResource(mp4handle, payloadres, payloadsize);
+			payload = GetPayload(mp4handle, payloadres, index);
 
 			if(debug)
-				printf("*d* %u samples, %u elements\n", samples, elements);
-	
-			if(elements != 5){
-				printf("*E* Malformed GPMF : 5 elements experted by sample, got %d.\n", elements);
-				continue;
+				printf("*d* payload : %u ... ", index);
+
+			if(!payload){	
+					/* For the moment, crashing.
+					 * Let see in the future if a recovery is needed ...
+					 */
+				puts("*F* can't get Payload\n");
+				exit(EXIT_FAILURE);
 			}
 
-			if(samples){
-				uint32_t type_samples = 1;
+			if((ret = GetPayloadTime(mp4handle, index, &tstart, &tend)) != GPMF_OK){
+				printf("*F* can't get payload's time : %s\n", gpmfError(ret));
+				exit(EXIT_FAILURE);
+			}
 
-				uint32_t buffersize = samples * elements * sizeof(double);
-				GPMF_stream find_stream;
-				double *tmpbuffer = (double*)malloc(buffersize);
+			if((ret = GPMF_Init(ms, payload, payloadsize)) != GPMF_OK){
+				printf("*F* can't init GPMF : %s\n", gpmfError(ret));
+				exit(EXIT_FAILURE);
+			}
 
-				uint32_t i;
+			if(debug)
+				printf("from %.3f to %.3f seconds\n", tstart, tend);
 
-				tstep = (tend - tstart)/samples;
 
-				if(!tmpbuffer){
-					puts("*F* Can't allocate temporary buffer\n");
-					exit(EXIT_FAILURE);
-				}
+			while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT)){
+				if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT))
+					continue;
 
-				GPMF_CopyState(ms, &find_stream);
-				type_samples = 0;
-				if(GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_TYPE, GPMF_CURRENT_LEVEL | GPMF_TOLERANT))
-					type_samples = GPMF_Repeat(&find_stream);
+				uint32_t samples = GPMF_Repeat(ms);
+				uint32_t elements = GPMF_ElementsInStruct(ms);
 
-				if(type_samples){
-					printf("*E* Malformed GPMF : type_samples expected to be 0, got %d.\n", type_samples);
+				if(debug)
+					printf("*d* %u samples, %u elements\n", samples, elements);
+	
+				if(elements != 5){
+					printf("*E* Malformed GPMF : 5 elements experted by sample, got %d.\n", elements);
 					continue;
 				}
 
-				if(
-					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_SI_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT) ||
-					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT)
-				){
-					if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
-						for(i = 0; i < samples; i++){
-							double drift;
+				if(samples){
+					uint32_t type_samples = 1;
 
-							if(debug)
-								printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
+					uint32_t buffersize = samples * elements * sizeof(double);
+					GPMF_stream find_stream;
+					double *tmpbuffer = (double*)malloc(buffersize);
+
+					uint32_t i;
+
+					tstep = (tend - tstart)/samples;
+
+					if(!tmpbuffer){
+						puts("*F* Can't allocate temporary buffer\n");
+						exit(EXIT_FAILURE);
+					}
+
+					GPMF_CopyState(ms, &find_stream);
+					type_samples = 0;
+					if(GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_TYPE, GPMF_CURRENT_LEVEL | GPMF_TOLERANT))
+						type_samples = GPMF_Repeat(&find_stream);
+
+					if(type_samples){
+						printf("*E* Malformed GPMF : type_samples expected to be 0, got %d.\n", type_samples);
+						continue;
+					}
+
+					if(
+						GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_SI_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT) ||
+						GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_UNITS, GPMF_CURRENT_LEVEL | GPMF_TOLERANT)
+					){
+						if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
+							for(i = 0; i < samples; i++){
+								double drift;
+
+								if(debug)
+									printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
+										tstart + i*tstep,
+										tmpbuffer[i*elements + 0],	/* latitude */
+										tmpbuffer[i*elements + 1],	/* longitude */
+										tmpbuffer[i*elements + 2],	/* altitude */
+										tmpbuffer[i*elements + 3],	/* speed2d */
+										tmpbuffer[i*elements + 4]	/* speed3d */
+									);
+
+								if(!!(drift = addSample(
 									tstart + i*tstep,
 									tmpbuffer[i*elements + 0],	/* latitude */
 									tmpbuffer[i*elements + 1],	/* longitude */
 									tmpbuffer[i*elements + 2],	/* altitude */
 									tmpbuffer[i*elements + 3],	/* speed2d */
 									tmpbuffer[i*elements + 4]	/* speed3d */
-								);
-
-							if(!!(drift = addSample(
-								tstart + i*tstep,
-								tmpbuffer[i*elements + 0],	/* latitude */
-								tmpbuffer[i*elements + 1],	/* longitude */
-								tmpbuffer[i*elements + 2],	/* altitude */
-								tmpbuffer[i*elements + 3],	/* speed2d */
-								tmpbuffer[i*elements + 4]	/* speed3d */
-							))){
-								if(verbose)
-									printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
+								))){
+									if(verbose)
+										printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
+								}
 							}
 						}
 					}
-
+					free(tmpbuffer);
 				}
-
-				free(tmpbuffer);
 			}
+			GPMF_ResetState(ms);
 		}
-		GPMF_ResetState(ms);
 	}
 
 	dumpSample();
