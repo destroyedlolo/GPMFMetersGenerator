@@ -4,6 +4,7 @@
  *
  * 26/01/2022 - Starting development
  * 28/02/2022 - Handle multipart video
+ * 07/03/2022 - Add GPX generation
  */
 
 #include <stdlib.h>
@@ -15,6 +16,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <libgen.h>
 
 #include "gpmf-parser/GPMF_parser.h"
 #include "gpmf-parser/GPMF_utils.h"
@@ -38,6 +40,7 @@ bool stracker = true;
 bool path = true;
 bool force = false;
 bool video = false;
+bool gpx = false;
 
 	/* Helpers */
 void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname){
@@ -61,11 +64,51 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 		printf("*E* returned %d error code\n", ret);
 }
 
+void generateGPX( const char *fulltarget, char *iname ){
+	char buf[1024];
+
+
+	sprintf(buf, "%s/telemetry.gpx", fulltarget);
+
+	FILE *f = fopen(buf,"w");
+	if(!f){
+		perror(buf);
+		return;
+	}
+
+	fputs("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		"<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"GPMFMetersGenerator\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd\">\n", f);
+	fprintf(f, "\t<metadata>\n"
+	    "\t\t<name>%s</name>\n"
+  		"\t</metadata>\n", iname
+	);
+	fprintf(f, "\t<trk>\n"
+	    "\t\t<name>%s</name>\n"
+		"\t\t<trkseg>\n", iname
+	);
+	
+	struct GPMFdata *p;
+	for(p = first; p; p = p->next){
+		fprintf(f, "\t\t\t<trkpt lat=\"%f\" lon=\"%f\">\n", p->latitude, p->longitude);
+		fprintf(f, "\t\t\t\t<ele>%f</ele>\n", p->altitude);
+		fputs("\t\t\t</trkpt>\n", f);
+	}
+
+	fputs( "\t\t</trkseg>\n"
+		"\t</trk>\n"
+		"</gpx>\n", f);
+
+	fclose(f);
+
+	if(verbose)
+		printf("'%s' generated\n", buf);
+}
+
 	/* main */
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4 [other video ...]\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.8\n"
+		"\nGPMFMetersGenerator v0.9\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
@@ -77,6 +120,7 @@ static void usage( const char *name ){
 		"-F : don't fail if the target directory exists\n"
 		"+V : Generate video and clean images\n"
 		"+G<file> : load a GPX file\n"
+		"+X : generate GPX file from video(s) telemetry\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
 	);
@@ -154,6 +198,9 @@ int main(int ac, char **av){
 				break;
 			case 'G':
 				loadGPX(av[nvideo]+2);
+				break;
+			case 'X':
+				gpx = true;
 				break;
 			default :
 				usage(av[0]);
@@ -379,7 +426,10 @@ int main(int ac, char **av){
 
 	if(path)
 		GenerateAllPathGfx( targetDir, targetFile );
-		
+
+	if(gpx)
+		generateGPX( targetDir, basename(av[nvideo]) );
+
 	if(verbose)
 		puts("");
 }
