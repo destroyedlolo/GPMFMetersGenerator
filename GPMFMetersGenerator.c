@@ -125,10 +125,18 @@ void generateKML( const char *fulltarget, char *iname ){
     	"\t\t<description>Created by GPMFMetersGenerator v"VERSION"</description>\n"
 	, f);
 
-		/* Trace color */
+		/* colors */
 	fputs("\t\t<Style id=\"trace\">\n"
 		"\t\t\t<LineStyle>\n"
         "\t\t\t\t<color>961400FF</color>\n"
+        "\t\t\t\t<width>3</width>\n"
+      	"\t\t\t</LineStyle>\n"
+    	"\t\t</Style>\n"
+	, f);
+
+	fputs("\t\t<Style id=\"End\">\n"
+		"\t\t\t<LineStyle>\n"
+        "\t\t\t\t<color>FFEE58FF</color>\n"
         "\t\t\t\t<width>3</width>\n"
       	"\t\t\t</LineStyle>\n"
     	"\t\t</Style>\n"
@@ -158,6 +166,29 @@ void generateKML( const char *fulltarget, char *iname ){
 		"</coordinates>\n"
 		"\t\t\t\t</LineString>\n"
 		"\t\t\t</Placemark>\n"
+	, f);
+
+	fprintf(f,
+		"\t\t\t<Placemark>\n"
+/*		"\t\t\t<styleUrl>#depart</styleUrl>\n" */
+		"\t\t\t\t<name>Starting point</name>\n"
+		"\t\t\t\t<Point>\n"
+		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
+		"\t\t\t\t</Point>\n"
+		"\t\t\t</Placemark>\n"
+	, first->longitude, first->latitude);
+
+	fprintf(f,
+		"\t\t\t<Placemark>\n"
+		"\t\t\t<styleUrl>#End</styleUrl>\n"
+		"\t\t\t\t<name>Finish</name>\n"
+		"\t\t\t\t<Point>\n"
+		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
+		"\t\t\t\t</Point>\n"
+		"\t\t\t</Placemark>\n"
+	, last->longitude, last->latitude);
+
+	fputs(
 		"\t\t</Folder>\n"
 		"\t</Document>\n"
 		"</kml>"
