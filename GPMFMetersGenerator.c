@@ -32,6 +32,8 @@
 
 	/* Configuration */
 
+#define VERSION "0.10"
+
 bool verbose = false;
 bool debug = false;
 bool altitude = true;
@@ -41,6 +43,7 @@ bool path = true;
 bool force = false;
 bool video = false;
 bool gpx = false;
+bool kml = false;
 
 	/* Helpers */
 void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname){
@@ -67,8 +70,7 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 void generateGPX( const char *fulltarget, char *iname ){
 	char buf[1024];
 
-
-	sprintf(buf, "%s/telemetry.gpx", fulltarget);
+	snprintf(buf, 1024, "%s/telemetry.gpx", fulltarget);
 
 	FILE *f = fopen(buf,"w");
 	if(!f){
@@ -104,11 +106,105 @@ void generateGPX( const char *fulltarget, char *iname ){
 		printf("'%s' generated\n", buf);
 }
 
+void generateKML( const char *fulltarget, char *iname ){
+	char buf[1024];
+
+	snprintf(buf, 1024, "%s/telemetry.kml", fulltarget);
+
+	FILE *f = fopen(buf,"w");
+	if(!f){
+		perror(buf);
+		return;
+	}
+
+
+	fputs("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		"<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n"
+		"\t<Document>\n"
+	    "\t\t<name>telemetry</name>\n"
+    	"\t\t<description>Created by GPMFMetersGenerator v"VERSION"</description>\n"
+	, f);
+
+		/* colors */
+	fputs("\t\t<Style id=\"trace\">\n"
+		"\t\t\t<LineStyle>\n"
+        "\t\t\t\t<color>961400FF</color>\n"
+        "\t\t\t\t<width>3</width>\n"
+      	"\t\t\t</LineStyle>\n"
+    	"\t\t</Style>\n"
+	, f);
+
+	fputs("\t\t<Style id=\"End\">\n"
+		"\t\t\t<LineStyle>\n"
+        "\t\t\t\t<color>FFEE58FF</color>\n"
+        "\t\t\t\t<width>3</width>\n"
+      	"\t\t\t</LineStyle>\n"
+    	"\t\t</Style>\n"
+	, f);
+
+		/* Trace itself */
+	fprintf(f, 
+		"\t\t<Folder>\n"
+		"\t\t\t<name>Trace</name>\n"
+		"\t\t\t<open>1</open>\n"
+		"\t\t\t<Placemark>\n"
+		"\t\t\t\t<visibility>1</visibility>\n"
+		"\t\t\t\t<styleUrl>#trace</styleUrl>\n"
+		"\t\t\t\t<name>%s</name>\n"
+		"\t\t\t\t<LineString>\n"
+		"\t\t\t\t\t<tessellate>1</tessellate>\n"
+		"\t\t\t\t\t<altitudeMode>clampToGround</altitudeMode>\n"
+		"\t\t\t\t\t<coordinates>"
+	, iname);
+
+	struct GPMFdata *p;
+	for(p = first; p; p = p->next){
+		fprintf(f, "%f,%f,%f\n", p->longitude, p->latitude, p->altitude);
+	}
+
+	fputs(
+		"</coordinates>\n"
+		"\t\t\t\t</LineString>\n"
+		"\t\t\t</Placemark>\n"
+	, f);
+
+	fprintf(f,
+		"\t\t\t<Placemark>\n"
+/*		"\t\t\t<styleUrl>#depart</styleUrl>\n" */
+		"\t\t\t\t<name>Starting point</name>\n"
+		"\t\t\t\t<Point>\n"
+		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
+		"\t\t\t\t</Point>\n"
+		"\t\t\t</Placemark>\n"
+	, first->longitude, first->latitude);
+
+	fprintf(f,
+		"\t\t\t<Placemark>\n"
+		"\t\t\t<styleUrl>#End</styleUrl>\n"
+		"\t\t\t\t<name>Finish</name>\n"
+		"\t\t\t\t<Point>\n"
+		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
+		"\t\t\t\t</Point>\n"
+		"\t\t\t</Placemark>\n"
+	, last->longitude, last->latitude);
+
+	fputs(
+		"\t\t</Folder>\n"
+		"\t</Document>\n"
+		"</kml>"
+	, f);
+
+	fclose(f);
+
+	if(verbose)
+		printf("'%s' generated\n", buf);
+}
+
 	/* main */
 static void usage( const char *name ){
 	printf("%s [opts] video.mp4 [other video ...]\n", name);
 	puts(
-		"\nGPMFMetersGenerator v0.9\n"
+		"\nGPMFMetersGenerator v"VERSION"\n"
 		"(c) L.Faillie (destroyedlolo) 2022\n"
 		"\nKnown opts :\n"
 		"-a : disable altitude gfx generation\n"
@@ -121,6 +217,7 @@ static void usage( const char *name ){
 		"+V : Generate video and clean images\n"
 		"+G<file> : load a GPX file\n"
 		"+X : generate GPX file from video(s) telemetry\n"
+		"+K : generate KML file from video(s) telemetry\n"
 		"-v : turn verbose on\n"
 		"-d : turn debugging messages on\n"
 	);
@@ -201,6 +298,9 @@ int main(int ac, char **av){
 				break;
 			case 'X':
 				gpx = true;
+				break;
+			case 'K':
+				kml = true;
 				break;
 			default :
 				usage(av[0]);
@@ -429,6 +529,9 @@ int main(int ac, char **av){
 
 	if(gpx)
 		generateGPX( targetDir, basename(av[nvideo]) );
+
+	if(kml)
+		generateKML( targetDir, basename(av[nvideo]) );
 
 	if(verbose)
 		puts("");
