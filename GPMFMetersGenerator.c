@@ -139,23 +139,25 @@ void generateKML( const char *fulltarget, char *iname ){
 		"\t\t<Folder>\n"
 		"\t\t\t<name>Trace</name>\n"
 		"\t\t\t<open>1</open>\n"
-		"\t\t\t<visibility>1</visibility>\n"
-		"\t\t\t<styleUrl>#trace</styleUrl>\n"
-		"\t\t\t<name>%s</name>\n"
-		"\t\t\t<LineString>\n"
-		"\t\t\t\t<tessellate>1</tessellate>\n"
-		"\t\t\t\t<altitudeMode>clampToGround</altitudeMode>\n"
-		"\t\t\t\t<coordinates>"
+		"\t\t\t<Placemark>\n"
+		"\t\t\t\t<visibility>1</visibility>\n"
+		"\t\t\t\t<styleUrl>#trace</styleUrl>\n"
+		"\t\t\t\t<name>%s</name>\n"
+		"\t\t\t\t<LineString>\n"
+		"\t\t\t\t\t<tessellate>1</tessellate>\n"
+		"\t\t\t\t\t<altitudeMode>clampToGround</altitudeMode>\n"
+		"\t\t\t\t\t<coordinates>"
 	, iname);
 
 	struct GPMFdata *p;
 	for(p = first; p; p = p->next){
-		fprintf(f, "%f,%f,%f ", p->latitude, p->longitude, p->altitude);
+		fprintf(f, "%f,%f,%f\n", p->longitude, p->latitude, p->altitude);
 	}
 
 	fputs(
 		"</coordinates>\n"
-		"\t\t\t</LineString>\n"
+		"\t\t\t\t</LineString>\n"
+		"\t\t\t</Placemark>\n"
 		"\t\t</Folder>\n"
 		"\t</Document>\n"
 		"</kml>"
