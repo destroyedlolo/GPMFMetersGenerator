@@ -70,7 +70,7 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 void generateGPX( const char *fulltarget, char *iname ){
 	char buf[1024];
 
-	snprintf(buf, 1024, "%s/telemetry.gpx", fulltarget);
+	snprintf(buf, 1024, "%s/%s.gpx", fulltarget, iname);
 
 	FILE *f = fopen(buf,"w");
 	if(!f){
@@ -109,7 +109,7 @@ void generateGPX( const char *fulltarget, char *iname ){
 void generateKML( const char *fulltarget, char *iname ){
 	char buf[1024];
 
-	snprintf(buf, 1024, "%s/telemetry.kml", fulltarget);
+	snprintf(buf, 1024, "%s/%s.kml", fulltarget, iname);
 
 	FILE *f = fopen(buf,"w");
 	if(!f){
