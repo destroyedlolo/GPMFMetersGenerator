@@ -32,7 +32,7 @@
 
 	/* Configuration */
 
-#define VERSION "0.10"
+#define VERSION "0.11"
 
 bool verbose = false;
 bool debug = false;
@@ -67,14 +67,12 @@ void generateVideo( const char *fulltarget, char *filename, const char *iname, c
 		printf("*E* returned %d error code\n", ret);
 }
 
-void generateGPX( const char *fulltarget, char *iname ){
-	char buf[1024];
+void generateGPX( const char *fulltarget, char *filename, char *iname ){
+	sprintf(filename, "%s.gpx", iname);
 
-	snprintf(buf, 1024, "%s/%s.gpx", fulltarget, iname);
-
-	FILE *f = fopen(buf,"w");
+	FILE *f = fopen(fulltarget,"w");
 	if(!f){
-		perror(buf);
+		perror(fulltarget);
 		return;
 	}
 
@@ -103,17 +101,15 @@ void generateGPX( const char *fulltarget, char *iname ){
 	fclose(f);
 
 	if(verbose)
-		printf("'%s' generated\n", buf);
+		printf("'%s' generated\n", fulltarget);
 }
 
-void generateKML( const char *fulltarget, char *iname ){
-	char buf[1024];
+void generateKML( const char *fulltarget, char *filename, char *iname ){
+	sprintf(filename, "%s.kml", iname);
 
-	snprintf(buf, 1024, "%s/%s.kml", fulltarget, iname);
-
-	FILE *f = fopen(buf,"w");
+	FILE *f = fopen(fulltarget,"w");
 	if(!f){
-		perror(buf);
+		perror(fulltarget);
 		return;
 	}
 
@@ -197,7 +193,7 @@ void generateKML( const char *fulltarget, char *iname ){
 	fclose(f);
 
 	if(verbose)
-		printf("'%s' generated\n", buf);
+		printf("'%s' generated\n", fulltarget);
 }
 
 	/* main */
@@ -316,7 +312,10 @@ int main(int ac, char **av){
 	}
 
 		/* Determine target directory name from the 1st video */
-	int len = strlen(av[nvideo]) + strlen("img0123456.png") + 1;
+	int len = strlen(av[nvideo]) + 4;
+	if( strlen("img0123456.png") > len )
+		len = strlen("img0123456.png");
+	len += strlen(av[nvideo]) + 1;
 	char targetDir[ len ];						/* Where files will be created */
 	strcpy(targetDir, av[nvideo]);
 	char *targetFile = strrchr(targetDir, '.');	/* target file name */
@@ -528,10 +527,10 @@ int main(int ac, char **av){
 		GenerateAllPathGfx( targetDir, targetFile );
 
 	if(gpx)
-		generateGPX( targetDir, basename(av[nvideo]) );
+		generateGPX( targetDir, targetFile, basename(av[nvideo]) );
 
 	if(kml)
-		generateKML( targetDir, basename(av[nvideo]) );
+		generateKML( targetDir, targetFile, basename(av[nvideo]) );
 
 	if(verbose)
 		puts("");
