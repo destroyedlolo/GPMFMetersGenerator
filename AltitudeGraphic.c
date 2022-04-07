@@ -60,18 +60,7 @@ static void generateBackGround(){
 		delta_h = range_h/5;
 }
 
-void GenerateAllAltitudeGfx( const char *fulltarget, char *filename ){
-	int i;
-	struct GPMFdata *p;
-	for(i = 0, p = first; i < samples_count; i++, p=p->next)
-		GenerateAltitudeGfx(fulltarget, filename, i, p);
-
-		/* Generate video */
-	if(video)
-		generateVideo(fulltarget, filename, "alt", "altitude");
-}
-
-void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+static void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
 
 		/*
 		 * Initialise Cairo
@@ -189,3 +178,22 @@ void GenerateAltitudeGfx( const char *fulltarget, char *filename, int index, str
 	cairo_destroy(cr);
 	cairo_surface_destroy(srf);
 }
+
+void GenerateAllAltitudeGfx( const char *fulltarget, char *filename ){
+	int i;
+	struct GPMFdata *p;
+
+	generateBackGround();
+
+	for(i = 0, p = first; i < samples_count; i++, p=p->next)
+		GenerateAltitudeGfx(fulltarget, filename, i, p);
+
+		/* Cleaning */
+	cairo_surface_destroy(background);
+
+		/* Generate video */
+	if(video)
+		generateVideo(fulltarget, filename, "alt", "altitude");
+}
+
+
