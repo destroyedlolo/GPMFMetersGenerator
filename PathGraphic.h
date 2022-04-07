@@ -14,6 +14,5 @@
  * -> index : which is the current index
  */
 extern void GenerateAllPathGfx( const char *fulltarget, char *filename );
-extern void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *);
 
 #endif
