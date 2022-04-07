@@ -39,7 +39,7 @@ static int range_x, range_y;
 static int off_x, off_y;
 static double scale;
 
-cairo_surface_t *background;
+static cairo_surface_t *background;
 
 static void generateBackGround(){
 		/*
