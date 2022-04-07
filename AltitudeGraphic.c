@@ -16,6 +16,50 @@
 #define GFX_W	600
 #define GFX_H	300
 
+static int posLabel, offx, offy;
+
+static int min_h, max_h, range_h;
+static double scale_h, scale_w;
+static int delta_h;
+
+static cairo_surface_t *background;
+
+static void generateBackGround(){
+	cairo_text_extents_t extents;
+
+	background = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX_W, GFX_H);
+	if(cairo_surface_status(background) != CAIRO_STATUS_SUCCESS){
+		puts("*F* Can't create Cairo's surface");
+		exit(EXIT_FAILURE);
+	}
+
+	cairo_t *cr = cairo_create(background);
+
+	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(cr, 35);
+	cairo_text_extents(cr, "8888", &extents);
+	offy = extents.height + 5;
+	posLabel = GFX_W - extents.x_advance - 55;
+
+	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_set_font_size(cr, 15);
+	cairo_text_extents(cr, "8888", &extents);
+	offx = extents.x_advance + 10;
+
+		/* 
+		 * compute scales 
+		 */
+
+	min_h = (((int)min.altitude)/50)*50;
+	max_h = (((int)max.altitude)/50 + 1)*50;
+	range_h = max_h - min_h;
+	scale_h = (double)(GFX_H - offy)/(double)range_h;
+	scale_w = (double)(GFX_W - offx)/(double)samples_count;
+	delta_h = ((range_h/5)/50)*50;
+	if(!delta_h)
+		delta_h = range_h/5;
+}
+
 void GenerateAllAltitudeGfx( const char *fulltarget, char *filename ){
 	int i;
 	struct GPMFdata *p;
