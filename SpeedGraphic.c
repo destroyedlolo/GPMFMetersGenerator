@@ -17,29 +17,27 @@
 bool s3d = false;
 bool sboth = false;
 
+static int range;
+static double scale;
+
+static cairo_surface_t *background;
+
 static double transforme( double angle ){
 	return -(1.5 * M_PI - angle);
 }
 
-static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
-		/*
-		 * Initialise Cairo
-		 */
-	cairo_status_t err;
-	cairo_text_extents_t extents;
+static void generateBackGround(){
+	background = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX_SZ, GFX_SZ);
+    if(cairo_surface_status(background) != CAIRO_STATUS_SUCCESS){
+        puts("*F* Can't create Cairo's surface");
+        exit(EXIT_FAILURE);
+    }
 
-	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX_SZ, GFX_SZ);
-	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
-		puts("*F* Can't create Cairo's surface");
-		exit(EXIT_FAILURE);
-	}
-
-	cairo_t *cr = cairo_create(srf);
+    cairo_t *cr = cairo_create(background);
 
 		/* 
 		 * compute scales 
 		 */
-	int range;
 	if(sboth){
 		range = (max.spd3d/10 + 1)*10;
 		int range2 = (max.spd2d/10 + 1)*10;
@@ -47,20 +45,7 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 			range = range2;
 	} else
 		range = (((int)(s3d ? max.spd3d : max.spd2d))/10 + 1)*10;
-	double scale = 3.0/2.0* M_PI/(double)range;
-
-#if 0	/* remove noise */
-	if(debug){
-		printf("*D* Normalized min: %.3f -> 0, max: %.3f -> %d\n",
-			(s3d ? min.spd3d : min.spd2d),
-			(s3d ? max.spd3d : max.spd2d), range
-		);
-	}
-#endif
-
-		/*
-		 * Generate image
-		 */
+	scale = 3.0/2.0* M_PI/(double)range;
 
 		/* Background */
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2, 0, 2 * M_PI);
@@ -86,6 +71,35 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 		cairo_line_to(cr, 0.8*x + GFX_SZ/2, 0.8 * y + GFX_SZ/2);
 	}
 	cairo_stroke(cr);
+
+		/* Cleaning */
+	cairo_destroy(cr);
+}
+
+static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+		/*
+		 * Initialise Cairo
+		 */
+	cairo_status_t err;
+	cairo_text_extents_t extents;
+
+	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX_SZ, GFX_SZ);
+	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
+		puts("*F* Can't create Cairo's surface");
+		exit(EXIT_FAILURE);
+	}
+
+	cairo_t *cr = cairo_create(srf);
+
+	cairo_set_source_surface(cr, background, 0, 0);
+	cairo_rectangle(cr, 0,0, GFX_SZ, GFX_SZ);
+	cairo_fill(cr);
+	cairo_stroke(cr);
+
+
+		/*
+		 * Generate image
+		 */
 
 	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
@@ -160,8 +174,14 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 void GenerateAllSpeedGfx( const char *fulltarget, char *filename ){
 	int i;
 	struct GPMFdata *p;
+
+	generateBackGround();
+
 	for(i = 0, p = first; i < samples_count; i++, p=p->next)
 		GenerateSpeedGfx(fulltarget, filename, i, p);
+
+		/* Cleaning */
+	cairo_surface_destroy(background);
 
 		/* Generate video */
 	if(video)
