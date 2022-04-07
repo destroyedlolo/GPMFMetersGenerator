@@ -17,22 +17,11 @@
 bool s3d = false;
 bool sboth = false;
 
-void GenerateAllSpeedGfx( const char *fulltarget, char *filename ){
-	int i;
-	struct GPMFdata *p;
-	for(i = 0, p = first; i < samples_count; i++, p=p->next)
-		GenerateSpeedGfx(fulltarget, filename, i, p);
-
-		/* Generate video */
-	if(video)
-		generateVideo(fulltarget, filename, "spd", "speed");
-}
-
 static double transforme( double angle ){
 	return -(1.5 * M_PI - angle);
 }
 
-void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
 		/*
 		 * Initialise Cairo
 		 */
@@ -166,4 +155,15 @@ void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct
 		/* Cleaning */
 	cairo_destroy(cr);
 	cairo_surface_destroy(srf);
+}
+
+void GenerateAllSpeedGfx( const char *fulltarget, char *filename ){
+	int i;
+	struct GPMFdata *p;
+	for(i = 0, p = first; i < samples_count; i++, p=p->next)
+		GenerateSpeedGfx(fulltarget, filename, i, p);
+
+		/* Generate video */
+	if(video)
+		generateVideo(fulltarget, filename, "spd", "speed");
 }
