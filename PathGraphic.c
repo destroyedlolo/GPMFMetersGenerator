@@ -18,7 +18,7 @@
 #define R (6371000)	/* terrestrial radius */
 
 	/* From https://forums.futura-sciences.com/mathematiques-superieur/39838-conversion-lat-long-x-y.html */
-void posXY( double lat, double lgt, int *x, int *y){
+static void posXY( double lat, double lgt, int *x, int *y){
 	/* Degree -> Radian */
 	lat *= M_PI/180.0;
 	lgt *= M_PI/180.0;
