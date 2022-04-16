@@ -16,6 +16,5 @@
  * -> index : which is the current index
  */
 extern void GenerateAllSpeedTrkGfx( const char *fulltarget, char *filename );
-extern void GenerateSpeedTrkGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *);
 
 #endif

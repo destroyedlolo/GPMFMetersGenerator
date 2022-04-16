@@ -49,5 +49,5 @@ Here the list of already known needed improvements
 
 - [X] Multi part video handling
 - [ ] Better support of timewrap video (for the moment, the result is a bit crappy)
-- [ ] Speedup images generation
+- [X] Speedup images generation
 - [ ] Add threading support to parallelise images' generation. 

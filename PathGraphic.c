@@ -18,7 +18,7 @@
 #define R (6371000)	/* terrestrial radius */
 
 	/* From https://forums.futura-sciences.com/mathematiques-superieur/39838-conversion-lat-long-x-y.html */
-void posXY( double lat, double lgt, int *x, int *y){
+static void posXY( double lat, double lgt, int *x, int *y){
 	/* Degree -> Radian */
 	lat *= M_PI/180.0;
 	lgt *= M_PI/180.0;
@@ -39,7 +39,7 @@ static int range_x, range_y;
 static int off_x, off_y;
 static double scale;
 
-cairo_surface_t *background;
+static cairo_surface_t *background;
 
 static void generateBackGround(){
 		/*
@@ -121,23 +121,7 @@ static void generateBackGround(){
 	cairo_destroy(cr);
 }
 
-void GenerateAllPathGfx( const char *fulltarget, char *filename ){
-	int i;
-	struct GPMFdata *p;
-
-	generateBackGround();
-	for(i = 0, p = first; i < samples_count; i++, p=p->next)
-		GeneratePathGfx(fulltarget, filename, i, p);
-
-		/* Cleaning */
-	cairo_surface_destroy(background);
-
-		/* Generate video */
-	if(video)
-		generateVideo(fulltarget, filename, "pth", "path");
-}
-
-void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+static void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX, GFX);
 	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
 		puts("*F* Can't create Cairo's surface");
@@ -175,3 +159,20 @@ void GeneratePathGfx( const char *fulltarget, char *filename, int index, struct 
 	cairo_destroy(cr);
 	cairo_surface_destroy(srf);
 }
+
+void GenerateAllPathGfx( const char *fulltarget, char *filename ){
+	int i;
+	struct GPMFdata *p;
+
+	generateBackGround();
+	for(i = 0, p = first; i < samples_count; i++, p=p->next)
+		GeneratePathGfx(fulltarget, filename, i, p);
+
+		/* Cleaning */
+	cairo_surface_destroy(background);
+
+		/* Generate video */
+	if(video)
+		generateVideo(fulltarget, filename, "pth", "path");
+}
+

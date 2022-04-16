@@ -19,6 +19,5 @@ extern bool sboth;
  * -> index : which is the current index
  */
 extern void GenerateAllSpeedGfx( const char *fulltarget, char *filename );
-extern void GenerateSpeedGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *);
 
 #endif
