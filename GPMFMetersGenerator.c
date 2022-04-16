@@ -5,6 +5,7 @@
  * 26/01/2022 - Starting development
  * 28/02/2022 - Handle multipart video
  * 07/03/2022 - Add GPX generation
+ * 16/04/2022 - Bump to v1.0 (CAUTION, verbose and debug options changed !)
  */
 
 #include <stdlib.h>
@@ -32,7 +33,7 @@
 
 	/* Configuration */
 
-#define VERSION "0.12"
+#define VERSION "1.00"
 
 bool verbose = false;
 bool debug = false;
@@ -214,8 +215,8 @@ static void usage( const char *name ){
 		"+G<file> : load a GPX file\n"
 		"+X : generate GPX file from video(s) telemetry\n"
 		"+K : generate KML file from video(s) telemetry\n"
-		"-v : turn verbose on\n"
-		"-d : turn debugging messages on\n"
+		"+v : turn verbose on\n"
+		"+d : turn debugging messages on\n"
 	);
 }
 
@@ -267,12 +268,6 @@ int main(int ac, char **av){
 			case 'F':
 				force = true;
 				break;
-			case 'v':
-				verbose = true;
-				break;
-			case 'd':
-				debug = true;
-				break;
 			default :
 				usage(av[0]);
 				exit(EXIT_FAILURE);
@@ -297,6 +292,12 @@ int main(int ac, char **av){
 				break;
 			case 'K':
 				kml = true;
+				break;
+			case 'v':
+				verbose = true;
+				break;
+			case 'd':
+				debug = true;
 				break;
 			default :
 				usage(av[0]);
