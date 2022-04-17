@@ -65,7 +65,7 @@ static void generateBackGround(){
 	
 		/* Background */
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2, 0, 2 * M_PI);
-	cairo_set_source_rgba(cr, 0,0,0, 0.25);
+	cairo_set_source_rgba(cr, 0,0,0, 0.15);
 //cairo_set_source_rgba(cr, 1,0.25,0.25, 0.25);
 	cairo_fill(cr);
 	cairo_stroke(cr);
@@ -82,7 +82,7 @@ static void generateBackGround(){
 	double i;
 	bool mid;
 	cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
-	for(i = 0, mid = false, speed = 0; i <= 3 * M_PI/2; i += 3 * M_PI/2/(range/5), mid = mid ? false:true, speed += 10){
+	for(i = 0, mid = false, speed = 0; i <= 3 * M_PI/2; i += 3 * M_PI/2/(range/5), mid = mid ? false:true, speed += 5){
 		double x = cos( transforme(i) ) * GFX_SZ/2;
 		double y = sin( transforme(i) ) * GFX_SZ/2;
 
@@ -90,7 +90,7 @@ static void generateBackGround(){
 			cairo_text_extents_t extents;
 			sprintf(t, "%d", speed);
 			cairo_text_extents(cr, t, &extents);
-			cairo_set_source_rgba(cr, 0.90,0.90,0.90, 0.75);
+			cairo_set_source_rgba(cr, 0.90,0.90,0.90, 0.85);
 			cairo_move_to(cr,
 				0.6 * x + GFX_SZ/2 - (extents.width/2 + extents.x_bearing), 
 				0.6 * y + GFX_SZ/2 - (extents.height/2 + extents.y_bearing)
