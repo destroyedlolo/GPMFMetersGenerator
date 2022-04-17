@@ -39,8 +39,8 @@ static void generateBackGround(){
 		 * compute scales 
 		 */
 	if(sboth){
-		range = (max.spd3d/10 + 1)*10;
-		int range2 = (max.spd2d/10 + 1)*10;
+		range = ((int)(max.spd3d/10) + 1)*10;
+		int range2 = ((int)(max.spd2d/10) + 1)*10;
 		if(range2 > range)
 			range = range2;
 	} else
@@ -61,16 +61,22 @@ static void generateBackGround(){
 	cairo_stroke(cr);
 
 	double i;
-	cairo_set_line_width(cr, 8);
+	bool mid;
 	cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
-	for(i = 0; i <= 3 * M_PI/2; i += 3 * M_PI/2/(range/10)){
+	for(i = 0, mid = false; i <= 3 * M_PI/2; i += 3 * M_PI/2/(range/5), mid = mid ? false:true){
 		double x = cos( transforme(i) ) * GFX_SZ/2;
 		double y = sin( transforme(i) ) * GFX_SZ/2;
 
-		cairo_move_to(cr, x + GFX_SZ/2, y + GFX_SZ/2);
-		cairo_line_to(cr, 0.8*x + GFX_SZ/2, 0.8 * y + GFX_SZ/2);
+		if(!mid){
+			cairo_set_line_width(cr, 8);
+			cairo_move_to(cr, 0.8*x + GFX_SZ/2, 0.8 * y + GFX_SZ/2);
+		} else {
+			cairo_set_line_width(cr, 3);
+			cairo_move_to(cr, 0.9*x + GFX_SZ/2, 0.9 * y + GFX_SZ/2);
+		}
+		cairo_line_to(cr, x + GFX_SZ/2, y + GFX_SZ/2);
+		cairo_stroke(cr);
 	}
-	cairo_stroke(cr);
 
 		/* Cleaning */
 	cairo_destroy(cr);
