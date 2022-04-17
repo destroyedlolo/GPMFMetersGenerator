@@ -61,7 +61,7 @@ static void generateBackGround(){
 	cairo_show_text(cr, "km/h");
 	cairo_stroke(cr);
 
-	cairo_set_font_size(cr, 30);
+	cairo_set_font_size(cr, 27);
 
 	double i;
 	bool mid;
@@ -86,7 +86,7 @@ static void generateBackGround(){
 			cairo_set_source_rgba(cr, 0,0,0, 0.75);
 			cairo_set_line_width(cr, 8);
 			cairo_move_to(cr, 0.8*x + GFX_SZ/2 + 4, 0.8 * y + GFX_SZ/2 + 4);
-			cairo_line_to(cr, x + GFX_SZ/2 + 2, y + GFX_SZ/2 + 2);
+			cairo_line_to(cr, x + GFX_SZ/2 + 4, y + GFX_SZ/2 + 4);
 			cairo_stroke(cr);
 
 			cairo_set_source_rgba(cr, 1,1,1, 1.00);
@@ -130,23 +130,29 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 
 	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-	cairo_set_font_size(cr, 65);
+	cairo_set_font_size(cr, 55);
+	char t[8];
+	sprintf(t, "%4.1f", (s3d ? current->spd3d : current->spd2d));
+	cairo_text_extents(cr, t, &extents);
+
 	if(sboth)
 		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
-	else
-		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
-	char t[8];
-	sprintf(t, "%6.1f", (s3d ? current->spd3d : current->spd2d));
-	cairo_text_extents(cr, t, &extents);
-	cairo_move_to(cr, 245 - extents.x_advance, 170 - (sboth ? 25:0));
+	else {
+		cairo_set_source_rgb(cr, 0,0,0);	/* Background */
+		cairo_move_to(cr, 225 - extents.x_advance + 4, 170 + 4);
+		cairo_show_text(cr, t);
+
+		cairo_set_source_rgb(cr, 1,1,1);	/* Foreground */
+	}
+	cairo_move_to(cr, 225 - extents.x_advance, 170 - (sboth ? 25:0));
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
 	if(sboth){
 		cairo_set_source_rgb(cr, 0.2, 0.8, 0.2);
-		sprintf(t, "%6.1f", current->spd2d);
+		sprintf(t, "%4.1f", current->spd2d);
 		cairo_text_extents(cr, t, &extents);
-		cairo_move_to(cr, 245 - extents.x_advance, 200);
+		cairo_move_to(cr, 225 - extents.x_advance, 200);
 		cairo_show_text(cr, t);
 		cairo_stroke(cr);
 	}
