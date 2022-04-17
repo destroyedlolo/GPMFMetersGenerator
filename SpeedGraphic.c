@@ -61,14 +61,28 @@ static void generateBackGround(){
 	cairo_show_text(cr, "km/h");
 	cairo_stroke(cr);
 
+	cairo_set_font_size(cr, 30);
+
 	double i;
 	bool mid;
+	int speed;
 	cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
-	for(i = 0, mid = false; i <= 3 * M_PI/2; i += 3 * M_PI/2/(range/5), mid = mid ? false:true){
+	for(i = 0, mid = false, speed = 0; i <= 3 * M_PI/2; i += 3 * M_PI/2/(range/5), mid = mid ? false:true, speed += 10){
 		double x = cos( transforme(i) ) * GFX_SZ/2;
 		double y = sin( transforme(i) ) * GFX_SZ/2;
 
 		if(!mid){
+			cairo_text_extents_t extents;
+			char t[11];
+			sprintf(t, "%d", speed);
+			cairo_text_extents(cr, t, &extents);
+			cairo_set_source_rgba(cr, 0.90,0.90,0.90, 0.75);
+			cairo_move_to(cr,
+				0.6 * x + GFX_SZ/2 - (extents.width/2 + extents.x_bearing), 
+				0.6 * y + GFX_SZ/2 - (extents.height/2 + extents.y_bearing)
+			);
+			cairo_show_text (cr, t);
+	
 			cairo_set_source_rgba(cr, 0,0,0, 0.75);
 			cairo_set_line_width(cr, 8);
 			cairo_move_to(cr, 0.8*x + GFX_SZ/2 + 4, 0.8 * y + GFX_SZ/2 + 4);
