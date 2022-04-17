@@ -142,7 +142,7 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 		val = transforme(current->spd2d * scale);
 
 		cairo_set_line_width(cr, 13);
-		cairo_set_source_rgb(cr, 0.3, 0.6, 0.4);
+		cairo_set_source_rgba(cr, 0.3, 0.6, 0.4, 0.75);
 		cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2 - 35, transforme(0), val );
 		cairo_stroke(cr);
 
@@ -158,7 +158,7 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 	val = transforme((s3d ? current->spd3d : current->spd2d) * scale);
 
 	cairo_set_line_width(cr, 13);
-	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	cairo_set_source_rgba(cr, 0.3, 0.4, 0.6, 0.75);
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2 - 15, transforme(0), val );
 	cairo_stroke(cr);
 
