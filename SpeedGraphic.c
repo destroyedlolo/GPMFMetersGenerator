@@ -13,11 +13,14 @@
 #include <math.h>
 
 #define GFX_SZ	300
+#define LABEL_SZ 55	/* Label font size */
+
 
 bool s3d = false;
 bool sboth = false;
 
 static int range;
+static int offlabel;
 static double scale;
 
 static cairo_surface_t *background;
@@ -47,6 +50,19 @@ static void generateBackGround(){
 		range = (((int)(s3d ? max.spd3d : max.spd2d))/10 + 1)*10;
 	scale = 3.0/2.0* M_PI/(double)range;
 
+		/* Calculate speed label offset */
+	cairo_text_extents_t extents;
+	int speed = (int)(log10(range)) + 1;
+	char t[11], *p = t;
+	for(;speed; speed--)
+		*(p++) = '8';
+	strcpy(p, ".8");
+	
+	cairo_set_font_size(cr, LABEL_SZ);
+	cairo_text_extents(cr, t, &extents);
+	
+	offlabel = (GFX_SZ - extents.x_advance)/2;
+	
 		/* Background */
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2, 0, 2 * M_PI);
 	cairo_set_source_rgba(cr, 0,0,0, 0.25);
@@ -65,7 +81,6 @@ static void generateBackGround(){
 
 	double i;
 	bool mid;
-	int speed;
 	cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
 	for(i = 0, mid = false, speed = 0; i <= 3 * M_PI/2; i += 3 * M_PI/2/(range/5), mid = mid ? false:true, speed += 10){
 		double x = cos( transforme(i) ) * GFX_SZ/2;
@@ -73,7 +88,6 @@ static void generateBackGround(){
 
 		if(!mid){
 			cairo_text_extents_t extents;
-			char t[11];
 			sprintf(t, "%d", speed);
 			cairo_text_extents(cr, t, &extents);
 			cairo_set_source_rgba(cr, 0.90,0.90,0.90, 0.75);
@@ -108,7 +122,6 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 		 * Initialise Cairo
 		 */
 	cairo_status_t err;
-	cairo_text_extents_t extents;
 
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, GFX_SZ, GFX_SZ);
 	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
@@ -130,29 +143,27 @@ static void GenerateSpeedGfx( const char *fulltarget, char *filename, int index,
 
 	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-	cairo_set_font_size(cr, 55);
+	cairo_set_font_size(cr, LABEL_SZ);
 	char t[8];
 	sprintf(t, "%4.1f", (s3d ? current->spd3d : current->spd2d));
-	cairo_text_extents(cr, t, &extents);
 
 	if(sboth)
 		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	else {
 		cairo_set_source_rgb(cr, 0,0,0);	/* Background */
-		cairo_move_to(cr, 225 - extents.x_advance + 4, 170 + 4);
+		cairo_move_to(cr, offlabel + 4, 170 + 4);
 		cairo_show_text(cr, t);
 
 		cairo_set_source_rgb(cr, 1,1,1);	/* Foreground */
 	}
-	cairo_move_to(cr, 225 - extents.x_advance, 170 - (sboth ? 25:0));
+	cairo_move_to(cr, offlabel, 170 - (sboth ? 25:0));
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
 	if(sboth){
 		cairo_set_source_rgb(cr, 0.2, 0.8, 0.2);
 		sprintf(t, "%4.1f", current->spd2d);
-		cairo_text_extents(cr, t, &extents);
-		cairo_move_to(cr, 225 - extents.x_advance, 200);
+		cairo_move_to(cr, offlabel, 200);
 		cairo_show_text(cr, t);
 		cairo_stroke(cr);
 	}
