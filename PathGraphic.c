@@ -140,6 +140,7 @@ static void GeneratePathGfx( const char *fulltarget, char *filename, int index, 
 	x = off_x + (x-min_x) * scale;
 	y = GFX - off_y - (y-min_y)*scale;
 
+	cairo_set_line_width(cr, 5);
 	cairo_arc(cr, x, y, 5, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
