@@ -41,6 +41,10 @@ static double scale;
 
 static cairo_surface_t *background;
 
+/* Draw GoPro's own data
+ * cr -> cairo context
+ * offset -> offset the curve (do draw shadows)
+ */
 static void drawGPMF(cairo_t *cr, int offset){
 	struct GPMFdata *p;
 
@@ -52,6 +56,27 @@ static void drawGPMF(cairo_t *cr, int offset){
 		y = GFX - off_y - (y-min_y)*scale + offset;
 
 		if(p == first)
+			cairo_move_to(cr, x, y);
+		else
+			cairo_line_to(cr, x, y);
+	}
+	cairo_stroke(cr);
+}
+
+/* Draw external GPX data
+ * cr -> cairo context
+ * offset -> offset the curve (do draw shadows)
+ */
+static void drawGPX(cairo_t *cr, int offset){
+	struct GpxData *p;
+	for(p = Gpx; p; p = p->next){
+		int x,y;
+
+		posXY(p->latitude, p->longitude, &x, &y);
+		x = off_x + (x-min_x) * scale + offset;
+		y = GFX - off_y - (y-min_y)*scale + offset;
+
+		if(p == Gpx)
 			cairo_move_to(cr, x, y);
 		else
 			cairo_line_to(cr, x, y);
@@ -94,26 +119,16 @@ static void generateBackGround(){
 
 		/* Draw GPX gfx */
 	if(Gpx){
-		struct GpxData *p;
+			/* Draw shadow */
+		cairo_set_line_width(cr, 2);
+		cairo_set_source_rgba(cr, 0,0,0, 0.55);
+		drawGPX(cr, 2);
 
+			/* Draw path */
 		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 		cairo_set_line_width(cr, 2);
-
-		for(p = Gpx; p; p = p->next){
-			int x,y;
-
-			posXY(p->latitude, p->longitude, &x, &y);
-			x = off_x + (x-min_x) * scale;
-			y = GFX - off_y - (y-min_y)*scale;
-
-			if(p == Gpx)
-				cairo_move_to(cr, x, y);
-			else
-				cairo_line_to(cr, x, y);
-		}
-		cairo_stroke(cr);
+		drawGPX(cr, 0);
 	} else {
-
 			/* Draw shadow */
 		cairo_set_line_width(cr, 2);
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
