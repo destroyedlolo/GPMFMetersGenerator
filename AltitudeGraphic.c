@@ -142,11 +142,17 @@ static void GenerateAltitudeGfx( const char *fulltarget, char *filename, int ind
 
 		/* Display the label */
 	char t[8];
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	sprintf(t, "%5d m", (int)current->altitude);
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, 35);
+
+	cairo_set_source_rgba(cr, 0,0,0, 0.55);
+	cairo_move_to(cr, posLabel+2, offy+2);
+	cairo_show_text(cr, t);
+	cairo_stroke(cr);
+
+	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_move_to(cr, posLabel, offy);
-	sprintf(t, "%5d m", (int)current->altitude);
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
