@@ -24,6 +24,22 @@ static int delta_h;
 
 static cairo_surface_t *background;
 
+static void drawGPMF(cairo_t *cr, int offset){
+	struct GPMFdata *p;
+	int i;
+
+	for(i = 0, p = first; i < samples_count; i++, p=p->next){
+		int x = offx + i*scale_w + offset;
+		int y = GFX_H - (p->altitude - min_h)*scale_h + offset;
+
+		if(!i)	/* First plot */
+			cairo_move_to(cr, x, y);
+		else
+			cairo_line_to(cr, x, y);
+	}
+	cairo_stroke(cr);
+}
+
 static void generateBackGround(){
 	cairo_text_extents_t extents;
 
@@ -85,20 +101,17 @@ static void generateBackGround(){
 	cairo_stroke(cr);
 
 		/* Draw altitude line */
-	struct GPMFdata *p;
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
-	cairo_set_line_width(cr, 2);
-	for(i = 0, p = first; i < samples_count; i++, p=p->next){
-		int x = offx + i*scale_w;
-		int y = GFX_H - (p->altitude - min_h)*scale_h;
 
-		if(!i)	/* First plot */
-			cairo_move_to(cr, x, y);
-		else
-			cairo_line_to(cr, x, y);
-	}
-	cairo_stroke(cr);
-	
+			/* Draw Shadow */
+	cairo_set_line_width(cr, 3);
+	cairo_set_source_rgba(cr, 0,0,0, 0.55);
+	drawGPMF(cr, 3);
+
+			/* Draw Altitude */
+	cairo_set_line_width(cr, 2);
+	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	drawGPMF(cr, 0);
+
 		/* Cleaning */
 	cairo_destroy(cr);
 }
