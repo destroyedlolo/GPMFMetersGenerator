@@ -84,6 +84,21 @@ static void generateBackGround(){
 	}
 	cairo_stroke(cr);
 
+		/* Draw altitude line */
+	struct GPMFdata *p;
+	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_set_line_width(cr, 2);
+	for(i = 0, p = first; i < samples_count; i++, p=p->next){
+		int x = offx + i*scale_w;
+		int y = GFX_H - (p->altitude - min_h)*scale_h;
+
+		if(!i)	/* First plot */
+			cairo_move_to(cr, x, y);
+		else
+			cairo_line_to(cr, x, y);
+	}
+	cairo_stroke(cr);
+	
 		/* Cleaning */
 	cairo_destroy(cr);
 }
@@ -122,21 +137,8 @@ static void GenerateAltitudeGfx( const char *fulltarget, char *filename, int ind
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-	struct GPMFdata *p;
-	cairo_set_line_width(cr, 2);
-	int i;
-	for(i = 0, p = first; i < samples_count; i++, p=p->next){
-		int x = offx + i*scale_w;
-		int y = GFX_H - (p->altitude - min_h)*scale_h;
-
-		if(!i)	/* First plot */
-			cairo_move_to(cr, x, y);
-		else
-			cairo_line_to(cr, x, y);
-	}
-	cairo_stroke(cr);
-
 		/* Display the spot */
+	cairo_set_line_width(cr, 5);
 	cairo_arc(cr, offx + index*scale_w, GFX_H - (current->altitude - min_h)*scale_h , 8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
