@@ -103,6 +103,34 @@ static void generateBackGround(){
 	cairo_destroy(cr);
 }
 
+
+static void updateBackGround(struct GPMFdata *current){
+	if(current == first)
+		return;
+
+    cairo_t *cr = cairo_create(background);
+	struct GPMFdata *p;
+	int i;
+
+	cairo_set_line_width(cr, 3);
+	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	
+	for(i = 0, p = first; i < samples_count; i++, p=p->next){
+		int x = i*scale_w;
+		int y = GFX_H - (s3d ? p->spd3d : p->spd2d)*scale_h;
+
+		if(p == current){
+			cairo_line_to(cr, x, y);
+			break;
+		} else
+			cairo_move_to(cr, x, y);
+	}
+	cairo_stroke(cr);
+	
+		/* Cleaning */
+	cairo_destroy(cr);
+}
+
 static void GenerateSpeedTrkGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
 
 		/*
@@ -152,8 +180,10 @@ void GenerateAllSpeedTrkGfx( const char *fulltarget, char *filename ){
 
 	generateBackGround();
 
-	for(i = 0, p = first; i < samples_count; i++, p=p->next)
+	for(i = 0, p = first; i < samples_count; i++, p=p->next){
+		updateBackGround(p);
 		GenerateSpeedTrkGfx(fulltarget, filename, i, p);
+	}
 
 		/* Generate video */
 	if(video)
