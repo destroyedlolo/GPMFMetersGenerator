@@ -70,9 +70,23 @@ static void generateBackGround(){
 	}
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	struct GPMFdata *p;
+
+	cairo_set_line_width(cr, 3);
+	cairo_set_source_rgba(cr, 0,0,0, 0.75);
+	for(i = 0, p = first; i < samples_count; i++, p=p->next){
+		int x = i*scale_w;
+		int y = GFX_H - (s3d ? p->spd3d : p->spd2d)*scale_h;
+
+		if(!i)	/* First plot */
+			cairo_move_to(cr, x+2, y+2);
+		else
+			cairo_line_to(cr, x+2, y+2);
+	}
+	cairo_stroke(cr);
+
 	cairo_set_line_width(cr, 2);
+	cairo_set_source_rgb(cr, 1,1,1);
 	for(i = 0, p = first; i < samples_count; i++, p=p->next){
 		int x = i*scale_w;
 		int y = GFX_H - (s3d ? p->spd3d : p->spd2d)*scale_h;
