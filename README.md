@@ -1,8 +1,5 @@
 <p align="center">
 <img src="https://img.shields.io/github/last-commit/destroyedlolo/GPMFMetersGenerator.svg?style=for-the-badge" />
-&nbsp;
-<img src="https://img.shields.io/github/license/destroyedlolo/GPMFMetersGenerator.svg?style=for-the-badge" />
-</p>
 <hr/>
 
 # GPMFMetersGenerator
@@ -52,11 +49,19 @@ As per V0.8, more than one videos can be specified in the command line and GPMF 
 
 ## Current widgets
 
-### instant Speed
+![Screenshot](Images/Screenshot.png)
+
+### Speed-O-Meter
 
 ![Speed](Images/Speed.png)
 
 Can be based on GPS' 2D or 3D speed figure ... or even both (*mostly for testing purpose*)
+
+### Speed tracker
+
+![Speed tracker](Images/Strk.png)
+
+*In this graphic, only 2D or 3D can be displayed.*
 
 ### Path
 
@@ -64,6 +69,10 @@ Can be based on GPS' 2D or 3D speed figure ... or even both (*mostly for testing
 ![Path](Images/Path2.png)
 
 Displays the north-facing path. Based on own video's telemetry or on external GPX files (*typical use: when hiking or ski touring*). 
+
+### Altitude
+
+![Altitude](Images/Altitude.png)
 
 ## TODO list
 
