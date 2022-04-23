@@ -72,7 +72,13 @@ Displays the north-facing path. Based on own video's telemetry or on external GP
 
 ### Altitude
 
-![Altitude](Images/Altitude.png)
+![Altitude](Images/KML.png)
+
+### KML and GPX file generation
+
+**GPMFMetersGenerator** can export GoPro's metrics into [KML](https://en.wikipedia.org/wiki/Keyhole_Markup_Language) or [GPX](https://en.wikipedia.org/wiki/GPS_Exchange_Format) file than can be included in a 3rd party GIS like **Google Map**, **Google Earth**, **OpenStreetMap** or such.
+
+![Google Earth](Images/KML.png)
 
 ## TODO list
 
