@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://img.shields.io/github/last-commit/destroyedlolo/GPMFMetersGenerator.svg?style=for-the-badge" />
+<hr/>
+
 # GPMFMetersGenerator
 Generate skickers from GoPro's GPMF
 
@@ -43,6 +47,39 @@ Due to SD card's FAT limitation, GoPro camera split too longs videos in shorter 
 
 As per V0.8, more than one videos can be specified in the command line and GPMF data will be agregated as if they were from an uniq video (*take care to put them in the right order*)
 
+## Current widgets
+
+![Screenshot](Images/Screenshot.png)
+
+### Speed-O-Meter
+
+![Speed](Images/Speed.png)
+
+Can be based on GPS' 2D or 3D speed figure ... or even both (*mostly for testing purpose*)
+
+### Speed tracker
+
+![Speed tracker](Images/Strk.png)
+
+*In this graphic, only 2D or 3D can be displayed.*
+
+### Path
+
+![Path](Images/Path1.png)
+![Path](Images/Path2.png)
+
+Displays the north-facing path. Based on own video's telemetry or on external GPX files (*typical use: when hiking or ski touring*). 
+
+### Altitude
+
+![Altitude](Images/Altitude.png)
+
+### KML and GPX file generation
+
+**GPMFMetersGenerator** can export GoPro's metrics into [KML](https://en.wikipedia.org/wiki/Keyhole_Markup_Language) or [GPX](https://en.wikipedia.org/wiki/GPS_Exchange_Format) file than can be included in a 3rd party GIS like **Google Map**, **Google Earth**, **OpenStreetMap** or such.
+
+![Google Earth](Images/KML.png)
+
 ## TODO list
 
 Here the list of already known needed improvements
@@ -50,4 +87,6 @@ Here the list of already known needed improvements
 - [X] Multi part video handling
 - [ ] Better support of timewrap video (for the moment, the result is a bit crappy)
 - [X] Speedup images generation
+- [X] Colorizes past figures
+- [ ] Inlays video's path on a map
 - [ ] Add threading support to parallelise images' generation. 
