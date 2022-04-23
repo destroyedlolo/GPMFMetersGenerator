@@ -50,6 +50,14 @@ Due to SD card's FAT limitation, GoPro camera split too longs videos in shorter 
 
 As per V0.8, more than one videos can be specified in the command line and GPMF data will be agregated as if they were from an uniq video (*take care to put them in the right order*)
 
+## Current widgets
+
+### instant Speed
+
+![Speed](Images/Speed.png)
+
+
+
 ## TODO list
 
 Here the list of already known needed improvements
