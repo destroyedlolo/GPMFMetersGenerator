@@ -56,10 +56,14 @@ As per V0.8, more than one videos can be specified in the command line and GPMF 
 
 ![Speed](Images/Speed.png)
 
+Can be based on GPS' 2D or 3D speed figure ... or even both (*mostly for testing purpose*)
+
 ### Path
 
 ![Path](Images/Path1.png)
 ![Path](Images/Path2.png)
+
+Displays the north-facing path. Based on own video telemetry or on external GPX files (typical use: when hiking or ski touring). 
 
 ## TODO list
 
@@ -68,4 +72,6 @@ Here the list of already known needed improvements
 - [X] Multi part video handling
 - [ ] Better support of timewrap video (for the moment, the result is a bit crappy)
 - [X] Speedup images generation
+- [X] Colorizes past figures
+- [ ] Inlays video's path on a map
 - [ ] Add threading support to parallelise images' generation. 
