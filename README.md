@@ -72,7 +72,7 @@ Displays the north-facing path. Based on own video's telemetry or on external GP
 
 ### Altitude
 
-![Altitude](Images/KML.png)
+![Altitude](Images/Altitude.png)
 
 ### KML and GPX file generation
 
