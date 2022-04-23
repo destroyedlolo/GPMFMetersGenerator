@@ -1,3 +1,10 @@
+<p align="center">
+<img src="https://img.shields.io/github/last-commit/destroyedlolo/GPMFMetersGenerator.svg?style=for-the-badge" />
+&nbsp;
+<img src="https://img.shields.io/github/license/destroyedlolo/GPMFMetersGenerator.svg?style=for-the-badge" />
+</p>
+<hr/>
+
 # GPMFMetersGenerator
 Generate skickers from GoPro's GPMF
 
