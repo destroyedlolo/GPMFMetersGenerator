@@ -24,9 +24,17 @@ static int delta_h;
 
 static cairo_surface_t *background;
 
-static void drawGPMF(cairo_t *cr, int offset){
+static void drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 	struct GPMFdata *p;
 	int i;
+
+	if(!current){	/* Drawing shadow */
+		cairo_set_source_rgba(cr, 0,0,0, 0.55);
+		cairo_set_line_width(cr, 3);
+	} else {	/* Drawing curve */
+		cairo_set_line_width(cr, 2);
+		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);	/* Set white color */
+	}
 
 	for(i = 0, p = first; i < samples_count; i++, p=p->next){
 		int x = offx + i*scale_w + offset;
@@ -36,6 +44,12 @@ static void drawGPMF(cairo_t *cr, int offset){
 			cairo_move_to(cr, x, y);
 		else
 			cairo_line_to(cr, x, y);
+
+		if(current == p){
+			cairo_stroke(cr);
+			cairo_move_to(cr, x, y);
+			cairo_set_source_rgb(cr, 1,1,1);
+		}
 	}
 	cairo_stroke(cr);
 }
@@ -103,14 +117,7 @@ static void generateBackGround(){
 		/* Draw altitude line */
 
 			/* Draw Shadow */
-	cairo_set_line_width(cr, 3);
-	cairo_set_source_rgba(cr, 0,0,0, 0.55);
-	drawGPMF(cr, 3);
-
-			/* Draw Altitude */
-	cairo_set_line_width(cr, 2);
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
-	drawGPMF(cr, 0);
+	drawGPMF(cr, 3, NULL);
 
 		/* Cleaning */
 	cairo_destroy(cr);
@@ -139,6 +146,9 @@ static void GenerateAltitudeGfx( const char *fulltarget, char *filename, int ind
 		/*
 		 * Generate image
 		 */
+
+			/* Draw Altitude curve */
+	drawGPMF(cr, 0, current);
 
 		/* Display the label */
 	char t[8];

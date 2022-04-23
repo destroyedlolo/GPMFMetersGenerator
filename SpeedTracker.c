@@ -72,7 +72,7 @@ static void generateBackGround(){
 
 	struct GPMFdata *p;
 
-	cairo_set_line_width(cr, 3);
+	cairo_set_line_width(cr, 2);
 	cairo_set_source_rgba(cr, 0,0,0, 0.75);
 	for(i = 0, p = first; i < samples_count; i++, p=p->next){
 		int x = i*scale_w;
@@ -85,51 +85,10 @@ static void generateBackGround(){
 	}
 	cairo_stroke(cr);
 
-	cairo_set_line_width(cr, 2);
-	cairo_set_source_rgb(cr, 1,1,1);
-	for(i = 0, p = first; i < samples_count; i++, p=p->next){
-		int x = i*scale_w;
-		int y = GFX_H - (s3d ? p->spd3d : p->spd2d)*scale_h;
-
-		if(!i)	/* First plot */
-			cairo_move_to(cr, x, y);
-		else
-			cairo_line_to(cr, x, y);
-	}
-	cairo_stroke(cr);
-	
-
 		/* Cleaning */
 	cairo_destroy(cr);
 }
 
-
-static void updateBackGround(struct GPMFdata *current){
-	if(current == first)
-		return;
-
-    cairo_t *cr = cairo_create(background);
-	struct GPMFdata *p;
-	int i;
-
-	cairo_set_line_width(cr, 3);
-	cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
-	
-	for(i = 0, p = first; i < samples_count; i++, p=p->next){
-		int x = i*scale_w;
-		int y = GFX_H - (s3d ? p->spd3d : p->spd2d)*scale_h;
-
-		if(p == current){
-			cairo_line_to(cr, x, y);
-			break;
-		} else
-			cairo_move_to(cr, x, y);
-	}
-	cairo_stroke(cr);
-	
-		/* Cleaning */
-	cairo_destroy(cr);
-}
 
 static void GenerateSpeedTrkGfx( const char *fulltarget, char *filename, int index, struct GPMFdata *current){
 
@@ -151,10 +110,38 @@ static void GenerateSpeedTrkGfx( const char *fulltarget, char *filename, int ind
 	cairo_fill(cr);
 	cairo_stroke(cr);
 
+
+		/* 
+		 * Draw the trend
+		 */
+	struct GPMFdata *p;
+	int i;
+
+	cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
+	cairo_set_line_width(cr, 2);
+	for(i = 0, p = first; i < samples_count; i++, p=p->next){
+		int x = i*scale_w;
+		int y = GFX_H - (s3d ? p->spd3d : p->spd2d)*scale_h;
+
+		if(!i)	/* First plot */
+			cairo_move_to(cr, x, y);
+		else
+			cairo_line_to(cr, x, y);
+
+		if(current == p){
+			cairo_stroke(cr);
+			cairo_move_to(cr, x, y);
+			cairo_set_source_rgb(cr, 1,1,1);
+		}
+	}
+	cairo_stroke(cr);
+
+
 		/*
 		 * Display the spot
 		 */
 
+	cairo_set_line_width(cr, 5);
 	cairo_arc(cr, index*scale_w, GFX_H - (s3d ? current->spd3d : current->spd2d)*scale_h , 8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
@@ -180,10 +167,8 @@ void GenerateAllSpeedTrkGfx( const char *fulltarget, char *filename ){
 
 	generateBackGround();
 
-	for(i = 0, p = first; i < samples_count; i++, p=p->next){
-		updateBackGround(p);
+	for(i = 0, p = first; i < samples_count; i++, p=p->next)
 		GenerateSpeedTrkGfx(fulltarget, filename, i, p);
-	}
 
 		/* Generate video */
 	if(video)
