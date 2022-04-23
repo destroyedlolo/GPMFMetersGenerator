@@ -63,7 +63,7 @@ Can be based on GPS' 2D or 3D speed figure ... or even both (*mostly for testing
 ![Path](Images/Path1.png)
 ![Path](Images/Path2.png)
 
-Displays the north-facing path. Based on own video telemetry or on external GPX files (typical use: when hiking or ski touring). 
+Displays the north-facing path. Based on own video's telemetry or on external GPX files (*typical use: when hiking or ski touring*). 
 
 ## TODO list
 
