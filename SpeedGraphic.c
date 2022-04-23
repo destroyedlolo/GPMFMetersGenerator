@@ -38,6 +38,7 @@ static void generateBackGround(){
 
     cairo_t *cr = cairo_create(background);
 
+
 		/* 
 		 * compute scales 
 		 */
@@ -50,7 +51,11 @@ static void generateBackGround(){
 		range = (((int)(s3d ? max.spd3d : max.spd2d))/10 + 1)*10;
 	scale = 3.0/2.0* M_PI/(double)range;
 
-		/* Calculate speed label offset */
+
+		/*
+		 * Calculate speed label offset 
+		 */
+
 	cairo_text_extents_t extents;
 	int speed = (int)(log10(range)) + 1;
 	char t[11], *p = t;
@@ -63,7 +68,11 @@ static void generateBackGround(){
 	
 	offlabel = (GFX_SZ - extents.x_advance)/2;
 	
-		/* Background */
+
+		/* 
+		 * Background 
+		 */
+
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2, 0, 2 * M_PI);
 	cairo_set_source_rgba(cr, 0,0,0, 0.15);
 //cairo_set_source_rgba(cr, 1,0.25,0.25, 0.25);
