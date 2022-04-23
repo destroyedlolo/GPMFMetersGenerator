@@ -56,7 +56,10 @@ As per V0.8, more than one videos can be specified in the command line and GPMF 
 
 ![Speed](Images/Speed.png)
 
+### Path
 
+![Path](Images/Path1.png)
+![Path](Images/Path2.png)
 
 ## TODO list
 
