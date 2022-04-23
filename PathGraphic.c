@@ -45,8 +45,12 @@ static cairo_surface_t *background;
  * cr -> cairo context
  * offset -> offset the curve (do draw shadows)
  */
-static void drawGPMF(cairo_t *cr, int offset){
+static void drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 	struct GPMFdata *p;
+
+	cairo_save(cr);
+	if(current)
+		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
 
 	for(p = first; p; p = p->next){
 		int x,y;
@@ -59,6 +63,12 @@ static void drawGPMF(cairo_t *cr, int offset){
 			cairo_move_to(cr, x, y);
 		else
 			cairo_line_to(cr, x, y);
+
+		if(current == p){
+			cairo_stroke(cr);
+			cairo_restore(cr);
+			cairo_move_to(cr, x, y);
+		}
 	}
 	cairo_stroke(cr);
 }
@@ -132,16 +142,8 @@ static void generateBackGround(){
 			/* Draw shadow */
 		cairo_set_line_width(cr, 2);
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
-		drawGPMF(cr, 2);
+		drawGPMF(cr, 2, NULL);
 	}
-
-		/* Draw GPMF gfx */
-	if(Gpx)
-		cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
-	else
-		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
-	cairo_set_line_width(cr, 3);
-	drawGPMF(cr, 0);
 
 		/* Cleaning */
 	cairo_destroy(cr);
@@ -159,6 +161,13 @@ static void GeneratePathGfx( const char *fulltarget, char *filename, int index, 
 	cairo_rectangle(cr, 0, 0, GFX, GFX);
 	cairo_fill(cr);
 	cairo_stroke(cr);
+
+	if(Gpx)
+		cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	else
+		cairo_set_source_rgb(cr, 1,1,1);
+	cairo_set_line_width(cr, 3);
+	drawGPMF(cr, 0, current);
 
 	cairo_set_source_rgb(cr, 1,1,1);
 	int x,y;
