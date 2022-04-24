@@ -73,9 +73,15 @@ static void generateBackGround(){
 		 * Background 
 		 */
 
+// 	cairo_set_source_rgba(cr, 0,0,0, 0.15);
+// cairo_set_source_rgba(cr, 1,0.25,0.25, 0.25);
+
+	cairo_pattern_t *pat = cairo_pattern_create_radial(GFX_SZ/3,GFX_SZ/3, GFX_SZ/2, 0,0, GFX_SZ/3);
+	cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.15);
+	cairo_pattern_add_color_stop_rgba(pat, 1, 0.6,0.6,0.6, 0.15);
+	cairo_set_source(cr, pat);
+
 	cairo_arc(cr, GFX_SZ/2, GFX_SZ/2 , GFX_SZ/2, 0, 2 * M_PI);
-	cairo_set_source_rgba(cr, 0,0,0, 0.15);
-//cairo_set_source_rgba(cr, 1,0.25,0.25, 0.25);
 	cairo_fill(cr);
 	cairo_stroke(cr);
 
