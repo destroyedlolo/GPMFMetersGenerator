@@ -33,7 +33,7 @@
 
 	/* Configuration */
 
-#define VERSION "1.01"
+#define VERSION "1.02"
 
 bool verbose = false;
 bool debug = false;
