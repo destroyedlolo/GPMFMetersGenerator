@@ -134,7 +134,7 @@ static void generateBackGround(){
 	cairo_line_to(cr, offx, GFX_H);
 	cairo_line_to(cr, offx, GFX_H - (first->altitude - min_h)*scale_h);
 
-	cairo_fill(cr);;
+	cairo_fill(cr);
 
 		/* Cleaning */
 	cairo_pattern_destroy(pat);
