@@ -24,15 +24,21 @@ static int delta_h;
 
 static cairo_surface_t *background;
 
+/* Draw GPMF data
+ * -> offset : move the curve (used to draw the shadow)
+ * -> current : current position.
+ *  if set, the color will not be the same in front and in back of this position
+ *  if not set, we are drawing the shadow : THE PATH IS PRESERVED
+ */
 static void drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 	struct GPMFdata *p;
 	int i;
 
 	if(!current){	/* Drawing shadow */
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
-		cairo_set_line_width(cr, 3);
+		cairo_set_line_width(cr, 5);
 	} else {	/* Drawing curve */
-		cairo_set_line_width(cr, 2);
+		cairo_set_line_width(cr, 3);
 		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);	/* Set white color */
 	}
 
@@ -51,7 +57,10 @@ static void drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 			cairo_set_source_rgb(cr, 1,1,1);
 		}
 	}
-	cairo_stroke(cr);
+	if(current)
+		cairo_stroke(cr);
+	else
+		cairo_stroke_preserve(cr);
 }
 
 static void generateBackGround(){
@@ -72,7 +81,7 @@ static void generateBackGround(){
 	posLabel = GFX_W - extents.x_advance - 55;
 
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size(cr, 15);
+	cairo_set_font_size(cr, 27);
 	cairo_text_extents(cr, "8888", &extents);
 	offx = extents.x_advance + 10;
 
@@ -93,12 +102,8 @@ static void generateBackGround(){
 		 * Generate image
 		 */
 
-	cairo_set_source_rgba(cr, 0,0,0, 0.25);	/* Dark background */
-	cairo_rectangle(cr, 0,0, GFX_W, GFX_H);
-	cairo_fill(cr);
-
 		/* Draw iso level lines */
-	cairo_set_source_rgba(cr, 1,1,1, 0.75);	/* Set white color */
+	cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */
 	cairo_set_line_width(cr, 1);
 
 	int i;
@@ -119,7 +124,20 @@ static void generateBackGround(){
 			/* Draw Shadow */
 	drawGPMF(cr, 3, NULL);
 
+			/* And bellow the curve */
+	cairo_pattern_t *pat = cairo_pattern_create_linear(offx,GFX_H - range_h*scale_h, offx,GFX_H);
+	cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.25);
+	cairo_pattern_add_color_stop_rgba(pat, 1, 0,0,0, 0.05);
+	cairo_set_source(cr, pat);
+
+	cairo_line_to(cr, GFX_W, GFX_H);
+	cairo_line_to(cr, offx, GFX_H);
+	cairo_line_to(cr, offx, GFX_H - (first->altitude - min_h)*scale_h);
+
+	cairo_fill(cr);
+
 		/* Cleaning */
+	cairo_pattern_destroy(pat);
 	cairo_destroy(cr);
 }
 

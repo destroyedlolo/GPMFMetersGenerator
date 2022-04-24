@@ -42,10 +42,6 @@ static void generateBackGround(){
 		 * Background
 		 */
 	int i;
-	cairo_set_source_rgba(cr, 0,0,0, 0.25);	/* Dark background */
-	cairo_rectangle(cr, 0,0, GFX_W, GFX_H);
-	cairo_fill(cr);
-	cairo_stroke(cr);
 
 	cairo_set_source_rgba(cr, 1,1,1, 0.75);	/* Set white color */
 	cairo_set_line_width(cr, 1);
@@ -70,8 +66,8 @@ static void generateBackGround(){
 	}
 	cairo_stroke(cr);
 
+		/* Shadows */
 	struct GPMFdata *p;
-
 	cairo_set_line_width(cr, 2);
 	cairo_set_source_rgba(cr, 0,0,0, 0.75);
 	for(i = 0, p = first; i < samples_count; i++, p=p->next){
@@ -83,9 +79,22 @@ static void generateBackGround(){
 		else
 			cairo_line_to(cr, x+2, y+2);
 	}
-	cairo_stroke(cr);
+	cairo_stroke_preserve(cr);
+
+			/* bellow the curve */
+	cairo_pattern_t *pat = cairo_pattern_create_linear(0,GFX_H - (s3d ? max.spd3d : max.spd2d)*scale_h, 0,GFX_H);
+	cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.25);
+	cairo_pattern_add_color_stop_rgba(pat, 1, 0,0,0, 0.05);
+	cairo_set_source(cr, pat);
+
+	cairo_line_to(cr, GFX_W, GFX_H);
+	cairo_line_to(cr, 0, GFX_H);
+	cairo_line_to(cr, 0, GFX_H - (s3d ? first->spd3d : first->spd2d)*scale_h);
+
+	cairo_fill(cr);
 
 		/* Cleaning */
+	cairo_pattern_destroy(pat);
 	cairo_destroy(cr);
 }
 
