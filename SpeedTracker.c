@@ -42,12 +42,6 @@ static void generateBackGround(){
 		 * Background
 		 */
 	int i;
-#if 0
-	cairo_set_source_rgba(cr, 0,0,0, 0.25);	/* Dark background */
-	cairo_rectangle(cr, 0,0, GFX_W, GFX_H);
-	cairo_fill(cr);
-	cairo_stroke(cr);
-#endif
 
 	cairo_set_source_rgba(cr, 1,1,1, 0.75);	/* Set white color */
 	cairo_set_line_width(cr, 1);
@@ -100,6 +94,7 @@ static void generateBackGround(){
 	cairo_fill(cr);
 
 		/* Cleaning */
+	cairo_pattern_destroy(pat);
 	cairo_destroy(cr);
 }
 
