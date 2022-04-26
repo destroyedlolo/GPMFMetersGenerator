@@ -1,10 +1,13 @@
 /* AltitudeGraphic
  * Generate altitude graphics
  *
+ * Notez bien : there is strictly NO WAY to synchronize GoPro's samples with GPX ones.
+ * 	Consequently, only the min/max is updated
  */
 
 #include "Shared.h"
 #include "AltitudeGraphic.h"
+#include "GpxHelper.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,8 +92,14 @@ static void generateBackGround(){
 		 * compute scales 
 		 */
 
-	min_h = (((int)min.altitude)/50)*50;
-	max_h = (((int)max.altitude)/50 + 1)*50;
+	if(Gpx){
+		min_h = (((int)minGpx.altitude)/50)*50;
+		max_h = (((int)maxGpx.altitude)/50 + 1)*50;
+	} else {
+		min_h = (((int)min.altitude)/50)*50;
+		max_h = (((int)max.altitude)/50 + 1)*50;
+	}
+
 	range_h = max_h - min_h;
 	scale_h = (double)(GFX_H - offy)/(double)range_h;
 	scale_w = (double)(GFX_W - offx)/(double)samples_count;
