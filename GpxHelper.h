@@ -6,6 +6,9 @@
 #ifndef GPXHELPER_H
 #define GPXHELPER_H
 
+#include <stdint.h>
+
+
 	/* Notez-bien : unlike GPMF data, GPX ones don't need to be used
 	 * "in order". Consequently, 
 	 * 		Gpx - is the starting point and is the last data read
@@ -14,10 +17,12 @@
 struct GpxData {
 	struct GpxData *next;
 	double latitude, longitude;
+	double altitude;
 };
 
 extern struct GpxData minGpx, maxGpx;
 extern struct GpxData *firstGpx, *Gpx;
+extern uint32_t Gpx_count;	/* how many samples */
 
 extern void loadGPX(const char *file);
 

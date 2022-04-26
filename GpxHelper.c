@@ -19,6 +19,7 @@
 
 struct GpxData minGpx, maxGpx;
 struct GpxData *firstGpx = NULL, *Gpx = NULL;
+uint32_t Gpx_count = 0;
 
 char buff[BUFFLEN];
 char *pbuff;	/* Pointer inside the buffer */
@@ -92,7 +93,7 @@ static bool lookFor(FILE *f, const char *string){
 
 void loadGPX(const char *file){
 	FILE *f;
-	double lat, lon;
+	double lat, lon, alt;
 
 	if(!(f = fopen(file, "r"))){
 		perror(file);
@@ -100,6 +101,7 @@ void loadGPX(const char *file){
 	}
 
 	while(true){
+			/* Reading track point */
 		if(!lookFor(f,"<trkpt "))	/* End of file reached */
 			break;
 
@@ -138,6 +140,35 @@ void loadGPX(const char *file){
 
 			Gpx = nv;
 		}
+
+			/* Read elevation */
+		clear();
+
+		if(!lookFor(f,"<ele>")){
+			puts("*F* No elevation");
+			exit(EXIT_FAILURE);
+		}
+
+		if(!readUptoChar(f, '<')){	/* read up to closing tag */
+			puts("*F* malformed elevation");
+			exit(EXIT_FAILURE);
+		}
+
+		if(sscanf(buff, "<ele>%lf<", &alt) != 1)
+			puts("*E* can't read altitude values");
+
+		Gpx->altitude = alt;
+
+		if(firstGpx == Gpx)
+			minGpx.altitude = maxGpx.altitude = alt;
+		else {
+			if(alt < minGpx.altitude)
+				minGpx.altitude = alt;
+			if(alt > maxGpx.altitude)
+				maxGpx.altitude = alt;
+		}
+
+		Gpx_count++;
 	}
 
 
@@ -147,8 +178,12 @@ void loadGPX(const char *file){
 	for( struct GpxData *p = Gpx; p; p = p->next )
 		printf("%p -> (%f %f)\n", p, p->latitude, p->longitude);
 #endif
-	if(debug){
-		printf("*D* GPX latitude : %f -> %f (%f)\n", minGpx.latitude, maxGpx.latitude, maxGpx.latitude - minGpx.latitude);
-		printf("*D* GPX longitude : %f -> %f (%f)\n", minGpx.longitude, maxGpx.longitude, maxGpx.longitude - minGpx.longitude);
+	if(verbose || debug){
+		puts("GPX :");
+		printf("\tlatitude : %f -> %f (%f)\n", minGpx.latitude, maxGpx.latitude, maxGpx.latitude - minGpx.latitude);
+		printf("\tlongitude : %f -> %f (%f)\n", minGpx.longitude, maxGpx.longitude, maxGpx.longitude - minGpx.longitude);
+		printf("\taltitude: %f -> %f (%f)\n", minGpx.altitude, maxGpx.altitude, maxGpx.altitude - minGpx.altitude);
 	}
+
+	printf("%u memorised GPX\n", Gpx_count);
 }

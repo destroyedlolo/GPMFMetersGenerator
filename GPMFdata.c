@@ -112,7 +112,7 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 
 void dumpSample( void ){
 	if(verbose || debug){
-		puts("min/max :");
+		puts("*I* Video min/max :");
 		printf("\tLatitude : %f deg - %f deg (%f)\n", min.latitude, max.latitude, max.latitude - min.latitude);
 		printf("\tLongitude : %f deg - %f deg (%f)\n", min.longitude, max.longitude, max.longitude - min.longitude);
 		printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", min.altitude, max.altitude, max.altitude - min.altitude);
@@ -120,9 +120,11 @@ void dumpSample( void ){
 		printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd3d, max.spd3d, max.spd3d - min.spd3d);
 	}
 
-	struct GPMFdata *p;
-	for(p = first; p; p = p->next){
-		if(debug){
+	if(debug){
+		struct GPMFdata *p;
+
+		puts("*D* Memorized video data");
+		for(p = first; p; p = p->next){
 			printf("%p (next: %p)\n", p, p->next);
 			printf("\tLatitude : %.3f deg\n", p->latitude);
 			printf("\tLongitude : %.3f deg\n", p->longitude);
