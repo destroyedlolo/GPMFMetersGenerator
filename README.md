@@ -80,6 +80,11 @@ Displays the north-facing path. Based on own video's telemetry or on external GP
 
 ![Google Earth](Images/KML.png)
 
+## Small tutorials
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/suNsHcW_mJ0/0.jpg)](https://www.youtube.com/watch?v=suNsHcW_mJ0 "How to add your GoPro tracks into Google Earth (or Maps)")
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/9xHZUzn8XDk/0.jpg)](https://www.youtube.com/watch?v=9xHZUzn8XDk "Add GoPro's telemetry stickers on your videos using GPMFMetersGenerator and Shotcut")
+ 
 ## TODO list
 
 Here the list of already known needed improvements

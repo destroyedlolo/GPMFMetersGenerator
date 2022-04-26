@@ -1,5 +1,5 @@
 # makefile created automaticaly by LFMakeMaker
-# LFMakeMaker 1.4 (Sep  7 2019 12:30:07) (c)LFSoft 1997
+# LFMakeMaker 1.4 (Apr  3 2018 23:14:49) (c)LFSoft 1997
 
 gotoall: all
 
@@ -9,7 +9,7 @@ cc=gcc -Wall -O2
 opts=-lm $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
 
 AltitudeGraphic.o : AltitudeGraphic.c Shared.h AltitudeGraphic.h \
-  GPMFdata.h Makefile 
+  GPMFdata.h GpxHelper.h Makefile 
 	$(cc) -c -o AltitudeGraphic.o AltitudeGraphic.c $(opts) 
 
 GPMFdata.o : GPMFdata.c Shared.h GPMFdata.h Makefile 
