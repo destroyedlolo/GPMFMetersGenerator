@@ -18,6 +18,7 @@ struct GpxData {
 	struct GpxData *next;
 	double latitude, longitude;
 	double altitude;
+	unsigned long time;
 };
 
 extern struct GpxData minGpx, maxGpx;

@@ -168,6 +168,29 @@ void loadGPX(const char *file){
 				maxGpx.altitude = alt;
 		}
 
+			/* Read timestamp */
+		clear();
+	
+		if(!lookFor(f,"<time>")){
+			puts("*F* No time");
+			exit(EXIT_FAILURE);
+		}
+	
+		if(!readUptoChar(f, '<')){	/* read up to closing tag */
+			puts("*F* malformed time");
+			exit(EXIT_FAILURE);
+		}
+
+		unsigned int y,m,d,h,mn,s;
+		char r[16];
+		if(sscanf(buff, "<time>%d-%d-%dT%d:%d:%d%s<", &y,&m,&d, &h,&mn,&s, r) != 7)
+			puts("*E* can't read altitude time");
+
+		Gpx->time = 10000000000*y + 100000000*m + 1000000*d + 10000*h + 100*mn + s;
+
+		if(debug)
+			printf("y:%d m:%02d d:%02d %02d:%02d:%02d '%s' -> %lu\n", y,m,d, h,mn,s, r, Gpx->time);
+
 		Gpx_count++;
 	}
 
