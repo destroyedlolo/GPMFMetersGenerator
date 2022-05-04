@@ -7,6 +7,7 @@
 #define GPXHELPER_H
 
 #include <stdint.h>
+#include <time.h>
 
 
 	/* Notez-bien : unlike GPMF data, GPX ones don't need to be used
@@ -18,7 +19,7 @@ struct GpxData {
 	struct GpxData *next;
 	double latitude, longitude;
 	double altitude;
-	unsigned long time;
+	time_t time;
 };
 
 extern struct GpxData minGpx, maxGpx;

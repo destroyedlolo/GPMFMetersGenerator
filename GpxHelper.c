@@ -6,6 +6,8 @@
  * <trkpt ...> tags and don't check it is enclosed in <gpx ...> and <trk> tags
  */
 
+#define _XOPEN_SOURCE 	/* for strptime() */
+
 #include "Shared.h"
 #include "GpxHelper.h"
 
@@ -181,15 +183,28 @@ void loadGPX(const char *file){
 			exit(EXIT_FAILURE);
 		}
 
-		unsigned int y,m,d,h,mn,s;
-		char r[16];
-		if(sscanf(buff, "<time>%d-%d-%dT%d:%d:%d%s<", &y,&m,&d, &h,&mn,&s, r) != 7)
-			puts("*E* can't read altitude time");
+		struct tm t;
+		memset(&t, 0, sizeof(struct tm));
 
-		Gpx->time = 10000000000*y + 100000000*m + 1000000*d + 10000*h + 100*mn + s;
-
+		if(!strptime(buff, "<time>%FT%T%z", &t)){
+			puts("*E* can't read time");
+			exit(EXIT_FAILURE);
+		}
+	
+		long int offset = t.__tm_gmtoff;
 		if(debug)
-			printf("y:%d m:%02d d:%02d %02d:%02d:%02d '%s' -> %lu\n", y,m,d, h,mn,s, r, Gpx->time);
+		  printf( "%4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec)\n", 
+	        t.tm_year+1900, t.tm_mon+1, t.tm_mday,
+       		t.tm_hour, t.tm_min, t.tm_sec, t.__tm_gmtoff
+		);
+
+		Gpx->time = mktime( &t );
+
+			/* Add the offset took from the sample
+			 * minus the one from the current TZ.
+			 * t.__tm_gmtoff has been updated by mktime( &t );
+			 */
+		Gpx->time -= offset - t.__tm_gmtoff;
 
 		Gpx_count++;
 	}
