@@ -8,6 +8,7 @@
  * 16/04/2022 - Bump to v1.0 (CAUTION, verbose and debug options changed !)
  */
 
+#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,6 +48,14 @@ bool gpx = false;
 bool kml = false;
 
 	/* Helpers */
+
+/* Convert 2 chars to inte */
+unsigned char char2int( const char *p ){
+	unsigned char ret = (*p - '0')*10;
+	ret += *(++p) - '0';
+	return ret;
+}
+
 void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname){
 	*filename = 0;
 
@@ -429,6 +438,49 @@ int main(int ac, char **av){
 
 
 			while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT)){
+				if(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("GPSU"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT)){
+					if(GPMF_Type(ms) != GPMF_TYPE_UTC_DATE_TIME){
+						puts("*E* found GPSU which doesn't contain a date");
+						continue;
+					}
+
+					if(GPMF_StructSize(ms) != 16){
+						puts("*E* found GPSU but its structure size is not 16");
+						continue;
+					}
+
+					if(debug){
+						char t[17];
+						t[16] = 0;
+
+						strncpy(t, GPMF_RawData(ms), 16);
+						printf("*I* ok GPSU : '%s'\n", t);
+					}
+
+					const char *p = GPMF_RawData(ms);
+					struct tm t;
+					memset(&t, 0, sizeof(struct tm));
+					t.tm_year = char2int(p) + 100;
+					t.tm_mon = char2int(p += 2) - 1;
+					t.tm_mday = char2int(p += 2);
+					t.tm_hour = char2int(p += 2);
+					t.tm_min = char2int(p += 2);
+					t.tm_sec = char2int(p += 2);
+					t.tm_isdst = -1;
+
+						/* Convert to timestamp and revert local TZ */
+					time_t time = mktime( &t );
+					time += t.tm_gmtoff;
+
+					if(debug){
+						printf("GPS time : %4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec) -> %s", 
+							t.tm_year+1900, t.tm_mon+1, t.tm_mday,
+							t.tm_hour, t.tm_min, t.tm_sec, t.tm_gmtoff,
+							ctime(&time)
+						);
+					}
+				}
+
 				if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), GPMF_RECURSE_LEVELS|GPMF_TOLERANT))
 					continue;
 
