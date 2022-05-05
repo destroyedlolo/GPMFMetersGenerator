@@ -56,7 +56,7 @@ unsigned char char2int( const char *p ){
 }
 
 void printtm( struct tm *t ){
-	printf( "%4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec)\n", 
+	printf( "%4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec)", 
 		t->tm_year+1900, t->tm_mon+1, t->tm_mday,
 		t->tm_hour, t->tm_min, t->tm_sec, t->tm_gmtoff
 	);
@@ -355,7 +355,8 @@ int main(int ac, char **av){
 	}
 
 	if(mkdir(targetDir, S_IRWXU | S_IRWXG | S_IRWXO) == -1){
-		perror(targetDir);
+		if((verbose || debug) && !force)
+			perror(targetDir);
 		if(!force)
 			exit(EXIT_FAILURE);
 	}

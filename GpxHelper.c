@@ -192,8 +192,10 @@ void loadGPX(const char *file){
 		}
 	
 		long int offset = t.__tm_gmtoff;
-		if(debug)
+		if(debug){
 			printtm(&t);
+			puts("");
+		}
 
 		Gpx->time = mktime( &t );
 
@@ -213,12 +215,18 @@ void loadGPX(const char *file){
 	for( struct GpxData *p = Gpx; p; p = p->next )
 		printf("%p -> (%f %f)\n", p, p->latitude, p->longitude);
 #endif
-	if(verbose || debug){
-		puts("GPX :");
-		printf("\tlatitude : %f -> %f (%f)\n", minGpx.latitude, maxGpx.latitude, maxGpx.latitude - minGpx.latitude);
-		printf("\tlongitude : %f -> %f (%f)\n", minGpx.longitude, maxGpx.longitude, maxGpx.longitude - minGpx.longitude);
-		printf("\taltitude: %f -> %f (%f)\n", minGpx.altitude, maxGpx.altitude, maxGpx.altitude - minGpx.altitude);
-	}
+	puts("*I* GPX min/max:");
+	printf("\tlatitude : %f -> %f (%f)\n", minGpx.latitude, maxGpx.latitude, maxGpx.latitude - minGpx.latitude);
+	printf("\tlongitude : %f -> %f (%f)\n", minGpx.longitude, maxGpx.longitude, maxGpx.longitude - minGpx.longitude);
+	printf("\taltitude: %f -> %f (%f)\n", minGpx.altitude, maxGpx.altitude, maxGpx.altitude - minGpx.altitude);
 
-	printf("%u memorised GPX\n", Gpx_count);
+	struct tm *t = gmtime(&firstGpx->time);
+	printf("\tTime : ");
+	printtm(t);
+	t = gmtime(&Gpx->time);
+	printf(" -> ");
+	printtm(t);
+	puts("");
+
+	printf("*I* %u memorised GPX\n", Gpx_count);
 }

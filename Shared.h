@@ -19,7 +19,9 @@ extern bool verbose, debug, video;
 	 */
 extern void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname);
 
-	/* print struct tm's content */
+	/* print struct tm's content 
+	 * CAUTION : doesn't issu a cariage return
+	 */
 extern void printtm( struct tm *t );
 
 #endif
