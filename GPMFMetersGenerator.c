@@ -8,7 +8,6 @@
  * 16/04/2022 - Bump to v1.0 (CAUTION, verbose and debug options changed !)
  */
 
-#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -34,7 +33,7 @@
 
 	/* Configuration */
 
-#define VERSION "1.03"
+#define VERSION "1.04"
 
 bool verbose = false;
 bool debug = false;
@@ -49,11 +48,18 @@ bool kml = false;
 
 	/* Helpers */
 
-/* Convert 2 chars to inte */
+/* Convert 2 chars to int */
 unsigned char char2int( const char *p ){
 	unsigned char ret = (*p - '0')*10;
 	ret += *(++p) - '0';
 	return ret;
+}
+
+void printtm( struct tm *t ){
+	printf( "%4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec)\n", 
+		t->tm_year+1900, t->tm_mon+1, t->tm_mday,
+		t->tm_hour, t->tm_min, t->tm_sec, t->tm_gmtoff
+	);
 }
 
 void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname){
@@ -470,7 +476,7 @@ int main(int ac, char **av){
 
 						/* Convert to timestamp and revert local TZ */
 					time_t time = mktime( &t );
-					time += t.tm_gmtoff;
+					time -= t.tm_gmtoff;
 
 					if(debug){
 						printf("GPS time : %4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec) -> %s", 

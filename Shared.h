@@ -4,6 +4,7 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include <time.h>
 #include <stdbool.h>
 
 	/****
@@ -17,5 +18,8 @@ extern bool verbose, debug, video;
 	 * -> vname : target video name 
 	 */
 extern void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname);
+
+	/* print struct tm's content */
+extern void printtm( struct tm *t );
 
 #endif

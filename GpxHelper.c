@@ -193,10 +193,7 @@ void loadGPX(const char *file){
 	
 		long int offset = t.__tm_gmtoff;
 		if(debug)
-		  printf( "%4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec)\n", 
-	        t.tm_year+1900, t.tm_mon+1, t.tm_mday,
-       		t.tm_hour, t.tm_min, t.tm_sec, t.__tm_gmtoff
-		);
+			printtm(&t);
 
 		Gpx->time = mktime( &t );
 
