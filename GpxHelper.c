@@ -191,19 +191,30 @@ void loadGPX(const char *file){
 			exit(EXIT_FAILURE);
 		}
 	
-		long int offset = t.__tm_gmtoff;
+		long int sample_offset = t.__tm_gmtoff;
 		if(debug){
+			printf(" ");
 			printtm(&t);
 			puts("");
 		}
 
-		Gpx->time = mktime( &t );
-
-			/* Add the offset took from the sample
-			 * minus the one from the current TZ.
-			 * t.__tm_gmtoff has been updated by mktime( &t );
+			/* mktime() considers only in account the current TZ
+			 * Consequently, it's needed to adjust the timestamps
+			 * as per the initial offset AS WELL AS the current one.
+			 * CAUTION : timezone is the offset of UTC compared to the 
+			 * current TZ. Consequently, it is the REVERSE of __tm_gmtoff
 			 */
-		Gpx->time -= offset - t.__tm_gmtoff;
+		Gpx->time = mktime( &t );
+		Gpx->time -= timezone + sample_offset;
+
+#if 1	/* Sanity check */
+		if(debug){
+			struct tm *tm = gmtime(&Gpx->time);
+			printf(">");
+			printtm(tm);
+			puts("");
+		}
+#endif
 
 		Gpx_count++;
 	}
