@@ -477,14 +477,17 @@ int main(int ac, char **av){
 
 						/* Convert to timestamp and revert local TZ */
 					time_t time = mktime( &t );
-					time -= t.tm_gmtoff;
+					time += t.tm_gmtoff;
 
 					if(debug){
-						printf("GPS time : %4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec) -> %s", 
+						printf("GPS time : %4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec) -> ", 
 							t.tm_year+1900, t.tm_mon+1, t.tm_mday,
-							t.tm_hour, t.tm_min, t.tm_sec, t.tm_gmtoff,
-							ctime(&time)
+							t.tm_hour, t.tm_min, t.tm_sec, t.tm_gmtoff
 						);
+
+						struct tm *tres = gmtime(&time);
+						printtm(tres);
+						puts("");
 					}
 				}
 
