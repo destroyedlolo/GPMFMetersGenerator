@@ -23,13 +23,13 @@
 #include "gpmf-parser/GPMF_utils.h"
 #include "gpmf-parser/demo/GPMF_mp4reader.h"
 
-#include "Shared.h"
-#include "GPMFdata.h"
-#include "AltitudeGraphic.h"
-#include "SpeedGraphic.h"
-#include "SpeedTracker.h"
-#include "PathGraphic.h"
-#include "GpxHelper.h"
+#include "datalib/Shared.h"
+#include "datalib/GPMFdata.h"
+#include "datalib/AltitudeGraphic.h"
+#include "datalib/SpeedGraphic.h"
+#include "datalib/SpeedTracker.h"
+#include "datalib/PathGraphic.h"
+#include "datalib/GpxHelper.h"
 
 	/* Configuration */
 
