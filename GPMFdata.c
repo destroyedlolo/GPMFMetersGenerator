@@ -33,7 +33,7 @@ void newVideo( void ){
 	 * The sample is stored only if its took at least SAMPLE seconds after the
 	 * last stored sample.
 	 */
-double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d ){
+double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time ){
 	double ret=0;
 
 	s2d *= 3.6;
@@ -46,6 +46,7 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 		min.altitude = max.altitude = alt;
 		min.spd2d = max.spd2d = s2d;
 		min.spd3d = max.spd3d = s3d;
+		min.sample_time = max.sample_time = time;
 	} else {
 		if(lat < min.latitude)
 			min.latitude = lat;
@@ -71,6 +72,13 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 			min.spd3d = s3d;
 		if(s3d > max.spd3d)
 			max.spd3d = s3d;
+
+		if(time != (time_t)-1){
+			if(min.sample_time == (time_t)-1 || min.sample_time > time)
+				min.sample_time = time;
+			if(max.sample_time == (time_t)-1 || max.sample_time < time)
+				max.sample_time = time;
+		}
 	}
 
 		/* Store sample if needed */
@@ -102,6 +110,7 @@ double addSample( double sec, double lat, double lgt, double alt, double s2d, do
 		nv->altitude = alt;
 		nv->spd2d = s2d;
 		nv->spd3d = s3d;
+		nv->sample_time = time;
 	
 		samples_count++;
 		last = nv;
@@ -117,6 +126,13 @@ void dumpSample( void ){
 	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", min.altitude, max.altitude, max.altitude - min.altitude);
 	printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd2d, max.spd2d, max.spd2d - min.spd2d);
 	printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd3d, max.spd3d, max.spd3d - min.spd3d);
+	struct tm *t = gmtime(&min.sample_time);
+	printf("\tTime : ");
+	printtm(t);
+	printf(" -> ");
+	t = gmtime(&max.sample_time);
+	printtm(t);
+	puts("");
 
 	if(debug){
 		struct GPMFdata *p;
@@ -129,6 +145,11 @@ void dumpSample( void ){
 			printf("\tAltitude : %.3f m\n", p->altitude);
 			printf("\tSpeed2d : %.3f km/h\n", p->spd2d);
 			printf("\tSpeed3d : %.3f km/h\n", p->spd3d);
+
+			struct tm *t = gmtime(&p->sample_time);
+			printf("\tTime : ");
+			printtm(t);
+			puts("");
 		}
 	}
 

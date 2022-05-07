@@ -17,6 +17,7 @@
 #define GPMFDATA_H
 
 #include <stdint.h>
+#include <time.h>
 
 struct GPMFdata {
 	struct GPMFdata *next;
@@ -24,6 +25,7 @@ struct GPMFdata {
 	double altitude;
 	double spd2d;
 	double spd3d;
+	time_t sample_time;
 };
 
 extern struct GPMFdata min, max;
@@ -44,7 +46,7 @@ extern void newVideo( void );
 	 *
 	 * <- not 0 if drift detected
 	 */
-extern double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d );
+extern double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t when );
 
 	/* Dump stored data 
 	 * relies on global verbose and debug

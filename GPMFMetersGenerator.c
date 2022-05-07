@@ -56,10 +56,12 @@ unsigned char char2int( const char *p ){
 }
 
 void printtm( struct tm *t ){
-	printf( "%4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec)", 
+	printf( "%4d-%02d-%02d %02d:%02d:%02d ", 
 		t->tm_year+1900, t->tm_mon+1, t->tm_mday,
-		t->tm_hour, t->tm_min, t->tm_sec, t->tm_gmtoff
+		t->tm_hour, t->tm_min, t->tm_sec
 	);
+	if(t->tm_gmtoff)
+		printf("(offset %6ld sec)", t->tm_gmtoff);
 }
 
 void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname){
@@ -373,6 +375,7 @@ int main(int ac, char **av){
 		 ****/
 	uint32_t fr_num1=0, fr_dem1;	/* First videos informations */
 	uint8_t vidx;
+	time_t time = (time_t)-1;
 
 	for(vidx = 0; nvideo+vidx < ac; vidx++){
 		newVideo();
@@ -476,7 +479,7 @@ int main(int ac, char **av){
 					t.tm_isdst = -1;
 
 						/* Convert to timestamp and revert local TZ */
-					time_t time = mktime( &t );
+					time = mktime( &t );
 					time += t.tm_gmtoff;
 
 					if(debug){
@@ -555,7 +558,8 @@ int main(int ac, char **av){
 									tmpbuffer[i*elements + 1],	/* longitude */
 									tmpbuffer[i*elements + 2],	/* altitude */
 									tmpbuffer[i*elements + 3],	/* speed2d */
-									tmpbuffer[i*elements + 4]	/* speed3d */
+									tmpbuffer[i*elements + 4],	/* speed3d */
+									time
 								))){
 									if(verbose)
 										printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
