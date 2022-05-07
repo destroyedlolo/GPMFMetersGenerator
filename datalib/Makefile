@@ -43,13 +43,13 @@ SpeedTracker.o : SpeedTracker.c Shared.h SpeedTracker.h SpeedGraphic.h \
 	$(cc) -c -o ../gpmf-parser/demo/GPMF_mp4reader.o \
   ../gpmf-parser/demo/GPMF_mp4reader.c $(opts) 
 
-datalib : ../gpmf-parser/demo/GPMF_mp4reader.o \
+lib_datalib.a : ../gpmf-parser/demo/GPMF_mp4reader.o \
   ../gpmf-parser/GPMF_utils.o ../gpmf-parser/GPMF_parser.o \
   SpeedTracker.o SpeedGraphic.o PathGraphic.o GpxHelper.o GPMFdata.o \
   AltitudeGraphic.o Makefile 
-	 ar rcs  datalib ../gpmf-parser/demo/GPMF_mp4reader.o \
+	 ar rcs  lib_datalib.a ../gpmf-parser/demo/GPMF_mp4reader.o \
   ../gpmf-parser/GPMF_utils.o ../gpmf-parser/GPMF_parser.o \
   SpeedTracker.o SpeedGraphic.o PathGraphic.o GpxHelper.o GPMFdata.o \
   AltitudeGraphic.o 
 
-all: datalib 
+all: lib_datalib.a 
