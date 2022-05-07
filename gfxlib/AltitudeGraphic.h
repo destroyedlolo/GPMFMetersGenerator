@@ -6,8 +6,6 @@
 #ifndef ALTITUDE_H
 #define ALTITUDE_H
 
-#include "GPMFdata.h"
-
 /* Generate altitude graphics
  * -> fulltarget : absolute target name (including directory)
  * -> filename : pointer to the filename only

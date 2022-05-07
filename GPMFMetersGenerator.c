@@ -25,18 +25,18 @@
 
 #include "datalib/Shared.h"
 #include "datalib/GPMFdata.h"
-#include "datalib/AltitudeGraphic.h"
-#include "datalib/SpeedGraphic.h"
-#include "datalib/SpeedTracker.h"
-#include "datalib/PathGraphic.h"
 #include "datalib/GpxHelper.h"
+
+#include "gfxlib/Shared.h"
+#include "gfxlib/AltitudeGraphic.h"
+#include "gfxlib/SpeedGraphic.h"
+#include "gfxlib/SpeedTracker.h"
+#include "gfxlib/PathGraphic.h"
 
 	/* Configuration */
 
 #define VERSION "1.04"
 
-bool verbose = false;
-bool debug = false;
 bool altitude = true;
 bool speed = true;
 bool stracker = true;
@@ -53,15 +53,6 @@ unsigned char char2int( const char *p ){
 	unsigned char ret = (*p - '0')*10;
 	ret += *(++p) - '0';
 	return ret;
-}
-
-void printtm( struct tm *t ){
-	printf( "%4d-%02d-%02d %02d:%02d:%02d ", 
-		t->tm_year+1900, t->tm_mon+1, t->tm_mday,
-		t->tm_hour, t->tm_min, t->tm_sec
-	);
-	if(t->tm_gmtoff)
-		printf("(offset %6ld sec)", t->tm_gmtoff);
 }
 
 void generateVideo( const char *fulltarget, char *filename, const char *iname, const char *vname){

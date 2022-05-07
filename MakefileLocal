@@ -1,0 +1,23 @@
+# makefile created automaticaly by LFMakeMaker
+# LFMakeMaker 1.6 (May  7 2022 20:46:23) (c)LFSoft 1997
+
+gotoall: all
+
+
+#The compiler (may be customized for compiler's options).
+cc=gcc -Wall -O2
+opts=-lm -L./datalib/ -l_datalib -L./gfxlib/ -l_gfxgen $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
+
+GPMFMetersGenerator.o : GPMFMetersGenerator.c \
+  gpmf-parser/GPMF_parser.h gpmf-parser/GPMF_utils.h \
+  gpmf-parser/demo/GPMF_mp4reader.h datalib/Shared.h \
+  datalib/GPMFdata.h datalib/GpxHelper.h gfxlib/Shared.h \
+  gfxlib/AltitudeGraphic.h gfxlib/SpeedGraphic.h gfxlib/SpeedTracker.h \
+  gfxlib/PathGraphic.h MakefileLocal 
+	$(cc) -c -o GPMFMetersGenerator.o GPMFMetersGenerator.c \
+  $(opts) 
+
+GPMFMetersGenerator : GPMFMetersGenerator.o MakefileLocal 
+	 $(cc) -o GPMFMetersGenerator GPMFMetersGenerator.o $(opts) 
+
+all: GPMFMetersGenerator 

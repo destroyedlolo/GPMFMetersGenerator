@@ -8,27 +8,14 @@ gotoall: all
 cc=gcc -Wall -O2
 opts=-lm $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
 
-AltitudeGraphic.o : AltitudeGraphic.c Shared.h AltitudeGraphic.h \
-  GPMFdata.h GpxHelper.h Makefile 
-	$(cc) -c -o AltitudeGraphic.o AltitudeGraphic.c $(opts) 
-
 GPMFdata.o : GPMFdata.c Shared.h GPMFdata.h Makefile 
 	$(cc) -c -o GPMFdata.o GPMFdata.c $(opts) 
 
 GpxHelper.o : GpxHelper.c Shared.h GpxHelper.h Makefile 
 	$(cc) -c -o GpxHelper.o GpxHelper.c $(opts) 
 
-PathGraphic.o : PathGraphic.c Shared.h PathGraphic.h GPMFdata.h \
-  GpxHelper.h Makefile 
-	$(cc) -c -o PathGraphic.o PathGraphic.c $(opts) 
-
-SpeedGraphic.o : SpeedGraphic.c SpeedGraphic.h GPMFdata.h Shared.h \
-  Makefile 
-	$(cc) -c -o SpeedGraphic.o SpeedGraphic.c $(opts) 
-
-SpeedTracker.o : SpeedTracker.c Shared.h SpeedTracker.h SpeedGraphic.h \
-  GPMFdata.h Makefile 
-	$(cc) -c -o SpeedTracker.o SpeedTracker.c $(opts) 
+Shared.o : Shared.c Shared.h Makefile 
+	$(cc) -c -o Shared.o Shared.c $(opts) 
 
 ../gpmf-parser/GPMF_parser.o : ../gpmf-parser/GPMF_parser.c Makefile 
 	$(cc) -c -o ../gpmf-parser/GPMF_parser.o \
@@ -44,12 +31,10 @@ SpeedTracker.o : SpeedTracker.c Shared.h SpeedTracker.h SpeedGraphic.h \
   ../gpmf-parser/demo/GPMF_mp4reader.c $(opts) 
 
 lib_datalib.a : ../gpmf-parser/demo/GPMF_mp4reader.o \
-  ../gpmf-parser/GPMF_utils.o ../gpmf-parser/GPMF_parser.o \
-  SpeedTracker.o SpeedGraphic.o PathGraphic.o GpxHelper.o GPMFdata.o \
-  AltitudeGraphic.o Makefile 
+  ../gpmf-parser/GPMF_utils.o ../gpmf-parser/GPMF_parser.o Shared.o \
+  GpxHelper.o GPMFdata.o Makefile 
 	 ar rcs  lib_datalib.a ../gpmf-parser/demo/GPMF_mp4reader.o \
-  ../gpmf-parser/GPMF_utils.o ../gpmf-parser/GPMF_parser.o \
-  SpeedTracker.o SpeedGraphic.o PathGraphic.o GpxHelper.o GPMFdata.o \
-  AltitudeGraphic.o 
+  ../gpmf-parser/GPMF_utils.o ../gpmf-parser/GPMF_parser.o Shared.o \
+  GpxHelper.o GPMFdata.o 
 
 all: lib_datalib.a 

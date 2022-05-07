@@ -6,8 +6,6 @@
 #ifndef PATH_H
 #define PATH_H
 
-#include "GPMFdata.h"
-
 /* Generate path graphics
  * -> fulltarget : absolute target name (including directory)
  * -> filename : pointer to the filename only

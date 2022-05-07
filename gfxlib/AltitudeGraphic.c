@@ -7,7 +7,9 @@
 
 #include "Shared.h"
 #include "AltitudeGraphic.h"
-#include "GpxHelper.h"
+
+#include "../datalib/GPMFdata.h"
+#include "../datalib/GpxHelper.h"
 
 #include <stdio.h>
 #include <stdlib.h>

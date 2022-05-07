@@ -4,8 +4,9 @@
  */
 
 #include "Shared.h"
+#include "../datalib/GPMFdata.h"
+#include "../datalib/GpxHelper.h"
 #include "PathGraphic.h"
-#include "GpxHelper.h"
 
 #include <stdio.h>
 #include <stdlib.h>

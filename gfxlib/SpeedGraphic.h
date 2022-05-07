@@ -6,7 +6,8 @@
 #ifndef SPEED_H
 #define SPEED_H
 
-#include "GPMFdata.h"
+#include "../datalib/GPMFdata.h"
+#include "../datalib/Shared.h"
 
 #include "Shared.h"
 
