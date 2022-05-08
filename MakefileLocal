@@ -8,11 +8,11 @@ gotoall: all
 cc=g++ -Wall -O2
 opts=-lm $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
 
-GPMFMetersGenerator.o : GPMFMetersGenerator.cpp Makefile 
+GPMFMetersGenerator.o : GPMFMetersGenerator.cpp MakefileLocal 
 	$(cc) -c -o GPMFMetersGenerator.o GPMFMetersGenerator.cpp \
   $(opts) 
 
-GPMFMetersGenerator : GPMFMetersGenerator.o Makefile 
+GPMFMetersGenerator : GPMFMetersGenerator.o MakefileLocal 
 	 $(cc) -o GPMFMetersGenerator GPMFMetersGenerator.o $(opts) 
 
 all: GPMFMetersGenerator 

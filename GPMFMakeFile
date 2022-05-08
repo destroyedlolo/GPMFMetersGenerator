@@ -1,0 +1,29 @@
+# makefile created automaticaly by LFMakeMaker
+# LFMakeMaker 1.6 (May  7 2022 20:46:23) (c)LFSoft 1997
+
+gotoall: all
+
+
+#The compiler (may be customized for compiler's options).
+cc=gcc -Wall -O2
+opts=
+
+gpmf-parser/GPMF_parser.o : gpmf-parser/GPMF_parser.c GPMFMakeFile 
+	$(cc) -c -o gpmf-parser/GPMF_parser.o \
+  gpmf-parser/GPMF_parser.c $(opts) 
+
+gpmf-parser/GPMF_utils.o : gpmf-parser/GPMF_utils.c GPMFMakeFile 
+	$(cc) -c -o gpmf-parser/GPMF_utils.o gpmf-parser/GPMF_utils.c \
+  $(opts) 
+
+gpmf-parser/demo/GPMF_mp4reader.o : gpmf-parser/demo/GPMF_mp4reader.c \
+  GPMFMakeFile 
+	$(cc) -c -o gpmf-parser/demo/GPMF_mp4reader.o \
+  gpmf-parser/demo/GPMF_mp4reader.c $(opts) 
+
+libGPMF.a : gpmf-parser/demo/GPMF_mp4reader.o gpmf-parser/GPMF_utils.o \
+  gpmf-parser/GPMF_parser.o GPMFMakeFile 
+	 ar rcs  libGPMF.a gpmf-parser/demo/GPMF_mp4reader.o \
+  gpmf-parser/GPMF_utils.o gpmf-parser/GPMF_parser.o 
+
+all: libGPMF.a 
