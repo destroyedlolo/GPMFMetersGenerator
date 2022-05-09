@@ -19,8 +19,7 @@
 #include <dirent.h>
 #include <unistd.h>
 
-bool verbose = false;
-bool debug = false;
+#include "datalib/Context.h"
 
 	/* Configuration */
 
