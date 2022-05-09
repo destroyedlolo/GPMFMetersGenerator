@@ -9,6 +9,9 @@
 
 class GPVideo {
 	uint32_t fr_num, fr_dem;	// Video framerates
-};
 
+public:
+		/* Read and parse a video */
+	GPVideo( char * );
+};
 #endif

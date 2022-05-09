@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include "datalib/Context.h"
+#include "datalib/GPVideo.h"
 
 	/* Configuration */
 
@@ -108,5 +109,7 @@ int main(int argc, char *argv[]){
 	for(; optind < argc; optind++){
 		if(verbose)
 			printf("*I Reading '%s'\n", argv[optind]);
+
+		GPVideo t(argv[optind]);
 	}
 }

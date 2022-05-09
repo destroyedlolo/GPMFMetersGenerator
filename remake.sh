@@ -13,4 +13,4 @@ cd ..
 
 # Final executables
 
-LFMakeMaker -v +f=MakefileLocal -cc="g++ -Wall -O2" --opts="-lm -L. -ldatalib \$(shell pkg-config --cflags cairo ) \$(shell pkg-config --libs cairo )" GPMFMetersGenerator.cpp -t=GPMFMetersGenerator > MakefileLocal
+LFMakeMaker -v +f=MakefileLocal -cc="g++ -Wall -O2" --opts="-lm -L. -ldatalib -lGPMF \$(shell pkg-config --cflags cairo ) \$(shell pkg-config --libs cairo )" GPMFMetersGenerator.cpp -t=GPMFMetersGenerator > MakefileLocal

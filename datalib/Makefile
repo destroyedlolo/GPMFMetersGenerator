@@ -1,5 +1,5 @@
 # makefile created automaticaly by LFMakeMaker
-# LFMakeMaker 1.6 (May  9 2022 10:57:45) (c)LFSoft 1997
+# LFMakeMaker 1.6 (May  9 2022 15:11:43) (c)LFSoft 1997
 
 gotoall: all
 
@@ -11,7 +11,12 @@ opts=-lm $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
 Context.o : Context.cpp Context.h Makefile 
 	$(cc) -c -o Context.o Context.cpp $(opts) 
 
-../libdatalib.a : Context.o Makefile 
-	 ar rcs  ../libdatalib.a Context.o 
+GPVideo.o : GPVideo.cpp ../gpmf-parser/GPMF_parser.h \
+  ../gpmf-parser/GPMF_utils.h ../gpmf-parser/demo/GPMF_mp4reader.h \
+  Context.h GPVideo.h Makefile 
+	$(cc) -c -o GPVideo.o GPVideo.cpp $(opts) 
+
+../libdatalib.a : GPVideo.o Context.o Makefile 
+	 ar rcs  ../libdatalib.a GPVideo.o Context.o 
 
 all: ../libdatalib.a 
