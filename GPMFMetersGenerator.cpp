@@ -105,11 +105,15 @@ int main(int argc, char *argv[]){
 	if(verbose)
 		printf("*I* images will be generated in '%s'\n", targetDir);
 
+		/* Read the 1st video */
+	if(verbose)
+		printf("*I Reading '%s'\n", argv[optind]);
+	GPVideo video(argv[optind++]);
 
 	for(; optind < argc; optind++){
 		if(verbose)
 			printf("*I Reading '%s'\n", argv[optind]);
 
-		GPVideo t(argv[optind]);
+		video.AddPart( argv[optind] );
 	}
 }

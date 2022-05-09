@@ -263,13 +263,13 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 		struct GPMFdata *nv = new GPMFdata( lat, lgt, alt, s2d, s3d, time);
 
 			/* insert the new sample in the list */
-		if(!first)
-			first = nv;
+		if(!this->first)
+			this->first = nv;
 		else
-			last->next = nv;
-		last = nv;
+			this->last->next = nv;
+		this->last = nv;
 
-		samples_count++;
+		this->samples_count++;
 	}
 
 	return ret;
@@ -291,4 +291,7 @@ GPVideo::GPVideo( char *fch ) : first(NULL), last(NULL), nextsample(0), voffset(
 		printf("*I* Video framerate : %.3f (%u frames)\n", (float)this->fr_num / (float)this->fr_dem, frames);
 
 	this->readGPMF();
+}
+
+void GPVideo::AddPart( char * ){
 }

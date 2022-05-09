@@ -56,7 +56,10 @@ protected:
 	double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time );
 
 public:
-		/* Read and parse a video */
+		/* Read and parse 1st video */
 	GPVideo( char * );
+
+		/* Read and parse another part */
+	void AddPart( char * );
 };
 #endif
