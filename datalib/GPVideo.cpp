@@ -73,7 +73,7 @@ void GPVideo::readGPMF( void ){
 			printf("from %.3f to %.3f seconds\n", tstart, tend);
 
 		while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) )){	// Looks for stream
-			if(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("GPSU"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) )){	// find out GPS time
+			if(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("GPSU"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) )){	// find out GPS time if any
 				if(GPMF_Type(ms) != GPMF_TYPE_UTC_DATE_TIME){
 					puts("*E* found GPSU which doesn't contain a date");
 					continue;
@@ -103,9 +103,9 @@ void GPVideo::readGPMF( void ){
 				t.tm_sec = char2int(p += 2);
 				t.tm_isdst = -1;
 
-					/* Convert to timestamp and revert local TZ */
-				time = mktime( &t );
-				time += t.tm_gmtoff;
+					/* Convert to timestamp */
+				time = mktime( &t );	// mktime() is based on local TZ
+				time += t.tm_gmtoff;	// reverting back to Z (as it's GPS TZ)
 
 				if(debug){
 					printf("GPS time : %4d-%02d-%02d %02d:%02d:%02d (offset %6ld sec) -> ", 
@@ -118,12 +118,164 @@ void GPVideo::readGPMF( void ){
 					puts("");
 				}
 			}
+
+			if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) ))	// No GPS data in this stream ... skipping
+				continue;
+
+			uint32_t samples = GPMF_Repeat(ms);
+			uint32_t elements = GPMF_ElementsInStruct(ms);
+			if(debug)
+				printf("*d* %u samples, %u elements\n", samples, elements);
+
+			if(elements != 5){
+				printf("*E* Malformed GPMF : 5 elements experted by sample, got %d.\n", elements);
+				continue;
+			}
+
+			if(samples){
+				uint32_t type_samples = 1;
+
+				uint32_t buffersize = samples * elements * sizeof(double);
+				GPMF_stream find_stream;
+				double *tmpbuffer = (double*)malloc(buffersize);
+
+				uint32_t i;
+
+				tstep = (tend - tstart)/samples;
+
+				if(!tmpbuffer){
+					puts("*F* Can't allocate temporary buffer\n");
+					exit(EXIT_FAILURE);
+				}
+
+				GPMF_CopyState(ms, &find_stream);
+				type_samples = 0;
+				if(GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_TYPE, (GPMF_LEVELS)(GPMF_CURRENT_LEVEL | GPMF_TOLERANT) ))
+					type_samples = GPMF_Repeat(&find_stream);
+
+				if(type_samples){
+					printf("*E* Malformed GPMF : type_samples expected to be 0, got %d.\n", type_samples);
+					continue;
+				}
+
+				if(
+					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_SI_UNITS, (GPMF_LEVELS)(GPMF_CURRENT_LEVEL | GPMF_TOLERANT) ) ||
+					GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_UNITS, (GPMF_LEVELS)(GPMF_CURRENT_LEVEL | GPMF_TOLERANT) )
+				){
+					if(GPMF_OK == GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples, GPMF_TYPE_DOUBLE)){	/* Output scaled data as floats */
+						for(i = 0; i < samples; i++){
+							double drift;
+
+							if(debug)
+								printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
+									tstart + i*tstep,
+									tmpbuffer[i*elements + 0],	/* latitude */
+									tmpbuffer[i*elements + 1],	/* longitude */
+									tmpbuffer[i*elements + 2],	/* altitude */
+									tmpbuffer[i*elements + 3],	/* speed2d */
+									tmpbuffer[i*elements + 4]	/* speed3d */
+								);
+
+							if(!!(drift = addSample(
+								tstart + i*tstep,
+								tmpbuffer[i*elements + 0],	/* latitude */
+								tmpbuffer[i*elements + 1],	/* longitude */
+								tmpbuffer[i*elements + 2],	/* altitude */
+								tmpbuffer[i*elements + 3],	/* speed2d */
+								tmpbuffer[i*elements + 4],	/* speed3d */
+								time
+							))){
+								if(verbose)
+									printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
+							}
+						}
+					}
+				}
+				free(tmpbuffer);
+			}
+
 		}
 		GPMF_ResetState(ms);
 	}
 }
 
-GPVideo::GPVideo( char *fch ){
+double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time ){
+	double ret=0;
+
+		/* Convert speed from m/s to km/h */
+	s2d *= 3.6;
+	s3d *= 3.6;
+
+		/* update Min / Max */
+	if(!first){	/* First data */
+		this->min.latitude = this->max.latitude = lat;
+		this->min.longitude = this->max.longitude = lgt;
+		this->min.altitude = this->max.altitude = alt;
+		this->min.spd2d = this->max.spd2d = s2d;
+		this->min.spd3d = this->max.spd3d = s3d;
+		this->min.sample_time = this->max.sample_time = time;
+	} else {
+		if(lat < this->min.latitude)
+			this->min.latitude = lat;
+		if(lat > this->max.latitude)
+			this->max.latitude = lat;
+
+		if(lgt < this->min.longitude)
+			this->min.longitude = lgt;
+		if(lgt > this->max.longitude)
+			this->max.longitude = lgt;
+
+		if(alt < this->min.altitude)
+			this->min.altitude = alt;
+		if(alt > this->max.altitude)
+			this->max.altitude = alt;
+
+		if(s2d < this->min.spd2d)
+			this->min.spd2d = s2d;
+		if(s2d > this->max.spd2d)
+			this->max.spd2d = s2d;
+
+		if(s3d < this->min.spd3d)
+			this->min.spd3d = s3d;
+		if(s3d > this->max.spd3d)
+			this->max.spd3d = s3d;
+
+		if(time != (time_t)-1){
+			if(this->min.sample_time == (time_t)-1 || this->min.sample_time > time)
+				this->min.sample_time = time;
+			if(this->max.sample_time == (time_t)-1 || this->max.sample_time < time)
+				this->max.sample_time = time;
+		}
+	}
+
+		/* manage timing */
+	this->lastTiming = sec;
+	sec += this->voffset;	// shift by this part's offset
+
+	if(!this->first || sec >= this->nextsample){	// store a new sample
+		if(this->first && sec > this->nextsample + SAMPLE/2)	// Drifting
+			ret = sec - (this->nextsample + SAMPLE/2);
+
+		this->nextsample += SAMPLE;
+		if(debug)
+			printf("accepted : %f, next:%f\n", sec, this->nextsample);
+
+		struct GPMFdata *nv = new GPMFdata( lat, lgt, alt, s2d, s3d, time);
+
+			/* insert the new sample in the list */
+		if(!first)
+			first = nv;
+		else
+			last->next = nv;
+		last = nv;
+
+		samples_count++;
+	}
+
+	return ret;
+}
+
+GPVideo::GPVideo( char *fch ) : first(NULL), last(NULL), nextsample(0), voffset(0) {
 	this->mp4handle = OpenMP4Source(fch, MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
 	if(!this->mp4handle){
 		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", fch);
