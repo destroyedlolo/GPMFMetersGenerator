@@ -22,6 +22,8 @@
 #include "datalib/Context.h"
 #include "datalib/GPVideo.h"
 
+#include "gfxlib/SpeedGfx.h"
+
 	/* Configuration */
 
 #define VERSION "2.00a01"
@@ -78,8 +80,6 @@ int main(int argc, char *argv[]){
 			break;
 		}
 	}
-
-printf("speed '%c'\n", gfx_speed);
 
 		/* Handle first videos */
 	if(optind >= argc){
@@ -138,5 +138,10 @@ printf("speed '%c'\n", gfx_speed);
 			printf("*I Reading '%s'\n", argv[optind]);
 
 		video.AddPart( argv[optind] );
+	}
+
+		/* Generate videos */
+	if(gfx_speed){
+		SpeedGfx gfx( video, gfx_speed );
 	}
 }

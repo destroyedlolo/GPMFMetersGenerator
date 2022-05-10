@@ -61,5 +61,8 @@ public:
 
 		/* Read and parse another part */
 	void AddPart( char * );
+
+	struct GPMFdata &getMin( void ){ return this->min; };
+	struct GPMFdata &getMax( void ){ return this->max; };
 };
 #endif
