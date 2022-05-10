@@ -139,9 +139,11 @@ int main(int argc, char *argv[]){
 
 		video.AddPart( argv[optind] );
 	}
+	video.Dump();
 
 		/* Generate videos */
 	if(gfx_speed){
 		SpeedGfx gfx( video, gfx_speed );
+		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 }

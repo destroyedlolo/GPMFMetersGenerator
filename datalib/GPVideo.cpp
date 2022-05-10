@@ -295,3 +295,19 @@ GPVideo::GPVideo( char *fch ) : first(NULL), last(NULL), nextsample(0), voffset(
 
 void GPVideo::AddPart( char * ){
 }
+
+void GPVideo::Dump( void ){
+	puts("*I* Video min/max :");
+	printf("\tLatitude : %f deg - %f deg (%f)\n", min.latitude, max.latitude, max.latitude - min.latitude);
+	printf("\tLongitude : %f deg - %f deg (%f)\n", min.longitude, max.longitude, max.longitude - min.longitude);
+	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", min.altitude, max.altitude, max.altitude - min.altitude);
+	printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd2d, max.spd2d, max.spd2d - min.spd2d);
+	printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", min.spd3d, max.spd3d, max.spd3d - min.spd3d);
+	struct tm *t = gmtime(&min.sample_time);
+	printf("\tTime : ");
+	printtm(t);
+	printf(" -> ");
+	t = gmtime(&max.sample_time);
+	printtm(t);
+	puts("");
+}

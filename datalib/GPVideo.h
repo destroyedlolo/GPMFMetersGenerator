@@ -62,7 +62,11 @@ public:
 		/* Read and parse another part */
 	void AddPart( char * );
 
+	void Dump( void );
+
 	struct GPMFdata &getMin( void ){ return this->min; };
 	struct GPMFdata &getMax( void ){ return this->max; };
+	struct GPMFdata *getFirst(void){ return this->first; };
+	uint32_t getSampleCount(void){ return this->samples_count; };
 };
 #endif
