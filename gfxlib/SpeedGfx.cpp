@@ -218,10 +218,11 @@ void SpeedGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 	for(i = 0, p = this->video.getFirst(); i < this->video.getSampleCount(); i++, p=p->next)
 		generateOneGfx(fulltarget, filename, i, p);
 
-#if 0
+	if(verbose)
+		puts("");
+
 		/* Generate video */
-	if(video)
+	if(genvideo)
 		generateVideo(fulltarget, filename, "spd", "speed");
-#endif
 }
 

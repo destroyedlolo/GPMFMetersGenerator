@@ -12,7 +12,8 @@
 #include <cstddef>
 #include <cairo.h>
 
-#include <cstdio>
+	/* Flags related to GPMFMetersGenerator only */
+extern bool genvideo;
 
 class Gfx {
 protected :
@@ -38,13 +39,18 @@ protected :
 		 */
 	void generateOneGfx(const char *dir, char *file, int index, struct GPMFdata *current);
 
+		/* Generate the video and remove png
+		 * -> dir, file : as GenerateAllGfx
+		 * -> iname : image filename's root
+		 * -> vname : video's filename
+		 */
+	void generateVideo( const char *dir, char *file, const char *iname, const char *vname);
+
 public:
 	Gfx( size_t x, size_t y, GPVideo &v ) : video(v), SX(x), SY(y), background(NULL) {};
 	~Gfx(){
-puts("clean");
 		if(this->background)
 			cairo_surface_destroy(this->background);
-puts("ok");
 	}
 
 		/* Generate sticker's video

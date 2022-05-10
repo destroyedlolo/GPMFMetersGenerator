@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:V")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -45,6 +45,9 @@ int main(int argc, char *argv[]){
 			debug = true;
 		case 'v':
 			verbose = true;
+			break;
+		case 'V':
+			genvideo = false;
 			break;
 		case 's':
 			switch(*optarg){
@@ -72,6 +75,7 @@ int main(int argc, char *argv[]){
 				"(c) L.Faillie (destroyedlolo) 2022\n"
 				"\nKnown opts :\n"
 				"-s[3|b] : enable speed gfx generate (default 2d, 3: 3d, b: both)\n"
+				"-V : Don't generate video, keep PNG files\n"
 				"-F : don't fail if the target directory exists\n"
 				"-v : turn verbose on\n"
 				"-d : turn debugging messages on\n"
