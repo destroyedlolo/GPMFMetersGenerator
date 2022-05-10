@@ -26,12 +26,15 @@
 
 #define VERSION "2.00a01"
 
+	/* Which gfx to generate */
+static char gfx_speed = 0;	/* 0,2,3,b */
+
 int main(int argc, char *argv[]){
 	bool force = false;
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhF")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -41,22 +44,42 @@ int main(int argc, char *argv[]){
 		case 'v':
 			verbose = true;
 			break;
+		case 's':
+			switch(*optarg){
+			case '2':
+			case '3':
+			case 'b':
+				gfx_speed = *optarg;
+				break;
+			default :
+				puts("*E* Only 2, 3, b are recognized as -s option");
+				exit(EXIT_FAILURE);
+			}
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
-		case ':':	// no argument provided
+		case ':':	// no argument provided (or missing argument)
+			if(optopt == 's'){
+				gfx_speed = '2';
+				break;
+			}
+
 			puts(
 				"\nGPMFMetersGenerator v" VERSION "\n"
 				"(c) L.Faillie (destroyedlolo) 2022\n"
 				"\nKnown opts :\n"
+				"-s[3|b] : enable speed gfx generate (default 2d, 3: 3d, b: both)\n"
 				"-F : don't fail if the target directory exists\n"
 				"-v : turn verbose on\n"
 				"-d : turn debugging messages on\n"
 			);
+			exit(EXIT_FAILURE);
 			break;
 		}
 	}
 
+printf("speed '%c'\n", gfx_speed);
 
 		/* Handle first videos */
 	if(optind >= argc){
