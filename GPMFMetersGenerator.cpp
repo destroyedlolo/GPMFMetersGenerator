@@ -24,6 +24,7 @@
 
 #include "gfxlib/SpeedGfx.h"
 #include "gfxlib/AltitudeGfx.h"
+#include "gfxlib/PathGfx.h"
 
 	/* Configuration */
 

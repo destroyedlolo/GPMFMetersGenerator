@@ -1,5 +1,5 @@
 # makefile created automaticaly by LFMakeMaker
-# LFMakeMaker 1.6 (May  9 2022 15:11:43) (c)LFSoft 1997
+# LFMakeMaker 1.6 (May  7 2022 20:46:23) (c)LFSoft 1997
 
 gotoall: all
 
@@ -16,11 +16,16 @@ Gfx.o : Gfx.cpp Gfx.h ../datalib/Context.h ../datalib/GPVideo.h \
   Makefile 
 	$(cc) -c -o Gfx.o Gfx.cpp $(opts) 
 
+PathGfx.o : PathGfx.cpp PathGfx.h Gfx.h ../datalib/Context.h \
+  ../datalib/GPVideo.h Makefile 
+	$(cc) -c -o PathGfx.o PathGfx.cpp $(opts) 
+
 SpeedGfx.o : SpeedGfx.cpp SpeedGfx.h Gfx.h ../datalib/Context.h \
   ../datalib/GPVideo.h Makefile 
 	$(cc) -c -o SpeedGfx.o SpeedGfx.cpp $(opts) 
 
-../libgfxlib.a : SpeedGfx.o Gfx.o AltitudeGfx.o Makefile 
-	 ar rcs  ../libgfxlib.a SpeedGfx.o Gfx.o AltitudeGfx.o 
+../libgfxlib.a : SpeedGfx.o PathGfx.o Gfx.o AltitudeGfx.o Makefile 
+	 ar rcs  ../libgfxlib.a SpeedGfx.o PathGfx.o Gfx.o \
+  AltitudeGfx.o 
 
 all: ../libgfxlib.a 
