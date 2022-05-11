@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
+#include <cmath>
 
 AltitudeGfx::AltitudeGfx(GPVideo &v) : Gfx( 600,300, v ) {
 	this->calcScales();
@@ -119,9 +120,70 @@ void AltitudeGfx::generateBackGround( ){
 }
 
 void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+
+		/*
+		 * Initialise Cairo
+		 */
+	cairo_status_t err;
+
+	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
+	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
+		puts("*F* Can't create Cairo's surface");
+		exit(EXIT_FAILURE);
+	}
+
+	cairo_t *cr = cairo_create(srf);
+
+	cairo_set_source_surface(cr, this->background, 0, 0);
+	cairo_rectangle(cr, 0,0, this->SX, this->SY);
+	cairo_fill(cr);
+	cairo_stroke(cr);
+
+		/* Draw Altitude curve */
+	drawGPMF(cr, 0, current);
+
+		/* Display the label */
+	char t[8];
+	sprintf(t, "%5d m", (int)current->altitude);
+	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(cr, 35);
+
+	cairo_set_source_rgba(cr, 0,0,0, 0.55);
+	cairo_move_to(cr, this->posLabel+2, this->offy+2);
+	cairo_show_text(cr, t);
+	cairo_stroke(cr);
+
+	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_move_to(cr, this->posLabel, this->offy);
+	cairo_show_text(cr, t);
+	cairo_stroke(cr);
+
+		/* Display the spot */
+	cairo_set_line_width(cr, 5);
+	cairo_arc(cr, this->offx + index*this->scale_w, this->SY - (current->altitude - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
+	cairo_stroke_preserve(cr);
+	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
+	cairo_fill(cr);
+
+		/* Writing the image */
+	sprintf(filename, "alt%07d.png", index);
+	if(verbose)
+		printf("*D* Writing '%s'\r", fulltarget);
+
+	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
+		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+		/* Cleaning */
+	cairo_destroy(cr);
+	cairo_surface_destroy(srf);
 }
 
 void AltitudeGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
-	this->generateBackGround();
-}
+	Gfx::GenerateAllGfx( fulltarget, filename );
 
+		/* Generate video */
+	if(genvideo)
+		generateVideo(fulltarget, filename, "alt", "altitude");
+}
