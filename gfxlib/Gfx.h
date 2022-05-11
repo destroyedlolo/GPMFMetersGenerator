@@ -60,7 +60,7 @@ public:
 		 * Notez-bien : GenerateAllGfx() is not called inside the constructor
 		 * to let some change to modify scales if needed and/or target directory
 		 */
-	virtual void GenerateAllGfx( const char *dir, char *file ) = 0;
+	virtual void GenerateAllGfx( const char *dir, char *file );
 };
 
 #endif

@@ -57,3 +57,16 @@ void Gfx::generateVideo( const char *fulltarget, char *filename, const char *ina
 
 	closedir(dp);
 }
+
+void Gfx::GenerateAllGfx( const char *fulltarget, char *filename ){
+	uint32_t i;
+	struct GPMFdata *p;
+
+	this->generateBackGround();
+
+	for(i = 0, p = this->video.getFirst(); i < this->video.getSampleCount(); i++, p=p->next)
+		generateOneGfx(fulltarget, filename, i, p);
+
+	if(verbose)
+		puts("");
+}

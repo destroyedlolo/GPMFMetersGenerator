@@ -214,16 +214,7 @@ void SpeedGfx::generateOneGfx(const char *fulltarget, char *filename, int index,
 }
 
 void SpeedGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
-	uint32_t i;
-	struct GPMFdata *p;
-
-	this->generateBackGround();
-
-	for(i = 0, p = this->video.getFirst(); i < this->video.getSampleCount(); i++, p=p->next)
-		generateOneGfx(fulltarget, filename, i, p);
-
-	if(verbose)
-		puts("");
+	Gfx::GenerateAllGfx( fulltarget, filename );
 
 		/* Generate video */
 	if(genvideo)
