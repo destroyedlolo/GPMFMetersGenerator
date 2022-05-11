@@ -197,6 +197,11 @@ void GPVideo::readGPMF( void ){
 		}
 		GPMF_ResetState(ms);
 	}
+
+	if(payloadres)
+		FreePayloadResource(mp4handle, payloadres);
+	if(ms)
+		GPMF_Free(ms);
 }
 
 double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time ){
@@ -291,6 +296,9 @@ GPVideo::GPVideo( char *fch ) : first(NULL), last(NULL), nextsample(0), samples_
 		printf("*I* Video framerate : %.3f (%u frames)\n", (float)this->fr_num / (float)this->fr_dem, frames);
 
 	this->readGPMF();
+
+	CloseSource(this->mp4handle);
+	this->mp4handle = 0;
 }
 
 void GPVideo::AddPart( char * ){
