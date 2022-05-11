@@ -37,7 +37,7 @@ protected :
 		 * -> index : index of the current sample
 		 * -> current : The data being drawn
 		 */
-	void generateOneGfx(const char *dir, char *file, int index, struct GPMFdata *current);
+	virtual void generateOneGfx(const char *dir, char *file, int index, struct GPMFdata *current) = 0;
 
 		/* Generate the video and remove png
 		 * -> dir, file : as GenerateAllGfx
