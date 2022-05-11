@@ -25,7 +25,7 @@ void SpeedGfx::calcScales( void ){
 	if(!this->background)
 		Gfx::generateBackGround();
 
-		/* Scale
+		/* Scales
 		 * As of speed, graphics's minimal is always 0
 		 */
 	if(this->type == 'b'){
@@ -114,6 +114,7 @@ void SpeedGfx::generateBackGround( ){
 		cairo_line_to(cr, x + this->SX/2, y + this->SX/2);
 		cairo_stroke(cr);
 	}
+	cairo_pattern_destroy(pat);
 	cairo_destroy(cr);
 }
 
