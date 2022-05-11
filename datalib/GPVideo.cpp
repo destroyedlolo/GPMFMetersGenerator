@@ -301,7 +301,33 @@ GPVideo::GPVideo( char *fch ) : first(NULL), last(NULL), nextsample(0), samples_
 	this->mp4handle = 0;
 }
 
-void GPVideo::AddPart( char * ){
+void GPVideo::AddPart( char *fch ){
+	this->voffset += this->lastTiming;
+
+	this->mp4handle = OpenMP4Source(fch, MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
+	if(!this->mp4handle){
+		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", fch);
+		exit(EXIT_FAILURE);
+	}
+
+	uint32_t fr_num, fr_dem;
+	uint32_t frames = GetVideoFrameRateAndCount(this->mp4handle, &fr_num, &fr_dem);
+	if(!frames){
+		puts("*F* Can't get frame count (incorrect MP4 ?)");
+		exit(EXIT_FAILURE);
+	}
+	if(verbose)
+		printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
+
+	if(fr_num != this->fr_num || fr_dem != this->fr_dem){
+		puts("*F* Not the same frame rate");
+		exit(EXIT_FAILURE);
+	}
+
+	this->readGPMF();
+
+	CloseSource(this->mp4handle);
+	this->mp4handle = 0;
 }
 
 void GPVideo::Dump( void ){
