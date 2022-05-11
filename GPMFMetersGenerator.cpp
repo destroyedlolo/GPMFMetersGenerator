@@ -23,20 +23,22 @@
 #include "datalib/GPVideo.h"
 
 #include "gfxlib/SpeedGfx.h"
+#include "gfxlib/AltitudeGfx.h"
 
 	/* Configuration */
 
-#define VERSION "2.00a01"
+#define VERSION "2.00a02"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
+static bool gfx_altitude = false;
 
 int main(int argc, char *argv[]){
 	bool force = false;
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:V")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:aV")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -61,6 +63,9 @@ int main(int argc, char *argv[]){
 				exit(EXIT_FAILURE);
 			}
 			break;
+		case 'a':
+			gfx_altitude = true;
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
@@ -74,7 +79,9 @@ int main(int argc, char *argv[]){
 				"\nGPMFMetersGenerator v" VERSION "\n"
 				"(c) L.Faillie (destroyedlolo) 2022\n"
 				"\nKnown opts :\n"
-				"-s[3|b] : enable speed gfx generate (default 2d, 3: 3d, b: both)\n"
+				"-s[3|b] : enable speed gfx (default 2d, 3: 3d, b: both)\n"
+				"-a : enable altitude gfx\n"
+				"\n"
 				"-V : Don't generate video, keep PNG files\n"
 				"-F : don't fail if the target directory exists\n"
 				"-v : turn verbose on\n"
@@ -148,6 +155,11 @@ int main(int argc, char *argv[]){
 		/* Generate videos */
 	if(gfx_speed){
 		SpeedGfx gfx( video, gfx_speed );
+		gfx.GenerateAllGfx(targetDir, targetFile);
+	}
+
+	if(gfx_altitude){
+		AltitudeGfx gfx( video );
 		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 }
