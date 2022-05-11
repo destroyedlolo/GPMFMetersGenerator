@@ -275,7 +275,7 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 	return ret;
 }
 
-GPVideo::GPVideo( char *fch ) : first(NULL), last(NULL), nextsample(0), voffset(0) {
+GPVideo::GPVideo( char *fch ) : first(NULL), last(NULL), nextsample(0), samples_count(0), voffset(0) {
 	this->mp4handle = OpenMP4Source(fch, MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
 	if(!this->mp4handle){
 		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", fch);
@@ -310,4 +310,25 @@ void GPVideo::Dump( void ){
 	t = gmtime(&max.sample_time);
 	printtm(t);
 	puts("");
+
+	if(debug){
+		struct GPMFdata *p;
+
+		puts("*D* Memorized video data");
+		for(p = first; p; p = p->next){
+			printf("%p (next: %p)\n", p, p->next);
+			printf("\tLatitude : %.3f deg\n", p->latitude);
+			printf("\tLongitude : %.3f deg\n", p->longitude);
+			printf("\tAltitude : %.3f m\n", p->altitude);
+			printf("\tSpeed2d : %.3f km/h\n", p->spd2d);
+			printf("\tSpeed3d : %.3f km/h\n", p->spd3d);
+
+			struct tm *t = gmtime(&p->sample_time);
+			printf("\tTime : ");
+			printtm(t);
+			puts("");
+		}
+	}
+
+	printf("*I* %u memorised samples\n", samples_count);
 }
