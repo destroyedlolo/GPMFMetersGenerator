@@ -1,5 +1,5 @@
 # makefile created automaticaly by LFMakeMaker
-# LFMakeMaker 1.6 (May  9 2022 15:11:43) (c)LFSoft 1997
+# LFMakeMaker 1.6 (May  7 2022 20:46:23) (c)LFSoft 1997
 
 gotoall: all
 
@@ -11,6 +11,10 @@ opts=-lm $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
 AltitudeGfx.o : AltitudeGfx.cpp AltitudeGfx.h Gfx.h \
   ../datalib/Context.h ../datalib/GPVideo.h Makefile 
 	$(cc) -c -o AltitudeGfx.o AltitudeGfx.cpp $(opts) 
+
+Export.o : Export.cpp Export.h ../datalib/Context.h \
+  ../datalib/GPVideo.h Makefile 
+	$(cc) -c -o Export.o Export.cpp $(opts) 
 
 Gfx.o : Gfx.cpp Gfx.h ../datalib/Context.h ../datalib/GPVideo.h \
   Makefile 
@@ -28,9 +32,9 @@ SpeedTrkGfx.o : SpeedTrkGfx.cpp SpeedTrkGfx.h Gfx.h \
   ../datalib/Context.h ../datalib/GPVideo.h Makefile 
 	$(cc) -c -o SpeedTrkGfx.o SpeedTrkGfx.cpp $(opts) 
 
-../libgfxlib.a : SpeedTrkGfx.o SpeedGfx.o PathGfx.o Gfx.o \
+../libgfxlib.a : SpeedTrkGfx.o SpeedGfx.o PathGfx.o Gfx.o Export.o \
   AltitudeGfx.o Makefile 
 	 ar rcs  ../libgfxlib.a SpeedTrkGfx.o SpeedGfx.o PathGfx.o \
-  Gfx.o AltitudeGfx.o 
+  Gfx.o Export.o AltitudeGfx.o 
 
 all: ../libgfxlib.a 

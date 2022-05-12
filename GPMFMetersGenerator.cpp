@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <libgen.h>
 
 #include "datalib/Context.h"
 #include "datalib/GPVideo.h"
@@ -26,23 +27,25 @@
 #include "gfxlib/AltitudeGfx.h"
 #include "gfxlib/PathGfx.h"
 #include "gfxlib/SpeedTrkGfx.h"
+#include "gfxlib/Export.h"
 
 	/* Configuration */
 
-#define VERSION "2.00a04"
+#define VERSION "2.00a05"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
 static bool gfx_altitude = false;
 static bool gfx_path = false;
 static char gfx_strk = 0;	/* 0,2,3 */
+static bool gfx_GPX = false;
 
 int main(int argc, char *argv[]){
 	bool force = false;
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apk:V")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:VX")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -84,6 +87,9 @@ int main(int argc, char *argv[]){
 				exit(EXIT_FAILURE);
 			}
 			break;
+		case 'X':
+			gfx_GPX = true;
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
@@ -104,6 +110,7 @@ int main(int argc, char *argv[]){
 				"-k[2|3] : enable speed tracker gfx (default 2d, 3: 3d)\n"
 				"-a : enable altitude gfx\n"
 				"-p : enable path gfx\n"
+				"-X : export telemetry as GPX file\n"
 				"\n"
 				"-V : Don't generate video, keep PNG files\n"
 				"-F : don't fail if the target directory exists\n"
@@ -156,6 +163,11 @@ int main(int argc, char *argv[]){
 			exit(EXIT_FAILURE);
 	}
 
+		/* Keep video name */
+	char *fname = basename(targetDir);
+	char vname[strlen(fname) + 1];
+	strcpy(vname, fname);
+
 		/* done with directory */
 	*(targetFile++) = '/';
 	*targetFile = 0;
@@ -194,5 +206,10 @@ int main(int argc, char *argv[]){
 	if(gfx_strk){
 		SpeedTrkGfx gfx( video, gfx_strk );
 		gfx.GenerateAllGfx(targetDir, targetFile);
+	}
+
+	if(gfx_GPX){
+		Export gfx( video );
+		gfx.generateGPX(targetDir, targetFile, vname);
 	}
 }
