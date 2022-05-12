@@ -37,7 +37,7 @@ void AltitudeGfx::calcScales( void ){
 
 	this->range_h = this->max_h - this->min_h;
 	this->scale_h = (double)(this->SY - offy)/(double)this->range_h;
-	this->scale_w = (double)(this->SX - offx)/(double)video.getSampleCount();
+	this->scale_w = (double)(this->SX - offx)/(double)this->video.getSampleCount();
 	this->delta_h = ((this->range_h/5)/50)*50;
 	if(!this->delta_h)
 		this->delta_h = this->range_h/5;
@@ -56,7 +56,7 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 
 	struct GPMFdata *p;
 	uint32_t i;
-	for(i = 0, p = this->video.getFirst(); i < video.getSampleCount(); i++, p=p->next){
+	for(i = 0, p = this->video.getFirst(); i < this->video.getSampleCount(); i++, p=p->next){
 		int x = this->offx + i*this->scale_w + offset;
 		int y = this->SY - (p->altitude - this->min_h)*this->scale_h + offset;
 

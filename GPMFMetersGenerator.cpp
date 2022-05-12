@@ -25,22 +25,24 @@
 #include "gfxlib/SpeedGfx.h"
 #include "gfxlib/AltitudeGfx.h"
 #include "gfxlib/PathGfx.h"
+#include "gfxlib/SpeedTrkGfx.h"
 
 	/* Configuration */
 
-#define VERSION "2.00a03"
+#define VERSION "2.00a04"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
 static bool gfx_altitude = false;
 static bool gfx_path = false;
+static char gfx_strk = 0;	/* 0,2,3 */
 
 int main(int argc, char *argv[]){
 	bool force = false;
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apV")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:V")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -71,6 +73,17 @@ int main(int argc, char *argv[]){
 		case 'p':
 			gfx_path = true;
 			break;
+		case 'k':
+			switch(*optarg){
+			case '2':
+			case '3':
+				gfx_strk = *optarg;
+				break;
+			default :
+				puts("*E* Only 2, 3 are recognized as -k option");
+				exit(EXIT_FAILURE);
+			}
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
@@ -78,13 +91,17 @@ int main(int argc, char *argv[]){
 			if(optopt == 's'){
 				gfx_speed = '2';
 				break;
+			} else if(optopt == 's'){
+				gfx_strk = '2';
+				break;
 			}
-
+	
 			puts(
 				"\nGPMFMetersGenerator v" VERSION "\n"
 				"(c) L.Faillie (destroyedlolo) 2022\n"
 				"\nKnown opts :\n"
-				"-s[3|b] : enable speed gfx (default 2d, 3: 3d, b: both)\n"
+				"-s[2|3|b] : enable speed gfx (default 2d, 3: 3d, b: both)\n"
+				"-k[2|3] : enable speed tracker gfx (default 2d, 3: 3d)\n"
 				"-a : enable altitude gfx\n"
 				"-p : enable path gfx\n"
 				"\n"
@@ -171,6 +188,11 @@ int main(int argc, char *argv[]){
 
 	if(gfx_path){
 		PathGfx gfx( video );
+		gfx.GenerateAllGfx(targetDir, targetFile);
+	}
+
+	if(gfx_strk){
+		SpeedTrkGfx gfx( video, gfx_strk );
 		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 }
