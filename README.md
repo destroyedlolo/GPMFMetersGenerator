@@ -93,7 +93,7 @@ Here the list of already known needed improvements (as of V2)
 - [X] Speedup images generation
 - [X] Colorizes past figures
 - [ ] Show full journey using external GPX trace file (*need to create a Fixer as the ones I got are crappy*)
-- [ ] Generate GPX and KML from telemetry
+- [X] Generate GPX and KML from telemetry
 - [ ] Inlays video's path on a map
 - [ ] Add threading support to parallelise images' generation.
 - [ ] Better support of timewrap video (for the moment, the result is a bit crappy)
