@@ -9,23 +9,126 @@
 #include <cstring>
 #include <cmath>
 
-PathGfx::PathGfx(GPVideo &v) : Gfx( 600,300, v ) {
+#define R (6371000)	// terrestrial radius
+
+PathGfx::PathGfx(GPVideo &v) : Gfx( 300,300, v ) {
 	this->calcScales();
 }
 
-void PathGfx::calcScales( void ){
-	if(!this->background)
-		Gfx::generateBackGround();
+	/* From https://forums.futura-sciences.com/mathematiques-superieur/39838-conversion-lat-long-x-y.html */
+void PathGfx::posXY( double lat, double lgt, int &x, int &y){
+	/* Degree -> Radian */
+	lat *= M_PI/180.0;
+	lgt *= M_PI/180.0;
+	
+	double sinlgt = sin(lgt),
+		coslgt = cos(lgt),
+		sintlat = sin(lat),
+		coslat = cos(lat);
 
+	x = (int)(2 * R * sinlgt*coslat / (1 + coslgt*coslat));
+	y = (int)(2 * R * sintlat / (1 + coslgt*coslat));
+}
+
+void PathGfx::calcScales( void ){
+	this->posXY( this->video.getMin().latitude, this->video.getMin().longitude, this->min_x, this->min_y);
+	this->posXY( this->video.getMax().latitude, this->video.getMax().longitude, this->max_x, this->max_y);
+
+	this->range_x = this->max_x - this->min_x;
+	this->range_y = this->max_y - this->min_y;
+
+	this->scale = (double)(this->SX - 20)/(double)((this->range_x > this->range_y) ? this->range_x : this->range_y);
+
+	this->off_x = (this->SX - this->range_x * this->scale)/2;
+	this->off_y = (this->SX - this->range_y * this->scale)/2;
 }
 
 void PathGfx::drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
+	struct GPMFdata *p;
+
+	cairo_save(cr);
+	if(current)
+		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
+
+	for(p = this->video.getFirst(); p; p = p->next){
+		int x,y;
+
+		this->posXY(p->latitude, p->longitude, x, y);
+		x = this->off_x + (x-this->min_x) * this->scale + offset;
+		y = this->SY - this->off_y - (y-this->min_y) * this->scale + offset;
+
+		if(p == this->video.getFirst())
+			cairo_move_to(cr, x, y);
+		else
+			cairo_line_to(cr, x, y);
+
+		if(current == p){
+			cairo_stroke(cr);
+			cairo_restore(cr);
+			cairo_move_to(cr, x, y);
+		}
+	}
+	cairo_stroke(cr);
 }
 
 void PathGfx::generateBackGround( ){
+	if(!this->background)
+		Gfx::generateBackGround();
+
+	cairo_t *cr = cairo_create(this->background);
+
+			/* Draw shadow */
+	cairo_set_line_width(cr, 2);
+	cairo_set_source_rgba(cr, 0,0,0, 0.55);
+	this->drawGPMF(cr, 2, NULL);
+
+
+		/* Cleaning */
+	cairo_destroy(cr);
 }
 
 void PathGfx::generateOneGfx(const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
+	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
+		puts("*F* Can't create Cairo's surface");
+		exit(EXIT_FAILURE);
+	}
+
+	cairo_t *cr = cairo_create(srf);
+	cairo_set_source_surface(cr, this->background, 0, 0);
+	cairo_rectangle(cr, 0, 0, this->SX, this->SY);
+	cairo_fill(cr);
+	cairo_stroke(cr);
+
+	cairo_set_source_rgb(cr, 1,1,1);
+	cairo_set_line_width(cr, 3);
+	this->drawGPMF(cr, 0, current);
+
+	cairo_set_source_rgb(cr, 1,1,1);
+	int x,y;
+	this->posXY(current->latitude, current->longitude, x, y);
+	x = this->off_x + (x-this->min_x) * this->scale;
+	y = this->SY - this->off_y - (y-this->min_y) * this->scale;
+
+	cairo_set_line_width(cr, 5);
+	cairo_arc(cr, x, y, 5, 0, 2 * M_PI);
+	cairo_stroke_preserve(cr);
+	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
+	cairo_fill(cr);
+
+	sprintf(filename, "pth%07d.png", index);
+	if(verbose)
+		printf("*D* Writing '%s'\r", fulltarget);
+	
+	cairo_status_t err;
+	if((err = cairo_surface_write_to_png(srf, fulltarget)) != CAIRO_STATUS_SUCCESS){
+		printf("*F* Writing surface : %s / %s\n", cairo_status_to_string(err), strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+		/* Cleaning */
+	cairo_destroy(cr);
+	cairo_surface_destroy(srf);
 }
 
 void PathGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
@@ -33,5 +136,5 @@ void PathGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 
 		/* Generate video */
 	if(genvideo)
-		generateVideo(fulltarget, filename, "alt", "altitude");
+		generateVideo(fulltarget, filename, "pth", "path");
 }

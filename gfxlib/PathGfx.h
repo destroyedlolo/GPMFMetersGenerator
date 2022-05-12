@@ -1,12 +1,21 @@
 /* PathGraphic
  * Generate path graphics
  */
-#ifndef ALTITUDEGFX_H
-#define ALTITUDEGFX_H
+#ifndef PATHGFX_H
+#define PATHGFX_H
 
 #include "Gfx.h"
 
 class PathGfx : public Gfx {
+	int min_x, min_y;
+	int max_x, max_y;
+
+	int range_x, range_y;
+	int off_x, off_y;		// offsets
+	double scale;
+
+	/* Convert position to coordinates */
+	void posXY( double, double, int &, int &);
 
 	/* Draw GPMF data
 	 * -> offset : move the curve (used to draw the shadow)

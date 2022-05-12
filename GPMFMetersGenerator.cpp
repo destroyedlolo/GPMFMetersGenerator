@@ -28,18 +28,19 @@
 
 	/* Configuration */
 
-#define VERSION "2.00a02"
+#define VERSION "2.00a03"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
 static bool gfx_altitude = false;
+static bool gfx_path = false;
 
 int main(int argc, char *argv[]){
 	bool force = false;
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:aV")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apV")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -67,6 +68,9 @@ int main(int argc, char *argv[]){
 		case 'a':
 			gfx_altitude = true;
 			break;
+		case 'p':
+			gfx_path = true;
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
@@ -82,6 +86,7 @@ int main(int argc, char *argv[]){
 				"\nKnown opts :\n"
 				"-s[3|b] : enable speed gfx (default 2d, 3: 3d, b: both)\n"
 				"-a : enable altitude gfx\n"
+				"-p : enable path gfx\n"
 				"\n"
 				"-V : Don't generate video, keep PNG files\n"
 				"-F : don't fail if the target directory exists\n"
@@ -161,6 +166,11 @@ int main(int argc, char *argv[]){
 
 	if(gfx_altitude){
 		AltitudeGfx gfx( video );
+		gfx.GenerateAllGfx(targetDir, targetFile);
+	}
+
+	if(gfx_path){
+		PathGfx gfx( video );
 		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 }
