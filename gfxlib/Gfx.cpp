@@ -12,7 +12,7 @@
 
 bool genvideo = true;
 
-void Gfx::generateBackGround( void ){
+void Gfx::generateBackground( void ){
 	this->background = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
     if(cairo_surface_status(background) != CAIRO_STATUS_SUCCESS){
         puts("*F* Can't create Cairo's surface");
@@ -62,7 +62,7 @@ void Gfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 	uint32_t i;
 	struct GPMFdata *p;
 
-	this->generateBackGround();
+	this->generateBackground();	// Needed for custom background
 
 	for(i = 0, p = this->video.getFirst(); i < this->video.getSampleCount(); i++, p=p->next)
 		generateOneGfx(fulltarget, filename, i, p);

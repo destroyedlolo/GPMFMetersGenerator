@@ -71,14 +71,11 @@ void PathGfx::drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 	cairo_stroke(cr);
 }
 
-void PathGfx::generateBackGround( ){
-	if(!this->background)
-		Gfx::generateBackGround();
-
+void PathGfx::generateBackground( ){
 	cairo_t *cr = cairo_create(this->background);
 
 			/* Draw shadow */
-	cairo_set_line_width(cr, 2);
+	cairo_set_line_width(cr, 4);
 	cairo_set_source_rgba(cr, 0,0,0, 0.55);
 	this->drawGPMF(cr, 2, NULL);
 

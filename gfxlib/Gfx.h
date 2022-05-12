@@ -30,7 +30,7 @@ protected :
 		/* Generate background image.
 		 * It is generated once and reused in every image
 		 */
-	virtual void generateBackGround( void );
+	virtual void generateBackground( void );
 
 		/* Generate only one gfx
 		 * -> dir, file : as GenerateAllGfx
@@ -47,7 +47,10 @@ protected :
 	void generateVideo( const char *dir, char *file, const char *iname, const char *vname);
 
 public:
-	Gfx( size_t x, size_t y, GPVideo &v ) : video(v), SX(x), SY(y), background(NULL) {};
+	Gfx( size_t x, size_t y, GPVideo &v ) : video(v), SX(x), SY(y), background(NULL) {
+	Gfx::generateBackground();
+};
+
 	~Gfx(){
 		if(this->background)
 			cairo_surface_destroy(this->background);

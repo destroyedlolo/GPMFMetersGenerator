@@ -24,7 +24,7 @@ class AltitudeGfx : public Gfx {
 
 protected:
 	void calcScales( void );
-	void generateBackGround( void );
+	void generateBackground( void );
 	void generateOneGfx(const char *, char *, int , struct GPMFdata *);
 
 public:

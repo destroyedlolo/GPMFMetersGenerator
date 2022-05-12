@@ -14,8 +14,6 @@ AltitudeGfx::AltitudeGfx(GPVideo &v) : Gfx( 600,300, v ) {
 }
 
 void AltitudeGfx::calcScales( void ){
-	if(!this->background)
-		Gfx::generateBackGround();
 
 		/* Label */
 	cairo_text_extents_t extents;
@@ -80,10 +78,7 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 		cairo_stroke_preserve(cr);
 }
 
-void AltitudeGfx::generateBackGround( ){
-	if(!this->background)
-		Gfx::generateBackGround();
-
+void AltitudeGfx::generateBackground( ){
 	cairo_t *cr = cairo_create(this->background);
 
 	cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */

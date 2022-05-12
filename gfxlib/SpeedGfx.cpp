@@ -22,8 +22,6 @@ double SpeedGfx::transforme( double angle ){
 }
 
 void SpeedGfx::calcScales( void ){
-	if(!this->background)
-		Gfx::generateBackGround();
 
 		/* Scales
 		 * As of speed, graphics's minimal is always 0
@@ -54,10 +52,7 @@ void SpeedGfx::calcScales( void ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateBackGround( ){
-	if(!this->background)
-		Gfx::generateBackGround();
-	
+void SpeedGfx::generateBackground( ){
 	int speed = (int)(log10(range)) + 1;
 
 	cairo_t *cr = cairo_create(this->background);
