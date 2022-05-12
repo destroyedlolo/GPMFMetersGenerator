@@ -40,5 +40,95 @@ void Export::generateGPX( const char *fulltarget, char *filename, char *iname ){
 
 	if(verbose)
 		printf("'%s' generated\n", fulltarget);
+}
 
+void Export::generateKML( const char *fulltarget, char *filename, char *iname ){
+	sprintf(filename, "%s.kml", iname);
+
+	FILE *f = fopen(fulltarget,"w");
+	if(!f){
+		perror(fulltarget);
+		return;
+	}
+
+
+	fputs("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		"<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n"
+		"\t<Document>\n"
+	    "\t\t<name>telemetry</name>\n"
+    	"\t\t<description>Created by GPMFMetersGenerator</description>\n"
+	, f);
+
+		/* colors */
+	fputs("\t\t<Style id=\"trace\">\n"
+		"\t\t\t<LineStyle>\n"
+        "\t\t\t\t<color>961400FF</color>\n"
+        "\t\t\t\t<width>3</width>\n"
+      	"\t\t\t</LineStyle>\n"
+    	"\t\t</Style>\n"
+	, f);
+
+	fputs("\t\t<Style id=\"End\">\n"
+		"\t\t\t<LineStyle>\n"
+        "\t\t\t\t<color>FFEE58FF</color>\n"
+        "\t\t\t\t<width>3</width>\n"
+      	"\t\t\t</LineStyle>\n"
+    	"\t\t</Style>\n"
+	, f);
+
+		/* Trace itself */
+	fprintf(f, 
+		"\t\t<Folder>\n"
+		"\t\t\t<name>Trace</name>\n"
+		"\t\t\t<open>1</open>\n"
+		"\t\t\t<Placemark>\n"
+		"\t\t\t\t<visibility>1</visibility>\n"
+		"\t\t\t\t<styleUrl>#trace</styleUrl>\n"
+		"\t\t\t\t<name>%s</name>\n"
+		"\t\t\t\t<LineString>\n"
+		"\t\t\t\t\t<tessellate>1</tessellate>\n"
+		"\t\t\t\t\t<altitudeMode>clampToGround</altitudeMode>\n"
+		"\t\t\t\t\t<coordinates>"
+	, iname);
+
+	for(struct GPMFdata *p = this->video.getFirst(); p; p = p->next){
+		fprintf(f, "%f,%f,%f\n", p->longitude, p->latitude, p->altitude);
+	}
+
+	fputs(
+		"</coordinates>\n"
+		"\t\t\t\t</LineString>\n"
+		"\t\t\t</Placemark>\n"
+	, f);
+
+	fprintf(f,
+		"\t\t\t<Placemark>\n"
+/*		"\t\t\t<styleUrl>#depart</styleUrl>\n" */
+		"\t\t\t\t<name>Starting point</name>\n"
+		"\t\t\t\t<Point>\n"
+		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
+		"\t\t\t\t</Point>\n"
+		"\t\t\t</Placemark>\n"
+	, this->video.getFirst()->longitude, this->video.getFirst()->latitude);
+
+	fprintf(f,
+		"\t\t\t<Placemark>\n"
+		"\t\t\t<styleUrl>#End</styleUrl>\n"
+		"\t\t\t\t<name>Finish</name>\n"
+		"\t\t\t\t<Point>\n"
+		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
+		"\t\t\t\t</Point>\n"
+		"\t\t\t</Placemark>\n"
+	, this->video.getLast()->longitude, this->video.getLast()->latitude);
+
+	fputs(
+		"\t\t</Folder>\n"
+		"\t</Document>\n"
+		"</kml>"
+	, f);
+
+	fclose(f);
+
+	if(verbose)
+		printf("'%s' generated\n", fulltarget);
 }

@@ -39,13 +39,14 @@ static bool gfx_altitude = false;
 static bool gfx_path = false;
 static char gfx_strk = 0;	/* 0,2,3 */
 static bool gfx_GPX = false;
+static bool gfx_KML = false;
 
 int main(int argc, char *argv[]){
 	bool force = false;
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apk:VX")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXK")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -89,6 +90,9 @@ int main(int argc, char *argv[]){
 			break;
 		case 'X':
 			gfx_GPX = true;
+			break;
+		case 'K':
+			gfx_KML = true;
 			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
@@ -211,5 +215,10 @@ int main(int argc, char *argv[]){
 	if(gfx_GPX){
 		Export gfx( video );
 		gfx.generateGPX(targetDir, targetFile, vname);
+	}
+
+	if(gfx_KML){
+		Export gfx( video );
+		gfx.generateKML(targetDir, targetFile, vname);
 	}
 }

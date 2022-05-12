@@ -14,6 +14,7 @@ public:
 	Export( GPVideo &v ): video(v) {}
 
 	void generateGPX( const char *fulltarget, char *filename, char *iname );
+	void generateKML( const char *fulltarget, char *filename, char *iname );
 };
 
 #endif
