@@ -18,7 +18,7 @@ class SpeedGfx : public Gfx {
 protected:
 	void calcScales( void );
 	void generateBackground( void );
-	void generateOneGfx(const char *, char *, int , struct GPMFdata *);
+	void generateOneGfx(const char *, char *, int , GPVideo::GPMFdata *);
 	
 public:
 	SpeedGfx(GPVideo &v, char atype='2');

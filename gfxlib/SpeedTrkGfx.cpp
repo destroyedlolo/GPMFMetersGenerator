@@ -19,7 +19,7 @@ void SpeedTrkGfx::calcScales( void ){
 	this->scale_w = (double)this->SX/(double)this->video.getSampleCount();
 }
 
-void SpeedTrkGfx::drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
+void SpeedTrkGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 	if(!current){	/* Drawing shadow */
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
 		cairo_set_line_width(cr, 5);
@@ -28,7 +28,7 @@ void SpeedTrkGfx::drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
 		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);	/* Set white color */
 	}
 
-	struct GPMFdata *p;
+	GPVideo::GPMFdata *p;
 	uint32_t i;
 	for(i = 0, p = this->video.getFirst(); i < video.getSampleCount(); i++, p=p->next){
 		int x = i*this->scale_w + offset;
@@ -97,7 +97,7 @@ void SpeedTrkGfx::generateBackground( ){
 
 }
 
-void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
 
 		/*
 		 * Initialise Cairo
