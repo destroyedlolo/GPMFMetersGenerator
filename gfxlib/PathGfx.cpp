@@ -31,8 +31,13 @@ void PathGfx::posXY( double lat, double lgt, int &x, int &y){
 }
 
 void PathGfx::calcScales( void ){
-	this->posXY( this->video.getMin().latitude, this->video.getMin().longitude, this->min_x, this->min_y);
-	this->posXY( this->video.getMax().latitude, this->video.getMax().longitude, this->max_x, this->max_y);
+	if(this->hiking){
+		this->posXY( this->hiking->getMin().latitude, this->hiking->getMin().longitude, this->min_x, this->min_y);
+		this->posXY( this->hiking->getMax().latitude, this->hiking->getMax().longitude, this->max_x, this->max_y);
+	} else {
+		this->posXY( this->video.getMin().latitude, this->video.getMin().longitude, this->min_x, this->min_y);
+		this->posXY( this->video.getMax().latitude, this->video.getMax().longitude, this->max_x, this->max_y);
+	}
 
 	this->range_x = this->max_x - this->min_x;
 	this->range_y = this->max_y - this->min_y;
@@ -41,6 +46,23 @@ void PathGfx::calcScales( void ){
 
 	this->off_x = (this->SX - this->range_x * this->scale)/2;
 	this->off_y = (this->SX - this->range_y * this->scale)/2;
+}
+
+void PathGfx::drawGPX(cairo_t *cr, int offset){
+puts("**** drawGPX");
+	for(GPX::GpxData *p = this->hiking->getFirst(); p; p = p->next){
+		int x,y;
+
+		posXY(p->latitude, p->longitude, x, y);
+		x = this->off_x + (x-this->min_x) * this->scale + offset;
+		y = this->SY - this->off_y - (y-this->min_y)*this->scale + offset;
+
+		if(p == this->hiking->getFirst())
+			cairo_move_to(cr, x, y);
+		else
+			cairo_line_to(cr, x, y);
+	}
+	cairo_stroke(cr);
 }
 
 void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
@@ -71,14 +93,25 @@ void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 	cairo_stroke(cr);
 }
 
-void PathGfx::generateBackground( GPX * ){
+void PathGfx::generateBackground( void ){
+puts("**** generateBackground");
 	cairo_t *cr = cairo_create(this->background);
 
-			/* Draw shadow */
-	cairo_set_line_width(cr, 4);
-	cairo_set_source_rgba(cr, 0,0,0, 0.55);
-	this->drawGPMF(cr, 2, NULL);
+	if(this->hiking){
+		cairo_set_line_width(cr, 2);
+		cairo_set_source_rgba(cr, 0,0,0, 0.55);
+		drawGPX(cr, 2);
 
+			/* Draw path */
+		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+		cairo_set_line_width(cr, 2);
+		drawGPX(cr, 0);
+	} else {
+			/* Draw shadow */
+		cairo_set_line_width(cr, 4);
+		cairo_set_source_rgba(cr, 0,0,0, 0.55);
+		this->drawGPMF(cr, 2, NULL);
+	}
 
 		/* Cleaning */
 	cairo_destroy(cr);
