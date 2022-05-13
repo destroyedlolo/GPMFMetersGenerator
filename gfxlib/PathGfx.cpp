@@ -71,7 +71,7 @@ void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 	cairo_stroke(cr);
 }
 
-void PathGfx::generateBackground( ){
+void PathGfx::generateBackground( GPX * ){
 	cairo_t *cr = cairo_create(this->background);
 
 			/* Draw shadow */
@@ -97,7 +97,10 @@ void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index,
 	cairo_fill(cr);
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 1,1,1);
+	if(hiking)
+		cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+	else
+		cairo_set_source_rgb(cr, 1,1,1);
 	cairo_set_line_width(cr, 3);
 	this->drawGPMF(cr, 0, current);
 

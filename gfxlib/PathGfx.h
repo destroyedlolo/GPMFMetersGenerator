@@ -27,7 +27,7 @@ class PathGfx : public Gfx {
 
 protected:
 	void calcScales( void );
-	void generateBackground( void );
+	void generateBackground( GPX * );
 	void generateOneGfx( const char *, char *, int , GPVideo::GPMFdata *, GPX * );
 
 public:

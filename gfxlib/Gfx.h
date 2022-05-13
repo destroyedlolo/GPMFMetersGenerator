@@ -31,7 +31,7 @@ protected :
 		/* Generate background image.
 		 * It is generated once and reused in every image
 		 */
-	virtual void generateBackground( void );
+	virtual void generateBackground( GPX * );
 
 		/* Generate only one gfx
 		 * -> dir, file : as GenerateAllGfx
@@ -50,7 +50,7 @@ protected :
 
 public:
 	Gfx( size_t x, size_t y, GPVideo &v ) : video(v), SX(x), SY(y), background(NULL) {
-	Gfx::generateBackground();
+	Gfx::generateBackground( NULL );
 };
 
 	~Gfx(){

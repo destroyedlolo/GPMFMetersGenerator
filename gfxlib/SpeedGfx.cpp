@@ -52,7 +52,7 @@ void SpeedGfx::calcScales( void ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateBackground( ){
+void SpeedGfx::generateBackground( GPX * ){
 	int speed = (int)(log10(range)) + 1;
 
 	cairo_t *cr = cairo_create(this->background);
