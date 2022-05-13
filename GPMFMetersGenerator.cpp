@@ -203,23 +203,23 @@ int main(int argc, char *argv[]){
 
 		/* Generate videos */
 	if(gfx_speed){
-		SpeedGfx gfx( video, gfx_speed );
-		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
+		SpeedGfx gfx( video, hiking, gfx_speed );
+		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 
 	if(gfx_altitude){
-		AltitudeGfx gfx( video );
-		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
+		AltitudeGfx gfx( video, hiking );
+		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 
 	if(gfx_path){
-		PathGfx gfx( video );
-		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
+		PathGfx gfx( video, hiking );
+		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 
 	if(gfx_strk){
-		SpeedTrkGfx gfx( video, gfx_strk );
-		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
+		SpeedTrkGfx gfx( video, hiking, gfx_strk );
+		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 
 	if(gfx_GPX){

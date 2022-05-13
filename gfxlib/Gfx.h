@@ -19,6 +19,7 @@ extern bool genvideo;
 class Gfx {
 protected :
 	GPVideo &video;	// source video
+	GPX *hiking;	// Hiking full trace
 
 	size_t SX, SY;	// size of the generated graphics
 	cairo_surface_t *background;	// Background images
@@ -31,7 +32,7 @@ protected :
 		/* Generate background image.
 		 * It is generated once and reused in every image
 		 */
-	virtual void generateBackground( GPX * );
+	virtual void generateBackground( void );
 
 		/* Generate only one gfx
 		 * -> dir, file : as GenerateAllGfx
@@ -39,7 +40,7 @@ protected :
 		 * -> current : The data being drawn
 		 * -> hiking : full hiking trave
 		 */
-	virtual void generateOneGfx(const char *dir, char *file, int index, GPVideo::GPMFdata *current, GPX *hiking ) = 0;
+	virtual void generateOneGfx(const char *dir, char *file, int index, GPVideo::GPMFdata *current ) = 0;
 
 		/* Generate the video and remove png
 		 * -> dir, file : as GenerateAllGfx
@@ -49,8 +50,8 @@ protected :
 	void generateVideo( const char *dir, char *file, const char *iname, const char *vname);
 
 public:
-	Gfx( size_t x, size_t y, GPVideo &v ) : video(v), SX(x), SY(y), background(NULL) {
-	Gfx::generateBackground( NULL );
+	Gfx( size_t x, size_t y, GPVideo &v, GPX *h ) : video(v), hiking(h), SX(x), SY(y), background(NULL) {
+	Gfx::generateBackground();
 };
 
 	~Gfx(){
@@ -65,7 +66,7 @@ public:
 		 * Notez-bien : GenerateAllGfx() is not called inside the constructor
 		 * to let some change to modify scales if needed and/or target directory
 		 */
-	virtual void GenerateAllGfx( const char *dir, char *file, GPX *hiking );
+	virtual void GenerateAllGfx( const char *dir, char *file );
 };
 
 #endif

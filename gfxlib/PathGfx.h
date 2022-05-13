@@ -28,12 +28,12 @@ class PathGfx : public Gfx {
 protected:
 	void calcScales( void );
 	void generateBackground( GPX * );
-	void generateOneGfx( const char *, char *, int , GPVideo::GPMFdata *, GPX * );
+	void generateOneGfx( const char *, char *, int , GPVideo::GPMFdata * );
 
 public:
-	PathGfx(GPVideo &v);
+	PathGfx(GPVideo &v, GPX *);
 
-	void GenerateAllGfx( const char *dir, char *file, GPX * );
+	void GenerateAllGfx( const char *dir, char *file );
 };
 
 #endif

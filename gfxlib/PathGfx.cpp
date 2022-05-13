@@ -11,7 +11,7 @@
 
 #define R (6371000)	// terrestrial radius
 
-PathGfx::PathGfx(GPVideo &v) : Gfx( 300,300, v ) {
+PathGfx::PathGfx(GPVideo &v, GPX *h) : Gfx( 300,300, v, h ) {
 	this->calcScales();
 }
 
@@ -84,7 +84,7 @@ void PathGfx::generateBackground( GPX * ){
 	cairo_destroy(cr);
 }
 
-void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current, GPX *hiking ){
+void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current ){
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
 	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
 		puts("*F* Can't create Cairo's surface");
@@ -97,7 +97,7 @@ void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index,
 	cairo_fill(cr);
 	cairo_stroke(cr);
 
-	if(hiking)
+	if(this->hiking)
 		cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
 	else
 		cairo_set_source_rgb(cr, 1,1,1);
@@ -131,8 +131,8 @@ void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index,
 	cairo_surface_destroy(srf);
 }
 
-void PathGfx::GenerateAllGfx( const char *fulltarget, char *filename, GPX *hiking ){
-	Gfx::GenerateAllGfx( fulltarget, filename, hiking );
+void PathGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
+	Gfx::GenerateAllGfx( fulltarget, filename );
 
 		/* Generate video */
 	if(genvideo)

@@ -9,7 +9,7 @@
 #include <cstring>
 #include <cmath>
 
-SpeedTrkGfx::SpeedTrkGfx(GPVideo &v, char atype) : Gfx( 600,300, v ), type(atype) {
+SpeedTrkGfx::SpeedTrkGfx(GPVideo &v, GPX *h, char atype) : Gfx( 600,300, v, h ), type(atype) {
 	this->calcScales();
 }
 
@@ -52,7 +52,7 @@ void SpeedTrkGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 		cairo_stroke_preserve(cr);
 }
 
-void SpeedTrkGfx::generateBackground( GPX * ){
+void SpeedTrkGfx::generateBackground( void ){
 	cairo_t *cr = cairo_create(this->background);
 
 	cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */
@@ -97,7 +97,7 @@ void SpeedTrkGfx::generateBackground( GPX * ){
 
 }
 
-void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current, GPX *){
+void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
 
 		/*
 		 * Initialise Cairo
@@ -143,8 +143,8 @@ void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_surface_destroy(srf);
 }
 
-void SpeedTrkGfx::GenerateAllGfx( const char *fulltarget, char *filename, GPX *hiking ){
-	Gfx::GenerateAllGfx( fulltarget, filename, hiking );
+void SpeedTrkGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
+	Gfx::GenerateAllGfx( fulltarget, filename );
 
 		/* Generate video */
 	if(genvideo)
