@@ -7,7 +7,7 @@ LFMakeMaker -v +f=GPMFMakeFile -cc="gcc -Wall -O2" gpmf-parser/*.c gpmf-parser/d
 # rebuild data utility library
 cd datalib
 
-LFMakeMaker -v +f=Makefile -cc="g++ -Wall -O2" --opts="-lm \$(shell pkg-config --cflags cairo ) \$(shell pkg-config --libs cairo )" *.cpp -ar=../libdatalib.a > Makefile 
+LFMakeMaker -v +f=Makefile -cc="g++ -Wall -O2" --opts="-lm" *.cpp -ar=../libdatalib.a > Makefile 
 
 cd ..
 

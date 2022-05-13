@@ -9,7 +9,7 @@
 #include <cstring>
 #include <cmath>
 
-AltitudeGfx::AltitudeGfx(GPVideo &v) : Gfx( 600,300, v ) {
+AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h) : Gfx( 600,300, v, h ) {
 	this->calcScales();
 }
 
@@ -78,7 +78,7 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 		cairo_stroke_preserve(cr);
 }
 
-void AltitudeGfx::generateBackground( ){
+void AltitudeGfx::generateBackground( void ){
 	cairo_t *cr = cairo_create(this->background);
 
 	cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */

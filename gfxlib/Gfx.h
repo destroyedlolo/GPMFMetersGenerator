@@ -8,6 +8,7 @@
 
 #include "../datalib/Context.h"
 #include "../datalib/GPVideo.h"
+#include "../datalib/GPX.h"
 
 #include <cstddef>
 #include <cairo.h>
@@ -18,6 +19,7 @@ extern bool genvideo;
 class Gfx {
 protected :
 	GPVideo &video;	// source video
+	GPX *hiking;	// Hiking full trace
 
 	size_t SX, SY;	// size of the generated graphics
 	cairo_surface_t *background;	// Background images
@@ -36,8 +38,9 @@ protected :
 		 * -> dir, file : as GenerateAllGfx
 		 * -> index : index of the current sample
 		 * -> current : The data being drawn
+		 * -> hiking : full hiking trave
 		 */
-	virtual void generateOneGfx(const char *dir, char *file, int index, GPVideo::GPMFdata *current) = 0;
+	virtual void generateOneGfx(const char *dir, char *file, int index, GPVideo::GPMFdata *current ) = 0;
 
 		/* Generate the video and remove png
 		 * -> dir, file : as GenerateAllGfx
@@ -47,7 +50,7 @@ protected :
 	void generateVideo( const char *dir, char *file, const char *iname, const char *vname);
 
 public:
-	Gfx( size_t x, size_t y, GPVideo &v ) : video(v), SX(x), SY(y), background(NULL) {
+	Gfx( size_t x, size_t y, GPVideo &v, GPX *h ) : video(v), hiking(h), SX(x), SY(y), background(NULL) {
 	Gfx::generateBackground();
 };
 

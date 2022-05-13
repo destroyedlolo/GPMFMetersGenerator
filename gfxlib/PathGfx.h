@@ -17,6 +17,12 @@ class PathGfx : public Gfx {
 	/* Convert position to coordinates */
 	void posXY( double, double, int &, int &);
 
+	/* Draw external GPX data
+	 * cr -> cairo context
+	 * offset -> offset the curve (do draw shadows)
+	 */
+	void drawGPX(cairo_t *cr, int offset);
+
 	/* Draw GPMF data
 	 * -> offset : move the curve (used to draw the shadow)
 	 * -> current : current position.
@@ -28,10 +34,10 @@ class PathGfx : public Gfx {
 protected:
 	void calcScales( void );
 	void generateBackground( void );
-	void generateOneGfx(const char *, char *, int , GPVideo::GPMFdata *);
+	void generateOneGfx( const char *, char *, int , GPVideo::GPMFdata * );
 
 public:
-	PathGfx(GPVideo &v);
+	PathGfx(GPVideo &v, GPX *);
 
 	void GenerateAllGfx( const char *dir, char *file );
 };

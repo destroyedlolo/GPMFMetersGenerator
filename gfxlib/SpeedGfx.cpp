@@ -13,7 +13,7 @@
 
 #define LABEL_SZ 55	/* Label font size */
 
-SpeedGfx::SpeedGfx(GPVideo &v, char atype) : Gfx( 300,300, v ), type(atype) {
+SpeedGfx::SpeedGfx(GPVideo &v, GPX *h, char atype) : Gfx( 300,300, v, h ), type(atype) {
 	this->calcScales();
 }
 
@@ -52,7 +52,7 @@ void SpeedGfx::calcScales( void ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateBackground( ){
+void SpeedGfx::generateBackground( void ){
 	int speed = (int)(log10(range)) + 1;
 
 	cairo_t *cr = cairo_create(this->background);
@@ -113,7 +113,7 @@ void SpeedGfx::generateBackground( ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
+void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current ){
 	cairo_status_t err;
 
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);

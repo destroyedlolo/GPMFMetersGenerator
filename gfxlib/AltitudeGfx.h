@@ -25,10 +25,10 @@ class AltitudeGfx : public Gfx {
 protected:
 	void calcScales( void );
 	void generateBackground( void );
-	void generateOneGfx(const char *, char *, int , GPVideo::GPMFdata *);
+	void generateOneGfx( const char *, char *, int , GPVideo::GPMFdata * );
 
 public:
-	AltitudeGfx(GPVideo &v);
+	AltitudeGfx(GPVideo &v, GPX *h);
 
 	void GenerateAllGfx( const char *dir, char *file );
 };
