@@ -113,7 +113,7 @@ void SpeedGfx::generateBackground( ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateOneGfx(const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+void SpeedGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
 	cairo_status_t err;
 
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);

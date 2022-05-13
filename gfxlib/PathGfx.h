@@ -23,12 +23,12 @@ class PathGfx : public Gfx {
 	 *  if set, the color will not be the same in front and in back of this position
 	 *  if not set, we are drawing the shadow : THE PATH IS PRESERVED
 	 */
-	void drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current);
+	void drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current);
 
 protected:
 	void calcScales( void );
 	void generateBackground( void );
-	void generateOneGfx(const char *, char *, int , struct GPMFdata *);
+	void generateOneGfx(const char *, char *, int , GPVideo::GPMFdata *);
 
 public:
 	PathGfx(GPVideo &v);

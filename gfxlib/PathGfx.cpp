@@ -43,8 +43,8 @@ void PathGfx::calcScales( void ){
 	this->off_y = (this->SX - this->range_y * this->scale)/2;
 }
 
-void PathGfx::drawGPMF(cairo_t *cr, int offset, struct GPMFdata *current){
-	struct GPMFdata *p;
+void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
+	GPVideo::GPMFdata *p;
 
 	cairo_save(cr);
 	if(current)
@@ -84,7 +84,7 @@ void PathGfx::generateBackground( ){
 	cairo_destroy(cr);
 }
 
-void PathGfx::generateOneGfx(const char *fulltarget, char *filename, int index, struct GPMFdata *current){
+void PathGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
 	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
 		puts("*F* Can't create Cairo's surface");

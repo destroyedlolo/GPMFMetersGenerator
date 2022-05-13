@@ -60,7 +60,7 @@ void Gfx::generateVideo( const char *fulltarget, char *filename, const char *ina
 
 void Gfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 	uint32_t i;
-	struct GPMFdata *p;
+	GPVideo::GPMFdata *p;
 
 	this->generateBackground();	// Needed for custom background
 

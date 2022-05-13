@@ -26,7 +26,7 @@ void Export::generateGPX( const char *fulltarget, char *filename, char *iname ){
 		"\t\t<trkseg>\n", iname
 	);
 	
-	for(struct GPMFdata *p = this->video.getFirst(); p; p = p->next){
+	for(GPVideo::GPMFdata *p = this->video.getFirst(); p; p = p->next){
 		fprintf(f, "\t\t\t<trkpt lat=\"%f\" lon=\"%f\">\n", p->latitude, p->longitude);
 		fprintf(f, "\t\t\t\t<ele>%f</ele>\n", p->altitude);
 		fputs("\t\t\t</trkpt>\n", f);
@@ -91,7 +91,7 @@ void Export::generateKML( const char *fulltarget, char *filename, char *iname ){
 		"\t\t\t\t\t<coordinates>"
 	, iname);
 
-	for(struct GPMFdata *p = this->video.getFirst(); p; p = p->next){
+	for(GPVideo::GPMFdata *p = this->video.getFirst(); p; p = p->next){
 		fprintf(f, "%f,%f,%f\n", p->longitude, p->latitude, p->altitude);
 	}
 
