@@ -40,8 +40,8 @@ private:
 	uint32_t fr_num, fr_dem;	// Video framerates
 
 		/* GPMF's */
-	struct GPMFdata min, max;
-	struct GPMFdata *first, *last;
+	GPMFdata min, max;
+	GPMFdata *first, *last;
 	double nextsample;			// timing of the next sample to store
 	uint32_t samples_count;		// number of samples stored
 
@@ -68,10 +68,10 @@ public:
 
 	void Dump( void );
 
-	struct GPMFdata &getMin( void ){ return this->min; };
-	struct GPMFdata &getMax( void ){ return this->max; };
-	struct GPMFdata *getFirst(void){ return this->first; };
-	struct GPMFdata *getLast(void){ return this->last; };
+	GPMFdata &getMin( void ){ return this->min; };
+	GPMFdata &getMax( void ){ return this->max; };
+	GPMFdata *getFirst(void){ return this->first; };
+	GPMFdata *getLast(void){ return this->last; };
 	uint32_t getSampleCount(void){ return this->samples_count; };
 };
 #endif
