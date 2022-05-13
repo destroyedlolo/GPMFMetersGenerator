@@ -22,6 +22,7 @@
 
 #include "datalib/Context.h"
 #include "datalib/GPVideo.h"
+#include "datalib/GPX.h"
 
 #include "gfxlib/SpeedGfx.h"
 #include "gfxlib/AltitudeGfx.h"
@@ -31,7 +32,7 @@
 
 	/* Configuration */
 
-#define VERSION "2.00"
+#define VERSION "2.01a01"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
@@ -41,12 +42,14 @@ static char gfx_strk = 0;	/* 0,2,3 */
 static bool gfx_GPX = false;
 static bool gfx_KML = false;
 
+GPX *journey = NULL;	// full journey trace
+
 int main(int argc, char *argv[]){
 	bool force = false;
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXK")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -94,6 +97,10 @@ int main(int argc, char *argv[]){
 		case 'K':
 			gfx_KML = true;
 			break;
+		case 'G':
+			journey = new GPX(optarg);
+			journey->Dump();
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
@@ -115,6 +122,9 @@ int main(int argc, char *argv[]){
 				"-a : enable altitude gfx\n"
 				"-p : enable path gfx\n"
 				"-X : export telemetry as GPX file\n"
+				"-K : export telemetry as KML file\n"
+				"\n"
+				"-G<file> : load a GPX file\n"
 				"\n"
 				"-V : Don't generate video, keep PNG files\n"
 				"-F : don't fail if the target directory exists\n"
