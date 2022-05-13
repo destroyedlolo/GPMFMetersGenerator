@@ -8,6 +8,7 @@
 
 #include "../datalib/Context.h"
 #include "../datalib/GPVideo.h"
+#include "../datalib/GPX.h"
 
 #include <cstddef>
 #include <cairo.h>
@@ -36,8 +37,9 @@ protected :
 		 * -> dir, file : as GenerateAllGfx
 		 * -> index : index of the current sample
 		 * -> current : The data being drawn
+		 * -> hiking : full hiking trave
 		 */
-	virtual void generateOneGfx(const char *dir, char *file, int index, GPVideo::GPMFdata *current) = 0;
+	virtual void generateOneGfx(const char *dir, char *file, int index, GPVideo::GPMFdata *current, GPX *hiking ) = 0;
 
 		/* Generate the video and remove png
 		 * -> dir, file : as GenerateAllGfx
@@ -63,7 +65,7 @@ public:
 		 * Notez-bien : GenerateAllGfx() is not called inside the constructor
 		 * to let some change to modify scales if needed and/or target directory
 		 */
-	virtual void GenerateAllGfx( const char *dir, char *file );
+	virtual void GenerateAllGfx( const char *dir, char *file, GPX *hiking );
 };
 
 #endif

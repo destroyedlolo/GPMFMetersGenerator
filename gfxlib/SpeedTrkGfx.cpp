@@ -97,7 +97,7 @@ void SpeedTrkGfx::generateBackground( ){
 
 }
 
-void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
+void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current, GPX *){
 
 		/*
 		 * Initialise Cairo
@@ -143,8 +143,8 @@ void SpeedTrkGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_surface_destroy(srf);
 }
 
-void SpeedTrkGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
-	Gfx::GenerateAllGfx( fulltarget, filename );
+void SpeedTrkGfx::GenerateAllGfx( const char *fulltarget, char *filename, GPX *hiking ){
+	Gfx::GenerateAllGfx( fulltarget, filename, hiking );
 
 		/* Generate video */
 	if(genvideo)

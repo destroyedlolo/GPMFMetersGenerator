@@ -18,12 +18,12 @@ class SpeedGfx : public Gfx {
 protected:
 	void calcScales( void );
 	void generateBackground( void );
-	void generateOneGfx(const char *, char *, int , GPVideo::GPMFdata *);
+	void generateOneGfx( const char *, char *, int , GPVideo::GPMFdata *, GPX * );
 	
 public:
 	SpeedGfx(GPVideo &v, char atype='2');
 
-	void GenerateAllGfx( const char *dir, char *file );
+	void GenerateAllGfx( const char *dir, char *file, GPX *hiking=NULL );
 };
 
 #endif

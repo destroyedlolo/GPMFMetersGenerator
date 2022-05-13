@@ -58,14 +58,14 @@ void Gfx::generateVideo( const char *fulltarget, char *filename, const char *ina
 	closedir(dp);
 }
 
-void Gfx::GenerateAllGfx( const char *fulltarget, char *filename ){
+void Gfx::GenerateAllGfx( const char *fulltarget, char *filename, GPX *hiking ){
 	uint32_t i;
 	GPVideo::GPMFdata *p;
 
 	this->generateBackground();	// Needed for custom background
 
 	for(i = 0, p = this->video.getFirst(); i < this->video.getSampleCount(); i++, p=p->next)
-		generateOneGfx(fulltarget, filename, i, p);
+		generateOneGfx(fulltarget, filename, i, p, hiking);
 
 	if(verbose)
 		puts("");

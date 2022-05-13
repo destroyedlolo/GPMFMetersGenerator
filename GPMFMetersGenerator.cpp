@@ -32,7 +32,7 @@
 
 	/* Configuration */
 
-#define VERSION "2.01a01"
+#define VERSION "2.01a02"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
@@ -42,7 +42,7 @@ static char gfx_strk = 0;	/* 0,2,3 */
 static bool gfx_GPX = false;
 static bool gfx_KML = false;
 
-GPX *journey = NULL;	// full journey trace
+GPX *hiking = NULL;	// full hiking trace
 
 int main(int argc, char *argv[]){
 	bool force = false;
@@ -98,8 +98,8 @@ int main(int argc, char *argv[]){
 			gfx_KML = true;
 			break;
 		case 'G':
-			journey = new GPX(optarg);
-			journey->Dump();
+			hiking = new GPX(optarg);
+			hiking->Dump();
 			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
@@ -204,22 +204,22 @@ int main(int argc, char *argv[]){
 		/* Generate videos */
 	if(gfx_speed){
 		SpeedGfx gfx( video, gfx_speed );
-		gfx.GenerateAllGfx(targetDir, targetFile);
+		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
 	}
 
 	if(gfx_altitude){
 		AltitudeGfx gfx( video );
-		gfx.GenerateAllGfx(targetDir, targetFile);
+		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
 	}
 
 	if(gfx_path){
 		PathGfx gfx( video );
-		gfx.GenerateAllGfx(targetDir, targetFile);
+		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
 	}
 
 	if(gfx_strk){
 		SpeedTrkGfx gfx( video, gfx_strk );
-		gfx.GenerateAllGfx(targetDir, targetFile);
+		gfx.GenerateAllGfx(targetDir, targetFile, hiking);
 	}
 
 	if(gfx_GPX){

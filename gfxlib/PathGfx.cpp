@@ -84,7 +84,7 @@ void PathGfx::generateBackground( ){
 	cairo_destroy(cr);
 }
 
-void PathGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
+void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current, GPX *hiking ){
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
 	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
 		puts("*F* Can't create Cairo's surface");
@@ -128,8 +128,8 @@ void PathGfx::generateOneGfx(const char *fulltarget, char *filename, int index, 
 	cairo_surface_destroy(srf);
 }
 
-void PathGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
-	Gfx::GenerateAllGfx( fulltarget, filename );
+void PathGfx::GenerateAllGfx( const char *fulltarget, char *filename, GPX *hiking ){
+	Gfx::GenerateAllGfx( fulltarget, filename, hiking );
 
 		/* Generate video */
 	if(genvideo)

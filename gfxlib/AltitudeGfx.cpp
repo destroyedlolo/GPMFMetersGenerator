@@ -114,7 +114,7 @@ void AltitudeGfx::generateBackground( ){
 
 }
 
-void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
+void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current, GPX *){
 
 		/*
 		 * Initialise Cairo
@@ -175,8 +175,8 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_surface_destroy(srf);
 }
 
-void AltitudeGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
-	Gfx::GenerateAllGfx( fulltarget, filename );
+void AltitudeGfx::GenerateAllGfx( const char *fulltarget, char *filename, GPX *hiking ){
+	Gfx::GenerateAllGfx( fulltarget, filename, hiking );
 
 		/* Generate video */
 	if(genvideo)

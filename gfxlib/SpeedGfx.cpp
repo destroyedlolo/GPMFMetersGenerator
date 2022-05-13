@@ -113,7 +113,7 @@ void SpeedGfx::generateBackground( ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
+void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current, GPX * ){
 	cairo_status_t err;
 
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
@@ -208,8 +208,8 @@ void SpeedGfx::generateOneGfx(const char *fulltarget, char *filename, int index,
 	cairo_surface_destroy(srf);
 }
 
-void SpeedGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
-	Gfx::GenerateAllGfx( fulltarget, filename );
+void SpeedGfx::GenerateAllGfx( const char *fulltarget, char *filename, GPX *hiking ){
+	Gfx::GenerateAllGfx( fulltarget, filename, hiking );
 
 		/* Generate video */
 	if(genvideo)
