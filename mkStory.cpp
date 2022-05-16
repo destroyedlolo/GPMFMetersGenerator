@@ -71,6 +71,10 @@ int main(int argc, char *argv[]){
 		if(verbose)
 			printf("*I Reading '%s'\n", argv[optind]);
 
+			/* As GoPro's OpenMP4Source() needs a "char *",
+			 * it's easier to manage this temporary file in C
+			 * instead of a C++'s string
+			 */
 		char *fname = strdup(argv[optind]);
 		assert(fname);		// quick & dirty : no raison to fail
 
