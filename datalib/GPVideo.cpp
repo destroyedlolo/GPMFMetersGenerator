@@ -331,7 +331,7 @@ void GPVideo::AddPart( char *fch ){
 }
 
 void GPVideo::Dump( void ){
-	puts("*I* Video this->min/this->max :");
+	puts("*I* Video min/max :");
 	printf("\tLatitude : %f deg - %f deg (%f)\n", this->min.latitude, this->max.latitude, this->max.latitude - this->min.latitude);
 	printf("\tLongitude : %f deg - %f deg (%f)\n", this->min.longitude, this->max.longitude, this->max.longitude - this->min.longitude);
 	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", this->min.altitude, this->max.altitude, this->max.altitude - this->min.altitude);
