@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
+#include <cassert>
+#include <cstring>
 
 #include <vector>
 
@@ -27,7 +29,8 @@ int main(int argc, char *argv[]){
 		switch(opt){
 		case 'G':
 			gpx = new GPX(optarg);
-			gpx->Dump();
+			if(verbose)
+				gpx->Dump();
 			break;
 		case 'd':	// debug implies verbose
 			debug = true;
@@ -68,11 +71,40 @@ int main(int argc, char *argv[]){
 		if(verbose)
 			printf("*I Reading '%s'\n", argv[optind]);
 
-		GPVideo video(argv[optind++]);
+		char *fname = strdup(argv[optind]);
+		assert(fname);		// quick & dirty : no raison to fail
+
+		GPVideo video(argv[optind]);	// load the first chunk
+
+			// "GX013561.MP4" -> 12 chars
+		size_t len = strlen(fname);
+		if(len < 12){
+			fputs("*E* filename doesn't correspond to a GoPro video\n", stderr);
+			exit(EXIT_FAILURE);
+		}
+		if(strncmp(fname + len - 12, "GX01", 4)){
+			fputs("*E* not a GoPro video or not the 1st one\n", stderr);
+			exit(EXIT_FAILURE);
+		}
+		len -= 9;	// point to the part number
+	
+		for(unsigned int i = '2'; i<='9'; i++){
+			*(fname + len) = i;
+
+			if(!access(fname, R_OK)){
+				if(verbose)
+					printf("*I Adding '%s'\n", argv[optind]);
+				
+				video.AddPart(fname);
+			}
+		}
+
 		if(verbose)
 			video.Dump();
 
 		videos.push_back(video);
+
+		free(fname);
 	}
 }
 
