@@ -17,8 +17,8 @@ PathGfx::PathGfx(GPVideo &v, GPX *h) : Gfx( 300,300, v, h ) {
 void PathGfx::posXY( double lat, double lgt, int &x, int &y){
 
 	/* Degree -> Radian */
-	lat = GPSCoordinates::toRadian(lat);
-	lgt = GPSCoordinates::toRadian(lgt);
+	lat = GPSCoordinate::toRadian(lat);
+	lgt = GPSCoordinate::toRadian(lgt);
 
 	double sinlgt = sin(lgt),
 		coslgt = cos(lgt),

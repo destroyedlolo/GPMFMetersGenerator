@@ -1,4 +1,4 @@
-/* GPSCoordinates
+/* GPSCoordinate
  */
 
 #ifndef GPSCOORD_H
@@ -8,12 +8,12 @@
 
 #define R (6371000)	// terrestrial radius
 
-class GPSCoordinates {
+class GPSCoordinate {
 	double latitude, longitude;
 
 public :
-	GPSCoordinates(){}
-	GPSCoordinates( double alat, double along ): latitude(alat), longitude(along) {}
+	GPSCoordinate(){}
+	GPSCoordinate( double alat, double along ): latitude(alat), longitude(along) {}
 
 	void set(double alat, double along) {
 		this->latitude = alat;
@@ -26,7 +26,7 @@ public :
 	double getLongitude( void ){ return this->longitude; }
 
 		/* from https://forums.futura-sciences.com/mathematiques-superieur/306536-calcul-de-distance-entre-2-points-dont-jai-coordonnees-geographiques-longitude-latitude.html#post2315609 */
-	double Distance( GPSCoordinates &other ){
+	double Distance( GPSCoordinate &other ){
 		double a = this->toRadian(other.getLatitude());
 		double b = this->toRadian(this->getLatitude());
 		double c = this->toRadian(other.getLongitude());

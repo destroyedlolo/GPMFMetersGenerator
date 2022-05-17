@@ -5,7 +5,7 @@
 #ifndef GPVIDEO_H
 #define GPVIDEO_H
 
-#include "GPSCoordinates.h"
+#include "GPSCoordinate.h"
 
 #include <cstdint>
 #include <ctime>
@@ -16,7 +16,7 @@
 class GPVideo {
 public:
 		/* Sample's data */
-	struct GPMFdata : public GPSCoordinates {
+	struct GPMFdata : public GPSCoordinate {
 		struct GPMFdata *next;
 		double altitude;
 		double spd2d, spd3d;
@@ -28,7 +28,7 @@ public:
 			double aaltitude,
 			double aspd2d, double aspd3d,
 			time_t asample_time
-		) : GPSCoordinates(alatitude, alongitude), next(NULL),
+		) : GPSCoordinate(alatitude, alongitude), next(NULL),
 			altitude(aaltitude), spd2d(aspd2d), spd3d(aspd3d), 
 			sample_time(asample_time){
 		}
