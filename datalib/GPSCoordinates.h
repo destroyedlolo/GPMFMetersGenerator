@@ -27,6 +27,12 @@ public :
 
 		/* from https://forums.futura-sciences.com/mathematiques-superieur/306536-calcul-de-distance-entre-2-points-dont-jai-coordonnees-geographiques-longitude-latitude.html#post2315609 */
 	double Distance( GPSCoordinates &other ){
+		double a = this->toRadian(other.getLatitude());
+		double b = this->toRadian(this->getLatitude());
+		double c = this->toRadian(other.getLongitude());
+		double d = this->toRadian(this->getLongitude());
+
+		return( R*acos(sin(a)*sin(b) + cos(a)*cos(b)*cos(c-d)) );
 	}
 
 	static double toRadian( double deg ){ return(deg * M_PI/180.0); }

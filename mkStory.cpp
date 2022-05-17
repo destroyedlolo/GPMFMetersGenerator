@@ -103,13 +103,17 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		if(verbose)
+		if(verbose){
 			video.Dump();
+			printf("*I* Distance vs min : %.0fm, max %.0fm\n",
+				video.getMin().Distance(gpx->getMin()),
+				video.getMax().Distance(gpx->getMax())
+			);
+		}
 
 		videos.push_back(video);
 
 		free(fname);
 	}
-
 }
 
