@@ -68,8 +68,7 @@ int main(int argc, char *argv[]){
 	}
 
 	for(; optind < argc; optind++){
-		if(verbose)
-			printf("*I Reading '%s'\n", argv[optind]);
+		printf("*I Reading '%s'\n", argv[optind]);
 
 			/* As GoPro's OpenMP4Source() needs a "char *",
 			 * it's easier to manage this temporary file in C
@@ -90,14 +89,15 @@ int main(int argc, char *argv[]){
 			fputs("*E* not a GoPro video or not the 1st one\n", stderr);
 			exit(EXIT_FAILURE);
 		}
-		len -= 9;	// point to the part number
+		len -= 10;	// point to the part number
 	
-		for(unsigned int i = '2'; i<='9'; i++){
-			*(fname + len) = i;
+		for(unsigned int i = 2; i<99; i++){	// As per GoPro, up to 98 parts
+			char buff[3];
+			sprintf(buff, "%02d", i);
+			memcpy(fname + len, buff, 2);
 
 			if(!access(fname, R_OK)){
-				if(verbose)
-					printf("*I Adding '%s'\n", argv[optind]);
+				printf("*I Adding '%s'\n", argv[optind]);
 				
 				video.AddPart(fname);
 			}
@@ -111,6 +111,5 @@ int main(int argc, char *argv[]){
 		free(fname);
 	}
 
-	
 }
 
