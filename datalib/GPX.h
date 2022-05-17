@@ -46,6 +46,7 @@ public:
 		/* Check if given coordinate is close to the footprint of the hiking.
 		 * It's a very quick and dirty test ... but enough to check a video
 		 * has been took in the same area
+		 * -> proximity_threshold in degree
 		 */
 	bool sameArea( GPSCoordinate &, uint32_t proximity_threshold = 0 );
 };

@@ -22,13 +22,14 @@ GPX *gpx = NULL;	// external original GPX data
 uint32_t proximity = 15;	// Proximity threshold 
 							// (bellow this distance, places are considered to 
 							// be the same.
+bool force = false;	// force video inclusion
 
 std::vector<GPVideo> videos;
 
 int main(int argc, char *argv[]){
 			/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhG:p:")) != -1){
+	while(( opt = getopt(argc, argv, ":vdhG:p:F")) != -1){
 		switch(opt){
 		case 'G':
 			gpx = new GPX(optarg);
@@ -43,6 +44,9 @@ int main(int argc, char *argv[]){
 		case 'p':
 			proximity = strtoul(optarg, NULL, 10);
 			break;
+		case 'F':
+			force = true;
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
@@ -55,6 +59,7 @@ int main(int argc, char *argv[]){
 				"Known opts :\n"
 				"-G<file> : GPX of the hicking\n"
 				"-p<val> : Proximity threshold (default: 15m)\n"
+				"-F : force video inclusion\n"
 				"\n"
 				"-v : turn verbose on\n"
 				"-d : turn debugging messages on\n"
@@ -118,12 +123,17 @@ int main(int argc, char *argv[]){
 			);
 		}
 
-		if( video.getMin().Distance(gpx->getMin()) < -proximity ||
-			video.getMax().Distance(gpx->getMax()) > proximity ){
-				fprintf(stderr, "*E* This video is far away from the GPX trace (%.0f and %.0f)\n", 
+		if( !gpx->sameArea(video.getMin()) ||
+			!gpx->sameArea(video.getMax()) ){
+				fprintf(stderr, "*W* This video seems outside the GPX trace (%.0fm and %.0fm)\n", 
 					video.getMin().Distance(gpx->getMin()),
 					video.getMax().Distance(gpx->getMax())
 				);
+
+				if(!force){
+					fputs("*F* exiting (use -F to force this video inclusion)\n", stderr);
+					exit(EXIT_FAILURE);
+				}
 		}
 		videos.push_back(video);
 

@@ -247,3 +247,14 @@ GPX::GPX( const char *file ):first(NULL), last(NULL), samples_count(0){
 	fclose(f);
 }
 
+bool GPX::sameArea( GPSCoordinate &coord, uint32_t proximity_threshold){
+	if( this->getMin().getLatitude() - proximity_threshold > coord.getLatitude() ||
+		this->getMax().getLatitude() + proximity_threshold < coord.getLatitude() )
+		return false;
+
+	if( this->getMin().getLongitude() - proximity_threshold > coord.getLongitude() ||
+		this->getMax().getLongitude() + proximity_threshold < coord.getLongitude() )
+		return false;
+	
+	return true;
+}
