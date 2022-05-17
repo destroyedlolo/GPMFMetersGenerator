@@ -48,16 +48,19 @@ void PathGfx::calcScales( void ){
 }
 
 void PathGfx::drawGPX(cairo_t *cr, int offset){
-	for(GPX::GpxData *p = this->hiking->getFirst(); p; p = p->next){
+	bool first = true;
+
+	for(auto p : this->hiking->getSamples()){
 		int x,y;
 
-		posXY(p->getLatitude(), p->getLongitude(), x, y);
+		posXY(p.getLatitude(), p.getLongitude(), x, y);
 		x = this->off_x + (x-this->min_x) * this->scale + offset;
 		y = this->SY - this->off_y - (y-this->min_y)*this->scale + offset;
 
-		if(p == this->hiking->getFirst())
+		if(first){
+			first = false;
 			cairo_move_to(cr, x, y);
-		else
+		} else
 			cairo_line_to(cr, x, y);
 	}
 	cairo_stroke(cr);

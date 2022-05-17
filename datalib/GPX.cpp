@@ -105,23 +105,22 @@ void GPX::Dump( void ){
 
 	if(debug){
 		puts("*D* Memorized video data");
-		for(GpxData *p = first; p; p = p->next){
-			printf("%p (next: %p)\n", p, p->next);
-			printf("\tLatitude : %.3f deg\n", p->getLatitude());
-			printf("\tLongitude : %.3f deg\n", p->getLongitude());
-			printf("\tAltitude : %.3f m\n", p->altitude);
+		for(auto p : samples){
+			printf("\tLatitude : %.3f deg\n", p.getLatitude());
+			printf("\tLongitude : %.3f deg\n", p.getLongitude());
+			printf("\tAltitude : %.3f m\n", p.altitude);
 
-			struct tm *t = gmtime(&p->sample_time);
+			struct tm *t = gmtime(&p.sample_time);
 			printf("\tTime : ");
 			printtm(t);
 			puts("");
 		}
 	}
 
-	printf("*I* %u memorised GPX\n", this->samples_count);
+	printf("*I* %u memorised GPX\n", this->getSampleCount());
 }
 
-GPX::GPX( const char *file ):first(NULL), last(NULL), samples_count(0){
+GPX::GPX( const char *file ){
 	FILE *f;
 
 	if(!(f = fopen(file, "r"))){
@@ -202,7 +201,7 @@ GPX::GPX( const char *file ):first(NULL), last(NULL), samples_count(0){
 #endif
 
 			/* Update min/max */
-		if(!this->first){
+		if(!this->getSampleCount()){
 			this->min.set( lat, lgt );
 			this->max.set( lat, lgt );
 
@@ -231,17 +230,10 @@ GPX::GPX( const char *file ):first(NULL), last(NULL), samples_count(0){
 		}
 
 			/* store the new sample */
-		GpxData *nv = new GpxData(lat, lgt, alt, time);
+		GpxData nv(lat, lgt, alt, time);
 	
 			/* insert the new sample in the list */
-		if(!this->first)
-			this->first = nv;
-		else
-			this->last->next = nv;
-		this->last = nv;
-
-		this->samples_count++;
-
+		samples.push_back(nv);
 	}
 
 	fclose(f);
