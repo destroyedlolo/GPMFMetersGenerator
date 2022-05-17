@@ -9,18 +9,17 @@
 #include <cstring>
 #include <cmath>
 
-#define R (6371000)	// terrestrial radius
-
 PathGfx::PathGfx(GPVideo &v, GPX *h) : Gfx( 300,300, v, h ) {
 	this->calcScales();
 }
 
 	/* From https://forums.futura-sciences.com/mathematiques-superieur/39838-conversion-lat-long-x-y.html */
 void PathGfx::posXY( double lat, double lgt, int &x, int &y){
+
 	/* Degree -> Radian */
-	lat *= M_PI/180.0;
-	lgt *= M_PI/180.0;
-	
+	lat = GPSCoordinates::toRadian(lat);
+	lgt = GPSCoordinates::toRadian(lgt);
+
 	double sinlgt = sin(lgt),
 		coslgt = cos(lgt),
 		sintlat = sin(lat),
