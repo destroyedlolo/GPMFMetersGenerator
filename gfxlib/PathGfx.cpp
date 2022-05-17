@@ -32,12 +32,8 @@ void PathGfx::posXY( double lat, double lgt, int &x, int &y){
 
 void PathGfx::calcScales( void ){
 	if(this->hiking){
-		this->posXY( this->hiking->getMin().latitude, this->hiking->getMin().longitude, this->min_x, this->min_y);
-		this->posXY( this->hiking->getMax().latitude, this->hiking->getMax().longitude, this->max_x, this->max_y);
-/*
 		this->posXY( this->hiking->getMin().getLatitude(), this->hiking->getMin().getLongitude(), this->min_x, this->min_y);
-		this->posXY( this->hiking->getMax().getLatitude(), this->hiking->getMax().getLongitude, this->max_x, this->max_y);
-*/
+		this->posXY( this->hiking->getMax().getLatitude(), this->hiking->getMax().getLongitude(), this->max_x, this->max_y);
 	} else {
 		this->posXY( this->video.getMin().getLatitude(), this->video.getMin().getLongitude(), this->min_x, this->min_y);
 		this->posXY( this->video.getMax().getLatitude(), this->video.getMax().getLongitude(), this->max_x, this->max_y);
@@ -56,7 +52,7 @@ void PathGfx::drawGPX(cairo_t *cr, int offset){
 	for(GPX::GpxData *p = this->hiking->getFirst(); p; p = p->next){
 		int x,y;
 
-		posXY(p->latitude, p->longitude, x, y);
+		posXY(p->getLatitude(), p->getLongitude(), x, y);
 		x = this->off_x + (x-this->min_x) * this->scale + offset;
 		y = this->SY - this->off_y - (y-this->min_y)*this->scale + offset;
 

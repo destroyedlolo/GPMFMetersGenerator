@@ -5,14 +5,15 @@
 #ifndef GPX_H
 #define GPX_H
 
+#include "GPSCoordinates.h"
+
 #include <cstdint>
 #include <ctime>
 
 class GPX {
 public:
-	struct GpxData {
+	struct GpxData : public GPSCoordinates {
 		struct GpxData *next;
-		double latitude, longitude;
 		double altitude;
 		time_t sample_time;
 
@@ -21,7 +22,7 @@ public:
 			double alatitude, double alongitude,
 			double aaltitude,
 			time_t asample_time
-		) : next(NULL), latitude(alatitude), longitude(alongitude),
+		) : GPSCoordinates(alatitude, alongitude), next(NULL),
 			altitude(aaltitude), sample_time(asample_time) {
 		}
 	};

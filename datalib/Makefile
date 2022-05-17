@@ -16,7 +16,7 @@ GPVideo.o : GPVideo.cpp ../gpmf-parser/GPMF_parser.h \
   Context.h GPVideo.h GPSCoordinates.h Makefile 
 	$(cc) -c -o GPVideo.o GPVideo.cpp $(opts) 
 
-GPX.o : GPX.cpp ../datalib/Context.h GPX.h Makefile 
+GPX.o : GPX.cpp ../datalib/Context.h GPX.h GPSCoordinates.h Makefile 
 	$(cc) -c -o GPX.o GPX.cpp $(opts) 
 
 ../libdatalib.a : GPX.o GPVideo.o Context.o Makefile 
