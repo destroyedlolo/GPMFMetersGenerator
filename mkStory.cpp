@@ -19,13 +19,16 @@
 #define VERSION "0.01a01"
 
 GPX *gpx = NULL;	// external original GPX data
+uint32_t proximity = 15;	// Proximity threshold 
+							// (bellow this distance, places are considered to 
+							// be the same.
 
 std::vector<GPVideo> videos;
 
 int main(int argc, char *argv[]){
 			/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhG:")) != -1){
+	while(( opt = getopt(argc, argv, ":vdhG:p:")) != -1){
 		switch(opt){
 		case 'G':
 			gpx = new GPX(optarg);
@@ -36,6 +39,9 @@ int main(int argc, char *argv[]){
 			debug = true;
 		case 'v':
 			verbose = true;
+			break;
+		case 'p':
+			proximity = strtoul(optarg, NULL, 10);
 			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
@@ -48,6 +54,7 @@ int main(int argc, char *argv[]){
 				"mkStory [-options] video.mp4 ...\n"
 				"Known opts :\n"
 				"-G<file> : GPX of the hicking\n"
+				"-p<val> : Proximity threshold (default: 15m)\n"
 				"\n"
 				"-v : turn verbose on\n"
 				"-d : turn debugging messages on\n"
@@ -111,6 +118,13 @@ int main(int argc, char *argv[]){
 			);
 		}
 
+		if( video.getMin().Distance(gpx->getMin()) < -proximity ||
+			video.getMax().Distance(gpx->getMax()) > proximity ){
+				fprintf(stderr, "*E* This video is far away from the GPX trace (%.0f and %.0f)\n", 
+					video.getMin().Distance(gpx->getMin()),
+					video.getMax().Distance(gpx->getMax())
+				);
+		}
 		videos.push_back(video);
 
 		free(fname);
