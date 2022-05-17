@@ -213,22 +213,23 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 
 		/* update Min / Max */
 	if(!this->first){	/* First data */
-		this->min.latitude = this->max.latitude = lat;
-		this->min.longitude = this->max.longitude = lgt;
+		this->min.set( lat, lgt );
+		this->max.set( lat, lgt );
+
 		this->min.altitude = this->max.altitude = alt;
 		this->min.spd2d = this->max.spd2d = s2d;
 		this->min.spd3d = this->max.spd3d = s3d;
 		this->min.sample_time = this->max.sample_time = time;
 	} else {
-		if(lat < this->min.latitude)
-			this->min.latitude = lat;
-		if(lat > this->max.latitude)
-			this->max.latitude = lat;
+		if(lat < this->min.getLatitude())
+			this->min.setLatitude(lat);
+		if(lat > this->max.getLatitude())
+			this->max.setLatitude(lat);
 
-		if(lgt < this->min.longitude)
-			this->min.longitude = lgt;
-		if(lgt > this->max.longitude)
-			this->max.longitude = lgt;
+		if(lgt < this->min.getLongitude())
+			this->min.setLongitude(lgt);
+		if(lgt > this->max.getLongitude())
+			this->max.setLongitude(lgt);
 
 		if(alt < this->min.altitude)
 			this->min.altitude = alt;
@@ -332,8 +333,8 @@ void GPVideo::AddPart( char *fch ){
 
 void GPVideo::Dump( void ){
 	puts("*I* Video min/max :");
-	printf("\tLatitude : %f deg - %f deg (%f)\n", this->min.latitude, this->max.latitude, this->max.latitude - this->min.latitude);
-	printf("\tLongitude : %f deg - %f deg (%f)\n", this->min.longitude, this->max.longitude, this->max.longitude - this->min.longitude);
+	printf("\tLatitude : %f deg - %f deg (%f)\n", this->min.getLatitude(), this->max.getLatitude(), this->max.getLatitude() - this->min.getLatitude());
+	printf("\tLongitude : %f deg - %f deg (%f)\n", this->min.getLongitude(), this->max.getLongitude(), this->max.getLongitude() - this->min.getLongitude());
 	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", this->min.altitude, this->max.altitude, this->max.altitude - this->min.altitude);
 	printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", this->min.spd2d, this->max.spd2d, this->max.spd2d - this->min.spd2d);
 	printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", this->min.spd3d, this->max.spd3d, this->max.spd3d - this->min.spd3d);
@@ -349,8 +350,8 @@ void GPVideo::Dump( void ){
 		puts("*D* Memorized video data");
 		for(GPMFdata *p = first; p; p = p->next){
 			printf("%p (next: %p)\n", p, p->next);
-			printf("\tLatitude : %.3f deg\n", p->latitude);
-			printf("\tLongitude : %.3f deg\n", p->longitude);
+			printf("\tLatitude : %.3f deg\n", p->getLatitude());
+			printf("\tLongitude : %.3f deg\n", p->getLongitude());
 			printf("\tAltitude : %.3f m\n", p->altitude);
 			printf("\tSpeed2d : %.3f km/h\n", p->spd2d);
 			printf("\tSpeed3d : %.3f km/h\n", p->spd3d);

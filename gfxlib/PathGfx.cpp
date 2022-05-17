@@ -34,9 +34,13 @@ void PathGfx::calcScales( void ){
 	if(this->hiking){
 		this->posXY( this->hiking->getMin().latitude, this->hiking->getMin().longitude, this->min_x, this->min_y);
 		this->posXY( this->hiking->getMax().latitude, this->hiking->getMax().longitude, this->max_x, this->max_y);
+/*
+		this->posXY( this->hiking->getMin().getLatitude(), this->hiking->getMin().getLongitude(), this->min_x, this->min_y);
+		this->posXY( this->hiking->getMax().getLatitude(), this->hiking->getMax().getLongitude, this->max_x, this->max_y);
+*/
 	} else {
-		this->posXY( this->video.getMin().latitude, this->video.getMin().longitude, this->min_x, this->min_y);
-		this->posXY( this->video.getMax().latitude, this->video.getMax().longitude, this->max_x, this->max_y);
+		this->posXY( this->video.getMin().getLatitude(), this->video.getMin().getLongitude(), this->min_x, this->min_y);
+		this->posXY( this->video.getMax().getLatitude(), this->video.getMax().getLongitude(), this->max_x, this->max_y);
 	}
 
 	this->range_x = this->max_x - this->min_x;
@@ -49,7 +53,6 @@ void PathGfx::calcScales( void ){
 }
 
 void PathGfx::drawGPX(cairo_t *cr, int offset){
-puts("**** drawGPX");
 	for(GPX::GpxData *p = this->hiking->getFirst(); p; p = p->next){
 		int x,y;
 
@@ -75,7 +78,7 @@ void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 	for(p = this->video.getFirst(); p; p = p->next){
 		int x,y;
 
-		this->posXY(p->latitude, p->longitude, x, y);
+		this->posXY(p->getLatitude(), p->getLongitude(), x, y);
 		x = this->off_x + (x-this->min_x) * this->scale + offset;
 		y = this->SY - this->off_y - (y-this->min_y) * this->scale + offset;
 
@@ -94,7 +97,6 @@ void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 }
 
 void PathGfx::generateBackground( void ){
-puts("**** generateBackground");
 	cairo_t *cr = cairo_create(this->background);
 
 	if(this->hiking){
@@ -139,7 +141,7 @@ void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index,
 
 	cairo_set_source_rgb(cr, 1,1,1);
 	int x,y;
-	this->posXY(current->latitude, current->longitude, x, y);
+	this->posXY(current->getLatitude(), current->getLongitude(), x, y);
 	x = this->off_x + (x-this->min_x) * this->scale;
 	y = this->SY - this->off_y - (y-this->min_y) * this->scale;
 
