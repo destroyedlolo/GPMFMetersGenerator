@@ -46,7 +46,7 @@ void AltitudeGfx::calcScales( void ){
 }
 
 void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
-	if(current != uint32_t(-1)){	/* Drawing shadow */
+	if(current == uint32_t(-1)){	/* Drawing shadow */
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
 		cairo_set_line_width(cr, 5);
 	} else {	/* Drawing curve */

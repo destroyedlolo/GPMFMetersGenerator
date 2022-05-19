@@ -66,26 +66,24 @@ void PathGfx::drawGPX(cairo_t *cr, int offset){
 	cairo_stroke(cr);
 }
 
-void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
-	GPVideo::GPMFdata *p;
-
+void PathGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
 	cairo_save(cr);
-	if(current)
+	if(current != (uint32_t)-1)
 		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
 
-	for(p = this->video.getFirst(); p; p = p->next){
+	for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
 		int x,y;
 
-		this->posXY(p->getLatitude(), p->getLongitude(), x, y);
+		this->posXY(this->video[i].getLatitude(), this->video[i].getLongitude(), x, y);
 		x = this->off_x + (x-this->min_x) * this->scale + offset;
 		y = this->SY - this->off_y - (y-this->min_y) * this->scale + offset;
 
-		if(p == this->video.getFirst())
+		if(!i)
 			cairo_move_to(cr, x, y);
 		else
 			cairo_line_to(cr, x, y);
 
-		if(current == p){
+		if(current == i){
 			cairo_stroke(cr);
 			cairo_restore(cr);
 			cairo_move_to(cr, x, y);
@@ -110,14 +108,14 @@ void PathGfx::generateBackground( void ){
 			/* Draw shadow */
 		cairo_set_line_width(cr, 4);
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
-		this->drawGPMF(cr, 2, NULL);
+		this->drawGPMF(cr, 2);
 	}
 
 		/* Cleaning */
 	cairo_destroy(cr);
 }
 
-void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current ){
+void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current ){
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
 	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
 		puts("*F* Can't create Cairo's surface");
@@ -135,11 +133,11 @@ void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index,
 	else
 		cairo_set_source_rgb(cr, 1,1,1);
 	cairo_set_line_width(cr, 3);
-	this->drawGPMF(cr, 0, current);
+	this->drawGPMF(cr, 0, index);
 
 	cairo_set_source_rgb(cr, 1,1,1);
 	int x,y;
-	this->posXY(current->getLatitude(), current->getLongitude(), x, y);
+	this->posXY(current.getLatitude(), current.getLongitude(), x, y);
 	x = this->off_x + (x-this->min_x) * this->scale;
 	y = this->SY - this->off_y - (y-this->min_y) * this->scale;
 
