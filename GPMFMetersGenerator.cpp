@@ -32,7 +32,7 @@
 
 	/* Configuration */
 
-#define VERSION "2.01"
+#define VERSION "2.02"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */

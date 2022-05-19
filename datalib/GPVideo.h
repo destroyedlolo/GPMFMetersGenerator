@@ -5,34 +5,32 @@
 #ifndef GPVIDEO_H
 #define GPVIDEO_H
 
-#include <cstdint>
+#include "GPSCoordinate.h"
+#include "samplesCollection.h"
+
 #include <ctime>
 
 	/* Number of samples per seconds (9) */
 #define SAMPLE (1.0/9.0)
 
-class GPVideo {
-public:
-		/* Sample's data */
-	struct GPMFdata {
-		struct GPMFdata *next;
-		double latitude, longitude;
-		double altitude;
-		double spd2d, spd3d;
-		time_t sample_time;
+struct GPMFdata : public GPSCoordinate {
+	double altitude;
+	double spd2d, spd3d;
+	time_t sample_time;
 
-		GPMFdata(){};
-		GPMFdata( 
-			double alatitude, double alongitude,
-			double aaltitude,
-			double aspd2d, double aspd3d,
-			time_t asample_time
-		) : next(NULL), latitude(alatitude), longitude(alongitude),
-			altitude(aaltitude), spd2d(aspd2d), spd3d(aspd3d), 
-			sample_time(asample_time){
-		}
-	};
+	GPMFdata(){};
+	GPMFdata( 
+		double alatitude, double alongitude,
+		double aaltitude,
+		double aspd2d, double aspd3d,
+		time_t asample_time
+	) : GPSCoordinate(alatitude, alongitude),
+		altitude(aaltitude), spd2d(aspd2d), spd3d(aspd3d), 
+		sample_time(asample_time){
+	}
+};
 
+class GPVideo : public samplesCollection<GPMFdata> {
 private:
 
 		/* video's */
@@ -40,10 +38,7 @@ private:
 	uint32_t fr_num, fr_dem;	// Video framerates
 
 		/* GPMF's */
-	GPMFdata min, max;
-	GPMFdata *first, *last;
 	double nextsample;			// timing of the next sample to store
-	uint32_t samples_count;		// number of samples stored
 
 		/* Multiparts' */
 	double voffset;		// part's timing offset
@@ -67,11 +62,5 @@ public:
 	void AddPart( char * );
 
 	void Dump( void );
-
-	GPMFdata &getMin( void ){ return this->min; };
-	GPMFdata &getMax( void ){ return this->max; };
-	GPMFdata *getFirst(void){ return this->first; };
-	GPMFdata *getLast(void){ return this->last; };
-	uint32_t getSampleCount(void){ return this->samples_count; };
 };
 #endif

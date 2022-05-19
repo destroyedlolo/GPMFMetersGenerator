@@ -9,18 +9,17 @@
 #include <cstring>
 #include <cmath>
 
-#define R (6371000)	// terrestrial radius
-
 PathGfx::PathGfx(GPVideo &v, GPX *h) : Gfx( 300,300, v, h ) {
 	this->calcScales();
 }
 
 	/* From https://forums.futura-sciences.com/mathematiques-superieur/39838-conversion-lat-long-x-y.html */
 void PathGfx::posXY( double lat, double lgt, int &x, int &y){
+
 	/* Degree -> Radian */
-	lat *= M_PI/180.0;
-	lgt *= M_PI/180.0;
-	
+	lat = GPSCoordinate::toRadian(lat);
+	lgt = GPSCoordinate::toRadian(lgt);
+
 	double sinlgt = sin(lgt),
 		coslgt = cos(lgt),
 		sintlat = sin(lat),
@@ -32,11 +31,11 @@ void PathGfx::posXY( double lat, double lgt, int &x, int &y){
 
 void PathGfx::calcScales( void ){
 	if(this->hiking){
-		this->posXY( this->hiking->getMin().latitude, this->hiking->getMin().longitude, this->min_x, this->min_y);
-		this->posXY( this->hiking->getMax().latitude, this->hiking->getMax().longitude, this->max_x, this->max_y);
+		this->posXY( this->hiking->getMin().getLatitude(), this->hiking->getMin().getLongitude(), this->min_x, this->min_y);
+		this->posXY( this->hiking->getMax().getLatitude(), this->hiking->getMax().getLongitude(), this->max_x, this->max_y);
 	} else {
-		this->posXY( this->video.getMin().latitude, this->video.getMin().longitude, this->min_x, this->min_y);
-		this->posXY( this->video.getMax().latitude, this->video.getMax().longitude, this->max_x, this->max_y);
+		this->posXY( this->video.getMin().getLatitude(), this->video.getMin().getLongitude(), this->min_x, this->min_y);
+		this->posXY( this->video.getMax().getLatitude(), this->video.getMax().getLongitude(), this->max_x, this->max_y);
 	}
 
 	this->range_x = this->max_x - this->min_x;
@@ -49,42 +48,42 @@ void PathGfx::calcScales( void ){
 }
 
 void PathGfx::drawGPX(cairo_t *cr, int offset){
-puts("**** drawGPX");
-	for(GPX::GpxData *p = this->hiking->getFirst(); p; p = p->next){
+	bool first = true;
+
+	for(auto p : this->hiking->getSamples()){
 		int x,y;
 
-		posXY(p->latitude, p->longitude, x, y);
+		posXY(p.getLatitude(), p.getLongitude(), x, y);
 		x = this->off_x + (x-this->min_x) * this->scale + offset;
 		y = this->SY - this->off_y - (y-this->min_y)*this->scale + offset;
 
-		if(p == this->hiking->getFirst())
+		if(first){
+			first = false;
 			cairo_move_to(cr, x, y);
-		else
+		} else
 			cairo_line_to(cr, x, y);
 	}
 	cairo_stroke(cr);
 }
 
-void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
-	GPVideo::GPMFdata *p;
-
+void PathGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
 	cairo_save(cr);
-	if(current)
+	if(current != (uint32_t)-1)
 		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
 
-	for(p = this->video.getFirst(); p; p = p->next){
+	for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
 		int x,y;
 
-		this->posXY(p->latitude, p->longitude, x, y);
+		this->posXY(this->video[i].getLatitude(), this->video[i].getLongitude(), x, y);
 		x = this->off_x + (x-this->min_x) * this->scale + offset;
 		y = this->SY - this->off_y - (y-this->min_y) * this->scale + offset;
 
-		if(p == this->video.getFirst())
+		if(!i)
 			cairo_move_to(cr, x, y);
 		else
 			cairo_line_to(cr, x, y);
 
-		if(current == p){
+		if(current == i){
 			cairo_stroke(cr);
 			cairo_restore(cr);
 			cairo_move_to(cr, x, y);
@@ -94,7 +93,6 @@ void PathGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 }
 
 void PathGfx::generateBackground( void ){
-puts("**** generateBackground");
 	cairo_t *cr = cairo_create(this->background);
 
 	if(this->hiking){
@@ -110,14 +108,14 @@ puts("**** generateBackground");
 			/* Draw shadow */
 		cairo_set_line_width(cr, 4);
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
-		this->drawGPMF(cr, 2, NULL);
+		this->drawGPMF(cr, 2);
 	}
 
 		/* Cleaning */
 	cairo_destroy(cr);
 }
 
-void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current ){
+void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current ){
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
 	if(cairo_surface_status(srf) != CAIRO_STATUS_SUCCESS){
 		puts("*F* Can't create Cairo's surface");
@@ -135,11 +133,11 @@ void PathGfx::generateOneGfx( const char *fulltarget, char *filename, int index,
 	else
 		cairo_set_source_rgb(cr, 1,1,1);
 	cairo_set_line_width(cr, 3);
-	this->drawGPMF(cr, 0, current);
+	this->drawGPMF(cr, 0, index);
 
 	cairo_set_source_rgb(cr, 1,1,1);
 	int x,y;
-	this->posXY(current->latitude, current->longitude, x, y);
+	this->posXY(current.getLatitude(), current.getLongitude(), x, y);
 	x = this->off_x + (x-this->min_x) * this->scale;
 	y = this->SY - this->off_y - (y-this->min_y) * this->scale;
 
