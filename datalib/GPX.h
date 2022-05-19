@@ -32,7 +32,6 @@ public:
 
 private:
 	GpxData min, max;
-	uint32_t samples_count;		// number of samples stored
 
 public:
 	GPX( const char * );
