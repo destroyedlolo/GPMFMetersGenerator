@@ -45,8 +45,8 @@ void AltitudeGfx::calcScales( void ){
 	cairo_destroy(cr);
 }
 
-void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
-	if(!current){	/* Drawing shadow */
+void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
+	if(current != uint32_t(-1)){	/* Drawing shadow */
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
 		cairo_set_line_width(cr, 5);
 	} else {	/* Drawing curve */
@@ -54,18 +54,16 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, GPVideo::GPMFdata *current){
 		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);	/* Set white color */
 	}
 
-	GPVideo::GPMFdata *p;
-	uint32_t i;
-	for(i = 0, p = this->video.getFirst(); i < this->video.getSampleCount(); i++, p=p->next){
+	for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
 		int x = this->offx + i*this->scale_w + offset;
-		int y = this->SY - (p->altitude - this->min_h)*this->scale_h + offset;
+		int y = this->SY - (this->video[i].altitude - this->min_h)*this->scale_h + offset;
 
 		if(!i)	/* First plot */
 			cairo_move_to(cr, x, y);
 		else
 			cairo_line_to(cr, x, y);
 
-		if(current == p){
+		if(current == i){
 			cairo_stroke(cr);
 			cairo_move_to(cr, x, y);
 			cairo_set_source_rgb(cr, 1,1,1);
@@ -96,7 +94,7 @@ void AltitudeGfx::generateBackground( void ){
 	}
 	cairo_stroke(cr);
 
-	drawGPMF(cr, 3, NULL);	// Draw Shadow
+	drawGPMF(cr, 3);	// Draw Shadow
 	cairo_pattern_t *pat = cairo_pattern_create_linear(this->offx,this->SY - this->range_h*this->scale_h, this->offx,this->SY);
 	cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.25);
 	cairo_pattern_add_color_stop_rgba(pat, 1, 0,0,0, 0.05);
@@ -104,7 +102,7 @@ void AltitudeGfx::generateBackground( void ){
 
 	cairo_line_to(cr, this->SX, this->SY);
 	cairo_line_to(cr, this->offx, this->SY);
-	cairo_line_to(cr, this->offx, this->SY - (this->video.getFirst()->altitude - this->min_h)*this->scale_h);
+	cairo_line_to(cr, this->offx, this->SY - (this->video.getFirst().altitude - this->min_h)*this->scale_h);
 
 	cairo_fill(cr);
 
@@ -114,7 +112,7 @@ void AltitudeGfx::generateBackground( void ){
 
 }
 
-void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current){
+void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPMFdata &current){
 
 		/*
 		 * Initialise Cairo
@@ -135,11 +133,11 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_stroke(cr);
 
 		/* Draw Altitude curve */
-	drawGPMF(cr, 0, current);
+	drawGPMF(cr, 0, index);
 
 		/* Display the label */
 	char t[8];
-	sprintf(t, "%5d m", (int)current->altitude);
+	sprintf(t, "%5d m", (int)current.altitude);
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, 35);
 
@@ -155,7 +153,7 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 
 		/* Display the spot */
 	cairo_set_line_width(cr, 5);
-	cairo_arc(cr, this->offx + index*this->scale_w, this->SY - (current->altitude - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
+	cairo_arc(cr, this->offx + index*this->scale_w, this->SY - (current.altitude - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
