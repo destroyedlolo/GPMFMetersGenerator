@@ -10,8 +10,6 @@
 
 #include <ctime>
 
-#include <vector>
-
 struct GpxData : public GPSCoordinate {
 	double altitude;
 	time_t sample_time;
@@ -32,7 +30,6 @@ public:
 	GPX( const char * );
 
 	void Dump( void );
-
 
 		/* Check if given coordinate is close to the footprint of the hiking.
 		 * It's a very quick and dirty test ... but enough to check a video
