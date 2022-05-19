@@ -70,7 +70,7 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
 		}
 	}
 
-	if(current)
+	if(current != uint32_t(-1))
 		cairo_stroke(cr);
 	else
 		cairo_stroke_preserve(cr);
