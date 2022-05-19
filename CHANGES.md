@@ -4,6 +4,10 @@ If you are updating from a previous version, pay particular attention to the cha
 
 ## 2.xx
 
+### 2.02
+
+Finalize C++ migration : redesign storage class
+
 ### 2.01
 
 GPX files are back.
