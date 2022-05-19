@@ -19,6 +19,7 @@ public:
 	DT &getMax( void ){ return this->max; };
 	DT &getFirst(void){ return this->samples.front(); };
 	DT &getLast(void){ return this->samples.back(); };
+	DT &operator[](int i){ return this->samples[i]; };
 	uint32_t getSampleCount(void){ return this->samples.size(); };
 
 	std::vector<DT> &getSamples(void){ return this->samples; };
