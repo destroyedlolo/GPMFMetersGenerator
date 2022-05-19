@@ -19,4 +19,11 @@ GPMFMetersGenerator : GPMFMetersGenerator.o libgfxlib.a libdatalib.a \
   MakefileLocal 
 	 $(cc) -o GPMFMetersGenerator GPMFMetersGenerator.o $(opts) 
 
-all: GPMFMetersGenerator 
+mkStory.o : mkStory.cpp datalib/Context.h datalib/GPVideo.h \
+  datalib/GPX.h libgfxlib.a libdatalib.a MakefileLocal 
+	$(cc) -c -o mkStory.o mkStory.cpp $(opts) 
+
+mkStory : mkStory.o libgfxlib.a libdatalib.a MakefileLocal 
+	 $(cc) -o mkStory mkStory.o $(opts) 
+
+all: mkStory GPMFMetersGenerator 
