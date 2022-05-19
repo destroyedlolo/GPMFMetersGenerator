@@ -15,6 +15,9 @@ GPMFMetersGenerator [options] file.MP4
 A directory with the same name of the mp4 file (without it's extention) will be created to
 hold resulting images / Videos.
 
+| :warning:WARNING:warning: : If you're upgrading from a previous version, please have a look on [Change file](Change.md) ! |
+| --- |
+
 ## Dependancies 
 
 - **Cairo** library is needed to generate PNG pics.
