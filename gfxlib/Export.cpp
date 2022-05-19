@@ -27,7 +27,7 @@ void Export::generateGPX( const char *fulltarget, char *filename, char *iname ){
 	);
 	
 	for(GPVideo::GPMFdata *p = this->video.getFirst(); p; p = p->next){
-		fprintf(f, "\t\t\t<trkpt lat=\"%f\" lon=\"%f\">\n", p->latitude, p->longitude);
+		fprintf(f, "\t\t\t<trkpt lat=\"%f\" lon=\"%f\">\n", p->getLatitude(), p->getLongitude());
 		fprintf(f, "\t\t\t\t<ele>%f</ele>\n", p->altitude);
 		fputs("\t\t\t</trkpt>\n", f);
 	}
@@ -92,7 +92,7 @@ void Export::generateKML( const char *fulltarget, char *filename, char *iname ){
 	, iname);
 
 	for(GPVideo::GPMFdata *p = this->video.getFirst(); p; p = p->next){
-		fprintf(f, "%f,%f,%f\n", p->longitude, p->latitude, p->altitude);
+		fprintf(f, "%f,%f,%f\n", p->getLongitude(), p->getLatitude(), p->altitude);
 	}
 
 	fputs(
@@ -109,7 +109,7 @@ void Export::generateKML( const char *fulltarget, char *filename, char *iname ){
 		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
 		"\t\t\t\t</Point>\n"
 		"\t\t\t</Placemark>\n"
-	, this->video.getFirst()->longitude, this->video.getFirst()->latitude);
+	, this->video.getFirst()->getLongitude(), this->video.getFirst()->getLatitude());
 
 	fprintf(f,
 		"\t\t\t<Placemark>\n"
@@ -119,7 +119,7 @@ void Export::generateKML( const char *fulltarget, char *filename, char *iname ){
 		"\t\t\t\t\t<coordinates>%f,%f</coordinates>\n"
 		"\t\t\t\t</Point>\n"
 		"\t\t\t</Placemark>\n"
-	, this->video.getLast()->longitude, this->video.getLast()->latitude);
+	, this->video.getLast()->getLongitude(), this->video.getLast()->getLatitude());
 
 	fputs(
 		"\t\t</Folder>\n"

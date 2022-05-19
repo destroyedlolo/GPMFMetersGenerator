@@ -91,37 +91,36 @@ static bool lookFor(FILE *f, const char *string){
 
 void GPX::Dump( void ){
 	puts("*I* GPX min/max:");
-	printf("\tlatitude : %f -> %f (%f)\n", min.latitude, max.latitude, max.latitude - min.latitude);
-	printf("\tlongitude : %f -> %f (%f)\n", min.longitude, max.longitude, max.longitude - min.longitude);
-	printf("\taltitude: %f -> %f (%f)\n", min.altitude, max.altitude, max.altitude - min.altitude);
+	printf("\tlatitude : %f -> %f (%f)\n", this->getMin().getLatitude(), this->getMax().getLatitude(), this->getMax().getLatitude() - this->getMin().getLatitude());
+	printf("\tlongitude : %f -> %f (%f)\n", this->getMin().getLongitude(), this->getMax().getLongitude(), this->getMax().getLongitude() - this->getMin().getLongitude());
+	printf("\taltitude: %f -> %f (%f)\n", this->getMin().altitude, this->getMax().altitude, this->getMax().altitude - this->getMin().altitude);
 
-	struct tm *t = gmtime(&min.sample_time);
+	struct tm *t = gmtime(&this->getMin().sample_time);
 	printf("\tTime : ");
 	printtm(t);
 	printf(" -> ");
-	t = gmtime(&max.sample_time);
+	t = gmtime(&this->getMax().sample_time);
 	printtm(t);
 	puts("");
 
 	if(debug){
 		puts("*D* Memorized video data");
-		for(GpxData *p = first; p; p = p->next){
-			printf("%p (next: %p)\n", p, p->next);
-			printf("\tLatitude : %.3f deg\n", p->latitude);
-			printf("\tLongitude : %.3f deg\n", p->longitude);
-			printf("\tAltitude : %.3f m\n", p->altitude);
+		for(auto p : samples){
+			printf("\tLatitude : %.3f deg\n", p.getLatitude());
+			printf("\tLongitude : %.3f deg\n", p.getLongitude());
+			printf("\tAltitude : %.3f m\n", p.altitude);
 
-			struct tm *t = gmtime(&p->sample_time);
+			struct tm *t = gmtime(&p.sample_time);
 			printf("\tTime : ");
 			printtm(t);
 			puts("");
 		}
 	}
 
-	printf("*I* %u memorised GPX\n", this->samples_count);
+	printf("*I* %u memorised GPX\n", this->getSampleCount());
 }
 
-GPX::GPX( const char *file ):first(NULL), last(NULL), samples_count(0){
+GPX::GPX( const char *file ){
 	FILE *f;
 
 	if(!(f = fopen(file, "r"))){
@@ -202,47 +201,52 @@ GPX::GPX( const char *file ):first(NULL), last(NULL), samples_count(0){
 #endif
 
 			/* Update min/max */
-		if(!this->first){
-			this->min.latitude = this->max.latitude = lat;
-			this->min.longitude = this->max.longitude = lgt;
-			this->min.altitude = this->max.altitude = alt;
-			this->min.sample_time = this->max.sample_time = time;
+		if(!this->getSampleCount()){
+			this->getMin().set( lat, lgt );
+			this->getMax().set( lat, lgt );
+
+			this->getMin().altitude = this->getMax().altitude = alt;
+			this->getMin().sample_time = this->getMax().sample_time = time;
 		} else {
-			if(lat < this->min.latitude)
-				this->min.latitude = lat;
-			if(lat > this->max.latitude)
-				this->max.latitude = lat;
+			if(lat < this->getMin().getLatitude())
+				this->getMin().setLatitude(lat);
+			if(lat > this->getMax().getLatitude())
+				this->getMax().setLatitude(lat);
 
-			if(lgt < this->min.longitude)
-				this->min.longitude = lgt;
-			if(lgt > this->max.longitude)
-				this->max.longitude = lgt;
+			if(lgt < this->getMin().getLongitude())
+				this->getMin().setLongitude(lgt);
+			if(lgt > this->getMax().getLongitude())
+				this->getMax().setLongitude(lgt);
 
-			if(alt < this->min.altitude)
-				this->min.altitude = alt;
-			if(alt > this->max.altitude)
-				this->max.altitude = alt;
+			if(alt < this->getMin().altitude)
+				this->getMin().altitude = alt;
+			if(alt > this->getMax().altitude)
+				this->getMax().altitude = alt;
 
-			if(this->min.sample_time > time)
-				this->min.sample_time = time;
-			if(this->max.sample_time < time)
-				this->max.sample_time = time;
+			if(this->getMin().sample_time > time)
+				this->getMin().sample_time = time;
+			if(this->getMax().sample_time < time)
+				this->getMax().sample_time = time;
 		}
 
 			/* store the new sample */
-		GpxData *nv = new GpxData(lat, lgt, alt, time);
+		GpxData nv(lat, lgt, alt, time);
 	
 			/* insert the new sample in the list */
-		if(!this->first)
-			this->first = nv;
-		else
-			this->last->next = nv;
-		this->last = nv;
-
-		this->samples_count++;
-
+		samples.push_back(nv);
 	}
 
 	fclose(f);
 }
 
+bool GPX::sameArea( GPSCoordinate &coord, uint32_t proximity_threshold){
+	if( this->getMin().getLatitude() - proximity_threshold > coord.getLatitude() ||
+		this->getMax().getLatitude() + proximity_threshold < coord.getLatitude() )
+		return false;
+
+	if( this->getMin().getLongitude() - proximity_threshold > coord.getLongitude() ||
+		this->getMax().getLongitude() + proximity_threshold < coord.getLongitude() )
+		return false;
+	
+	return true;
+}
