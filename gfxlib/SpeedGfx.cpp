@@ -113,7 +113,7 @@ void SpeedGfx::generateBackground( void ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPVideo::GPMFdata *current ){
+void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current ){
 	cairo_status_t err;
 
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
@@ -138,7 +138,7 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, LABEL_SZ);
 	char t[8];
-	sprintf(t, "%4.1f", (type == '3'? current->spd3d : current->spd2d));
+	sprintf(t, "%4.1f", (type == '3'? current.spd3d : current.spd2d));
 
 	if(this->type == 'b')
 		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
@@ -155,7 +155,7 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 
 	if(this->type == 'b'){
 		cairo_set_source_rgb(cr, 0.2, 0.8, 0.2);
-		sprintf(t, "%4.1f", current->spd2d);
+		sprintf(t, "%4.1f", current.spd2d);
 		cairo_move_to(cr, offlabel, 200);
 		cairo_show_text(cr, t);
 		cairo_stroke(cr);
@@ -163,7 +163,7 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 
 	double val;
 	if(this->type == 'b'){
-		val = this->transforme(current->spd2d * scale);
+		val = this->transforme(current.spd2d * scale);
 
 		cairo_set_line_width(cr, 13);
 		cairo_set_source_rgba(cr, 0.3, 0.6, 0.4, 0.75);
@@ -179,7 +179,7 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 		cairo_stroke(cr);
 	}
 
-	val = this->transforme(((this->type == '3') ? current->spd3d : current->spd2d) * scale);
+	val = this->transforme(((this->type == '3') ? current.spd3d : current.spd2d) * scale);
 
 	cairo_set_line_width(cr, 13);
 	cairo_set_source_rgba(cr, 0.3, 0.4, 0.6, 0.75);
