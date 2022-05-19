@@ -104,7 +104,7 @@ void GPX::Dump( void ){
 	puts("");
 
 	if(debug){
-		puts("*D* Memorized video data");
+		puts("*D* Memorized CPX data");
 		for(auto p : samples){
 			printf("\tLatitude : %.3f deg\n", p.getLatitude());
 			printf("\tLongitude : %.3f deg\n", p.getLongitude());
@@ -233,7 +233,7 @@ GPX::GPX( const char *file ){
 		GpxData nv(lat, lgt, alt, time);
 	
 			/* insert the new sample in the list */
-		samples.push_back(nv);
+		this->samples.push_back(nv);
 	}
 
 	fclose(f);

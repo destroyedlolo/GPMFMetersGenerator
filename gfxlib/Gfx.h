@@ -38,9 +38,8 @@ protected :
 		 * -> dir, file : as GenerateAllGfx
 		 * -> index : index of the current sample
 		 * -> current : The data being drawn
-		 * -> hiking : full hiking trave
 		 */
-	virtual void generateOneGfx(const char *dir, char *file, int index, GPVideo::GPMFdata *current ) = 0;
+	virtual void generateOneGfx(const char *dir, char *file, int index, GPMFdata &current ) = 0;
 
 		/* Generate the video and remove png
 		 * -> dir, file : as GenerateAllGfx
