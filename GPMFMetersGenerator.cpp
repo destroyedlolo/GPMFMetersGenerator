@@ -32,7 +32,7 @@
 
 	/* Configuration */
 
-#define VERSION "2.02"
+#define VERSION "2.03"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
@@ -114,9 +114,10 @@ int main(int argc, char *argv[]){
 			}
 	
 			puts(
-				"\nGPMFMetersGenerator v" VERSION "\n"
+				"GPMFMetersGenerator v" VERSION "\n"
 				"(c) L.Faillie (destroyedlolo) 2022\n"
-				"\nKnown opts :\n"
+				"\nGPMFMetersGenerator [-options] Video.mp4\n"
+				"\nKnown options :\n"
 				"-s[2|3|b] : enable speed gfx (default 2d, 3: 3d, b: both)\n"
 				"-k[2|3] : enable speed tracker gfx (default 2d, 3: 3d)\n"
 				"-a : enable altitude gfx\n"
@@ -138,7 +139,12 @@ int main(int argc, char *argv[]){
 
 		/* Handle first videos */
 	if(optind >= argc){
-		puts("*F* No Video provided");
+		fputs("*F* No Video provided\n",stderr);
+		exit(EXIT_FAILURE);		
+	}
+
+	if(optind != argc-1){
+		fputs("*F* Only one video is expected\n",stderr);
 		exit(EXIT_FAILURE);		
 	}
 
@@ -188,17 +194,8 @@ int main(int argc, char *argv[]){
 	if(verbose)
 		printf("*I* images will be generated in '%s'\n", targetDir);
 
-		/* Read the 1st video */
-	if(verbose)
-		printf("*I Reading '%s'\n", argv[optind]);
-	GPVideo video(argv[optind++]);
+	GPVideo video(argv[optind]);
 
-	for(; optind < argc; optind++){
-		if(verbose)
-			printf("*I Reading '%s'\n", argv[optind]);
-
-		video.AddPart( argv[optind] );
-	}
 	video.Dump();
 
 		/* Generate videos */
