@@ -13,7 +13,7 @@ Context.o : Context.cpp Context.h Makefile
 
 GPVideo.o : GPVideo.cpp ../gpmf-parser/GPMF_parser.h \
   ../gpmf-parser/GPMF_utils.h ../gpmf-parser/demo/GPMF_mp4reader.h \
-  Context.h GPVideo.h GPSCoordinate.h Makefile 
+  Context.h GPVideo.h GPSCoordinate.h samplesCollection.h Makefile 
 	$(cc) -c -o GPVideo.o GPVideo.cpp $(opts) 
 
 GPX.o : GPX.cpp ../datalib/Context.h GPX.h GPSCoordinate.h \
