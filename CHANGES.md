@@ -9,6 +9,8 @@ If you are updating from a previous version, pay particular attention to the cha
 Detect automatically if a video is multi-parts
 Consequently : **Only one video can be provided**
 
+Handle AVC encoded video as well (GX and GH videos supported)
+
 ### 2.02
 
 Finalize C++ migration : redesign storage class
