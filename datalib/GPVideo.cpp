@@ -7,6 +7,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cassert>
+#include <unistd.h>
+
 
 extern "C" {
 #include "../gpmf-parser/GPMF_parser.h"
@@ -277,6 +280,32 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 }
 
 GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0) {
+
+	/* Ensure it's the 1st part of a GoPro video
+	 *
+	 * As GoPro's OpenMP4Source() needs a "char *",
+	 * it's easier to manage this temporary file in C
+	 * instead of a C++'s string
+	 */
+	char *fname = strdup(fch);
+	assert(fname);		// quick & dirty : no raison to fail
+
+		// "GX013561.MP4" -> 12 chars
+	size_t len = strlen(fname);
+	if(len < 12){
+		fputs("*E* filename doesn't correspond to a GoPro video\n", stderr);
+		exit(EXIT_FAILURE);
+	}
+	if(strncmp(fname + len - 12, "GX01", 4)){
+		fputs("*E* not a GoPro video or not the 1st one\n", stderr);
+		exit(EXIT_FAILURE);
+	}
+	len -= 10;	// point to the part number
+
+
+		/* Read the 1st chunck */
+	printf("*L* Reading '%s'\n", fch);
+
 	this->mp4handle = OpenMP4Source(fch, MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
 	if(!this->mp4handle){
 		printf("*F* '%s' is an invalid MP4/MOV or it has no GPMF data\n\n", fch);
@@ -285,7 +314,7 @@ GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0) {
 
 	uint32_t frames = GetVideoFrameRateAndCount(this->mp4handle, &this->fr_num, &this->fr_dem);
 	if(!frames){
-		puts("*F* Can't get frame count (incorrect MP4 ?)");
+		fputs("*F* Can't get frame count (incorrect MP4 ?)", stderr);
 		exit(EXIT_FAILURE);
 	}
 	if(verbose)
@@ -295,6 +324,23 @@ GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0) {
 
 	CloseSource(this->mp4handle);
 	this->mp4handle = 0;
+
+
+		/* Check if there are others parts */
+
+	for(unsigned int i = 2; i<99; i++){	// As per GoPro, up to 98 parts
+		char buff[3];
+		sprintf(buff, "%02d", i);
+		memcpy(fname + len, buff, 2);
+
+		if(!access(fname, R_OK)){
+			printf("*L* Adding '%s'\n", fname);
+				
+			this->AddPart(fname);
+		}
+	}
+	
+	free(fname);
 }
 
 void GPVideo::AddPart( char *fch ){
