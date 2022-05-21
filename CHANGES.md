@@ -4,6 +4,11 @@ If you are updating from a previous version, pay particular attention to the cha
 
 ## 2.xx
 
+### 2.03
+
+Detect automatically if a video is multi-parts
+Consequently : **Only one video can be provided**
+
 ### 2.02
 
 Finalize C++ migration : redesign storage class
