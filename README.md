@@ -48,7 +48,7 @@ hold resulting images / Videos.
 
 Due to SD card's FAT limitation, GoPro camera split too longs videos in shorter chunks (on my Hero9, it seems earch chunk can't be longer than 3.7 GB so about 11 minutes in 1080p mode).
 
-As per V0.8, more than one videos can be specified in the command line and GPMF data will be agregated as if they were from an uniq video (*take care to put them in the right order*)
+As of V2.03, **GPMFMetersGenerator** detects by itself the presence of additionnal part.
 
 ## Current widgets
 
