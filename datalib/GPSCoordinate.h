@@ -5,6 +5,7 @@
 #define GPSCOORD_H
 
 #include <cmath>
+#include <string>
 
 #define R (6371000)	// terrestrial radius
 
@@ -36,6 +37,8 @@ public :
 
 	struct tm *getGMT( void ){ return gmtime(&this->sample_time); }
 	struct tm *getLocalTime( void ){ return localtime(&this->sample_time); }
+	std::string strLocalTime( void );
+	std::string strLocalHour( bool HM_only = false );
 
 		/* from https://forums.futura-sciences.com/mathematiques-superieur/306536-calcul-de-distance-entre-2-points-dont-jai-coordonnees-geographiques-longitude-latitude.html#post2315609 */
 	double Distance( GPSCoordinate &other ){
