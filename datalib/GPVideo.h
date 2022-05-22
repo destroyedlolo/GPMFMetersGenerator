@@ -15,7 +15,6 @@
 
 struct GPMFdata : public GPSCoordinate {
 	double spd2d, spd3d;
-	time_t sample_time;
 
 	GPMFdata(){};
 	GPMFdata( 
