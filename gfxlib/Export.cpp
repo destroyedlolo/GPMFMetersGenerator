@@ -28,7 +28,7 @@ void Export::generateGPX( const char *fulltarget, char *filename, char *iname ){
 	
 	for(auto p : this->video.getSamples()){
 		fprintf(f, "\t\t\t<trkpt lat=\"%f\" lon=\"%f\">\n", p.getLatitude(), p.getLongitude());
-		fprintf(f, "\t\t\t\t<ele>%f</ele>\n", p.altitude);
+		fprintf(f, "\t\t\t\t<ele>%f</ele>\n", p.getAltitude());
 		fputs("\t\t\t</trkpt>\n", f);
 	}
 
@@ -92,7 +92,7 @@ void Export::generateKML( const char *fulltarget, char *filename, char *iname ){
 	, iname);
 
 	for(auto p : this->video.getSamples()){
-		fprintf(f, "%f,%f,%f\n", p.getLongitude(), p.getLatitude(), p.altitude);
+		fprintf(f, "%f,%f,%f\n", p.getLongitude(), p.getLatitude(), p.getAltitude());
 	}
 
 	fputs(
