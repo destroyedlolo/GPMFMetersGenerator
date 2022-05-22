@@ -20,17 +20,48 @@
 #define VERSION "0.01a01"
 
 GPX *Gpx = NULL;	// external original GPX data
-uint32_t proximity = 15;	// Proximity threshold 
+double proximity = 1;	// Proximity threshold 
 							// (bellow this distance, places are considered to 
 							// be the same.
 
-	/* Extended GPVideo with it's name */
-class NamedGPVideo : public GPVideo, public std::string {
+	/* Extended GPVideo */
+class GPVideoExt : public GPVideo, public std::string {
 public:
-	NamedGPVideo( char *n ) : GPVideo(n), std::string(n){}
+	struct closest {
+		int idx;
+		double distance;
+
+		closest():idx(-1){}
+	} beginning, end;
+
+	GPVideoExt( char *n ) : GPVideo(n), std::string(n){}
+
+		/* update beginning & end as per a given value */
+	void Consider( int idx, GPSCoordinate &p ){
+		if(this->beginning.idx == -1){	// Initialize with the 1st point
+			this->beginning.idx = this->end.idx = idx;
+			this->beginning.distance = this->getFirst().Distance(p);
+			this->end.distance = this->getLast().Distance(p);
+		} else {
+			double dst = this->getFirst().Distance(p);
+			if(dst < this->beginning.distance){	// New guessed beginning point
+				this->beginning.idx = idx;
+				this->beginning.distance = dst;
+
+				this->end.idx = -1;			// invalidate end point
+				this->end.distance = NAN;
+			} else {
+				dst = this->getLast().Distance(p);
+				if(std::isnan(this->end.distance) || dst < this->end.distance){	// new guessed end point
+					this->end.idx = idx;
+					this->end.distance = dst;
+				}
+			}
+		}
+	}
 };
 
-std::vector<NamedGPVideo> videos;
+std::vector<GPVideoExt> videos;
 
 int main(int argc, char *argv[]){
 	bool force = false;	// force video inclusion
@@ -50,7 +81,7 @@ int main(int argc, char *argv[]){
 			verbose = true;
 			break;
 		case 'p':
-			proximity = strtoul(optarg, NULL, 10);
+			proximity = atof(optarg);
 			break;
 		case 'F':
 			force = true;
@@ -66,7 +97,7 @@ int main(int argc, char *argv[]){
 				"mkStory [-options] video.mp4 ...\n"
 				"Known opts :\n"
 				"-G<file> : GPX of the hicking\n"
-				"-p<val> : Proximity threshold (default: 15m)\n"
+				"-p<val> : Proximity threshold (default: 1m)\n"
 				"-F : force video inclusion\n"
 				"\n"
 				"-v : turn verbose on\n"
@@ -88,7 +119,7 @@ int main(int argc, char *argv[]){
 	}
 
 	for(; optind < argc; optind++){
-		NamedGPVideo video(argv[optind]);	// load the first chunk
+		GPVideoExt video(argv[optind]);	// load the first chunk
 
 		if(verbose){
 			video.Dump();
@@ -113,5 +144,19 @@ int main(int argc, char *argv[]){
 		videos.push_back(video);
 	}
 
+	for( int idx = 0; idx < (int)Gpx->getSampleCount(); idx++ ){
+		auto &gpx = (*Gpx)[idx];
+
+		for(auto &v : videos)
+			v.Consider( idx, gpx );
+	}
+
+	for(auto &v : videos){
+		printf("*I* '%s' beg(%d, %f), end(%d, %f)\n",
+			v.c_str(),
+			v.beginning.idx, v.beginning.distance,
+			v.end.idx, v.end.distance
+		);
+	}
 }
 
