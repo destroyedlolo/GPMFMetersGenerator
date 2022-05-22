@@ -11,8 +11,6 @@
 #include <ctime>
 
 struct GpxData : public GPSCoordinate {
-	time_t sample_time;
-
 	GpxData(){};
 	GpxData(
 		double alatitude, double alongitude,
