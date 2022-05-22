@@ -93,7 +93,7 @@ void GPX::Dump( void ){
 	puts("*I* GPX min/max:");
 	printf("\tlatitude : %f -> %f (%f)\n", this->getMin().getLatitude(), this->getMax().getLatitude(), this->getMax().getLatitude() - this->getMin().getLatitude());
 	printf("\tlongitude : %f -> %f (%f)\n", this->getMin().getLongitude(), this->getMax().getLongitude(), this->getMax().getLongitude() - this->getMin().getLongitude());
-	printf("\taltitude: %f -> %f (%f)\n", this->getMin().altitude, this->getMax().altitude, this->getMax().altitude - this->getMin().altitude);
+	printf("\taltitude: %f -> %f (%f)\n", this->getMin().getAltitude(), this->getMax().getAltitude(), this->getMax().getAltitude() - this->getMin().getAltitude());
 
 	struct tm *t = gmtime(&this->getMin().sample_time);
 	printf("\tTime : ");
@@ -108,7 +108,7 @@ void GPX::Dump( void ){
 		for(auto p : samples){
 			printf("\tLatitude : %.3f deg\n", p.getLatitude());
 			printf("\tLongitude : %.3f deg\n", p.getLongitude());
-			printf("\tAltitude : %.3f m\n", p.altitude);
+			printf("\tAltitude : %.3f m\n", p.getAltitude());
 
 			struct tm *t = gmtime(&p.sample_time);
 			printf("\tTime : ");
@@ -202,11 +202,8 @@ GPX::GPX( const char *file ){
 
 			/* Update min/max */
 		if(!this->getSampleCount()){
-			this->getMin().set( lat, lgt );
-			this->getMax().set( lat, lgt );
-
-			this->getMin().altitude = this->getMax().altitude = alt;
-			this->getMin().sample_time = this->getMax().sample_time = time;
+			this->getMin().set( lat, lgt, alt, time );
+			this->getMax().set( lat, lgt, alt, time );
 		} else {
 			if(lat < this->getMin().getLatitude())
 				this->getMin().setLatitude(lat);
@@ -218,15 +215,15 @@ GPX::GPX( const char *file ){
 			if(lgt > this->getMax().getLongitude())
 				this->getMax().setLongitude(lgt);
 
-			if(alt < this->getMin().altitude)
-				this->getMin().altitude = alt;
-			if(alt > this->getMax().altitude)
-				this->getMax().altitude = alt;
+			if(alt < this->getMin().getAltitude())
+				this->getMin().setAltitude(alt);
+			if(alt > this->getMax().getAltitude())
+				this->getMax().setAltitude(alt);
 
-			if(this->getMin().sample_time > time)
-				this->getMin().sample_time = time;
-			if(this->getMax().sample_time < time)
-				this->getMax().sample_time = time;
+			if(this->getMin().getSampleTime() > time)
+				this->getMin().setSampleTime(time);
+			if(this->getMax().getSampleTime() < time)
+				this->getMax().setSampleTime(time);
 		}
 
 			/* store the new sample */
