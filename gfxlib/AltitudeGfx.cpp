@@ -31,8 +31,8 @@ void AltitudeGfx::calcScales( void ){
 	this->offx = extents.x_advance + 10;
 
 		/* Scales */
-	this->min_h = (((int)this->video.getMin().altitude)/50)*50;
-	this->max_h = (((int)this->video.getMax().altitude)/50 + 1)*50;
+	this->min_h = (((int)this->video.getMin().getAltitude())/50)*50;
+	this->max_h = (((int)this->video.getMax().getAltitude())/50 + 1)*50;
 
 
 	this->range_h = this->max_h - this->min_h;
@@ -56,7 +56,7 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
 
 	for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
 		int x = this->offx + i*this->scale_w + offset;
-		int y = this->SY - (this->video[i].altitude - this->min_h)*this->scale_h + offset;
+		int y = this->SY - (this->video[i].getAltitude() - this->min_h)*this->scale_h + offset;
 
 		if(!i)	/* First plot */
 			cairo_move_to(cr, x, y);
@@ -102,7 +102,7 @@ void AltitudeGfx::generateBackground( void ){
 
 	cairo_line_to(cr, this->SX, this->SY);
 	cairo_line_to(cr, this->offx, this->SY);
-	cairo_line_to(cr, this->offx, this->SY - (this->video.getFirst().altitude - this->min_h)*this->scale_h);
+	cairo_line_to(cr, this->offx, this->SY - (this->video.getFirst().getAltitude() - this->min_h)*this->scale_h);
 
 	cairo_fill(cr);
 
@@ -137,7 +137,7 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 
 		/* Display the label */
 	char t[8];
-	sprintf(t, "%5d m", (int)current.altitude);
+	sprintf(t, "%5d m", (int)current.getAltitude());
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, 35);
 
@@ -153,7 +153,7 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 
 		/* Display the spot */
 	cairo_set_line_width(cr, 5);
-	cairo_arc(cr, this->offx + index*this->scale_w, this->SY - (current.altitude - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
+	cairo_arc(cr, this->offx + index*this->scale_w, this->SY - (current.getAltitude() - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
