@@ -95,12 +95,10 @@ void GPX::Dump( void ){
 	printf("\tlongitude : %f -> %f (%f)\n", this->getMin().getLongitude(), this->getMax().getLongitude(), this->getMax().getLongitude() - this->getMin().getLongitude());
 	printf("\taltitude: %f -> %f (%f)\n", this->getMin().getAltitude(), this->getMax().getAltitude(), this->getMax().getAltitude() - this->getMin().getAltitude());
 
-	struct tm *t = gmtime(&this->getMin().sample_time);
 	printf("\tTime : ");
-	printtm(t);
+	printtm(this->getMin().getGMT());
 	printf(" -> ");
-	t = gmtime(&this->getMax().sample_time);
-	printtm(t);
+	printtm(this->getMax().getGMT());
 	puts("");
 
 	if(debug){
@@ -110,9 +108,8 @@ void GPX::Dump( void ){
 			printf("\tLongitude : %.3f deg\n", p.getLongitude());
 			printf("\tAltitude : %.3f m\n", p.getAltitude());
 
-			struct tm *t = gmtime(&p.sample_time);
 			printf("\tTime : ");
-			printtm(t);
+			printtm(p.getGMT());
 			puts("");
 		}
 	}
