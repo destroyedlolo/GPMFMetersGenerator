@@ -193,7 +193,7 @@ CAUTION : 'p' has been removed from getopt !!
 			basename(v.c_str()),
 			v.beginning.idx, v.beginning.distance,
 			v.end.idx, v.end.distance,
-			v.getMin().strLocalHour(true).c_str()
+			v.getFirst().strLocalHour(true).c_str()
 		);
 
 		if(v.end.idx == -1){
@@ -221,9 +221,9 @@ CAUTION : 'p' has been removed from getopt !!
 	fputs("GPMFStory 1.0\n", story);	// Header to identify a story
 	fprintf(story, "s%s\n", Gpx->getMin().strLocalTime().c_str());	// Starting time
 
-	fputs("# Format : Index, latitude, longitude, altitude, timestamp (ignored)\n", story);
+	fputs("# Format : Index, latitude, longitude, altitude, timestamps (ignored)\n", story);
 	for(int vidx = 0; vidx < (int)videos.size(); vidx++){
-		for(; idx < videos[vidx].beginning.idx; idx++){
+		for(; idx < videos[vidx].beginning.idx; idx++){	// GPX before the video
 			auto &gpx = (*Gpx)[idx];
 			fprintf(story,"p%05d, %f, %f, %f, %s\n",
 				idx,
@@ -231,9 +231,32 @@ CAUTION : 'p' has been removed from getopt !!
 				gpx.getAltitude(), gpx.strLocalTime().c_str()
 			);
 		}
-exit(EXIT_SUCCESS);
+
+		fprintf(story, "# video's starting timestamps : %s\n", videos[vidx].getFirst().strLocalTime().c_str() );
+		fprintf(story, "v%s\n", videos[vidx].c_str());
+
+		for(; idx < videos[vidx].end.idx; idx++){	// GPX before the video
+			auto &gpx = (*Gpx)[idx];
+			fprintf(story,"p%05d, %f, %f, %f, %s\n",
+				idx,
+				gpx.getLatitude(), gpx.getLongitude(),
+				gpx.getAltitude(), gpx.strLocalTime().c_str()
+			);
+		}
+
+		fprintf(story, "# video's ending timestamps : %s\n", videos[vidx].getLast().strLocalTime().c_str() );
+		fputs("V\n", story);
 	}
 
+	for(; idx < (int)Gpx->getSampleCount(); idx++){	// Remaining
+		auto &gpx = (*Gpx)[idx];
+		fprintf(story,"p%05d, %f, %f, %f, %s\n",
+			idx,
+			gpx.getLatitude(), gpx.getLongitude(),
+			gpx.getAltitude(), gpx.strLocalTime().c_str()
+		);
+	}
+	
 	fclose(story);
 
 }
