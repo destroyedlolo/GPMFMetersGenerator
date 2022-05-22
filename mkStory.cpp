@@ -20,9 +20,11 @@
 #define VERSION "0.01a01"
 
 GPX *Gpx = NULL;	// external original GPX data
+
+#if 0
 double proximity = 1;	// Proximity threshold 
 							// (bellow this distance, places are considered to 
-							// be the same.
+#endif							// be the same.
 
 	/* Extended GPVideo */
 class GPVideoExt : public GPVideo, public std::string {
@@ -68,7 +70,7 @@ int main(int argc, char *argv[]){
 
 			/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhG:p:F")) != -1){
+	while(( opt = getopt(argc, argv, ":vdhG:F")) != -1){
 		switch(opt){
 		case 'G':
 			Gpx = new GPX(optarg);
@@ -80,9 +82,13 @@ int main(int argc, char *argv[]){
 		case 'v':
 			verbose = true;
 			break;
+#if 0
+CAUTION : 'p' has been removed from getopt !!
+
 		case 'p':
 			proximity = atof(optarg);
 			break;
+#endif
 		case 'F':
 			force = true;
 			break;
@@ -151,12 +157,28 @@ int main(int argc, char *argv[]){
 			v.Consider( idx, gpx );
 	}
 
+	puts("*I* results");
+
+	int prev = -1;	// Prev index
+
+//		  GX013158.MP4| 99999 | 100000.0 | 99999 | 100000.0 | 
+	puts(" ----------------------------------------------------");
+	puts("|    video     |    Beginning     |     End          | Status");
+	puts("|              | Index | distance | index | distance |");
+	puts(" ------------------------------------------------------------");
 	for(auto &v : videos){
-		printf("*I* '%s' beg(%d, %f), end(%d, %f)\n",
-			v.c_str(),
+		printf("| %12s | %05d | %8.1f | %05d | %8.1f | ",
+			basename(v.c_str()),
 			v.beginning.idx, v.beginning.distance,
 			v.end.idx, v.end.distance
 		);
+
+		if(v.end.idx == -1)
+			puts(" Not ending");
+		else if(prev > v.beginning.idx)
+			puts(" Overlapping");
+		else
+			puts(" ok");
 	}
 }
 
