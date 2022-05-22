@@ -14,7 +14,6 @@
 #define SAMPLE (1.0/9.0)
 
 struct GPMFdata : public GPSCoordinate {
-	double altitude;
 	double spd2d, spd3d;
 	time_t sample_time;
 
@@ -24,9 +23,8 @@ struct GPMFdata : public GPSCoordinate {
 		double aaltitude,
 		double aspd2d, double aspd3d,
 		time_t asample_time
-	) : GPSCoordinate(alatitude, alongitude),
-		altitude(aaltitude), spd2d(aspd2d), spd3d(aspd3d), 
-		sample_time(asample_time){
+	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time),
+		spd2d(aspd2d), spd3d(aspd3d){
 	}
 };
 

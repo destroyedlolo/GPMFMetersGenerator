@@ -216,13 +216,10 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 
 		/* update Min / Max */
 	if(this->getSamples().empty()){	/* First data */
-		this->getMin().set( lat, lgt );
-		this->getMax().set( lat, lgt );
-
-		this->getMin().altitude = this->getMax().altitude = alt;
+		this->getMin().set( lat, lgt, alt, time );
+		this->getMax().set( lat, lgt, alt, time );
 		this->getMin().spd2d = this->getMax().spd2d = s2d;
 		this->getMin().spd3d = this->getMax().spd3d = s3d;
-		this->getMin().sample_time = this->getMax().sample_time = time;
 	} else {
 		if(lat < this->getMin().getLatitude())
 			this->getMin().setLatitude(lat);
@@ -234,10 +231,10 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 		if(lgt > this->getMax().getLongitude())
 			this->getMax().setLongitude(lgt);
 
-		if(alt < this->getMin().altitude)
-			this->getMin().altitude = alt;
-		if(alt > this->getMax().altitude)
-			this->getMax().altitude = alt;
+		if(alt < this->getMin().getAltitude())
+			this->getMin().setAltitude(alt);
+		if(alt > this->getMax().getAltitude())
+			this->getMax().setAltitude(alt);
 
 		if(s2d < this->getMin().spd2d)
 			this->getMin().spd2d = s2d;
@@ -250,10 +247,10 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 			this->getMax().spd3d = s3d;
 
 		if(time != (time_t)-1){
-			if(this->getMin().sample_time == (time_t)-1 || this->getMin().sample_time > time)
-				this->getMin().sample_time = time;
-			if(this->getMax().sample_time == (time_t)-1 || this->getMax().sample_time < time)
-				this->getMax().sample_time = time;
+			if(this->getMin().getSampleTime() == (time_t)-1 || this->getMin().getSampleTime() > time)
+				this->getMin().setSampleTime(time);
+			if(this->getMax().getSampleTime() == (time_t)-1 || this->getMax().getSampleTime() < time)
+				this->getMax().setSampleTime(time);
 		}
 	}
 
@@ -378,16 +375,14 @@ void GPVideo::Dump( void ){
 	puts("*I* Video min/max :");
 	printf("\tLatitude : %f deg - %f deg (%f)\n", this->getMin().getLatitude(), this->getMax().getLatitude(), this->getMax().getLatitude() - this->getMin().getLatitude());
 	printf("\tLongitude : %f deg - %f deg (%f)\n", this->getMin().getLongitude(), this->getMax().getLongitude(), this->getMax().getLongitude() - this->getMin().getLongitude());
-	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", this->getMin().altitude, this->getMax().altitude, this->getMax().altitude - this->getMin().altitude);
+	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", this->getMin().getAltitude(), this->getMax().getAltitude(), this->getMax().getAltitude() - this->getMin().getAltitude());
 	printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", this->getMin().spd2d, this->getMax().spd2d, this->getMax().spd2d - this->getMin().spd2d);
 	printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", this->getMin().spd3d, this->getMax().spd3d, this->getMax().spd3d - this->getMin().spd3d);
-	struct tm *t = gmtime(&this->getMin().sample_time);
 
-  printf("\tTime : ");
-	printtm(t);
+	printf("\tTime : ");
+	printtm(this->getMin().getGMT());
 	printf(" -> ");
-	t = gmtime(&this->getMax().sample_time);
-	printtm(t);
+	printtm(this->getMax().getGMT());
 	puts("");
 
 	if(debug){
@@ -395,13 +390,12 @@ void GPVideo::Dump( void ){
     for(auto p : samples){
 			printf("\tLatitude : %.3f deg\n", p.getLatitude());
 			printf("\tLongitude : %.3f deg\n", p.getLongitude());
-			printf("\tAltitude : %.3f m\n", p.altitude);
+			printf("\tAltitude : %.3f m\n", p.getAltitude());
 			printf("\tSpeed2d : %.3f km/h\n", p.spd2d);
 			printf("\tSpeed3d : %.3f km/h\n", p.spd3d);
 
-			struct tm *t = gmtime(&p.sample_time);
 			printf("\tTime : ");
-			printtm(t);
+			printtm(p.getGMT());
 			puts("");
 		}
 	}
