@@ -107,6 +107,7 @@ void GPX::Dump( void ){
 			printf("\tLatitude : %.3f deg\n", p.getLatitude());
 			printf("\tLongitude : %.3f deg\n", p.getLongitude());
 			printf("\tAltitude : %.3f m\n", p.getAltitude());
+			printf("\tCom distance : %.0f m\n", p.getCumulativeDistance());
 
 			printf("\tTime : ");
 			printtm(p.getGMT());
@@ -225,6 +226,8 @@ GPX::GPX( const char *file ){
 
 			/* store the new sample */
 		GpxData nv(lat, lgt, alt, time);
+		if(!this->samples.empty())
+			nv.addDistance( this->getLast() );
 	
 			/* insert the new sample in the list */
 		this->samples.push_back(nv);
