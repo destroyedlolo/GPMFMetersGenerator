@@ -8,6 +8,8 @@
  * 16/04/2022 - Bump to v1.0 (CAUTION, verbose and debug options changed !)
  *
  * 09/05/2022 - Switch to v2.0
+ *
+ * 23/05/2022 - Switch to v3.0 : adding stories support
  */
 
 #include <cstdio>
@@ -32,7 +34,7 @@
 
 	/* Configuration */
 
-#define VERSION "2.03"
+#define VERSION "3.00a1"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
@@ -70,7 +72,7 @@ int main(int argc, char *argv[]){
 				gfx_speed = *optarg;
 				break;
 			default :
-				puts("*E* Only 2, 3, b are recognized as -s option");
+				fputs("*E* Only 2, 3, b are recognized as -s option\n", stderr);
 				exit(EXIT_FAILURE);
 			}
 			break;
@@ -87,7 +89,7 @@ int main(int argc, char *argv[]){
 				gfx_strk = *optarg;
 				break;
 			default :
-				puts("*E* Only 2, 3 are recognized as -k option");
+				fputs("*E* Only 2, 3 are recognized as -k option\n", stderr);
 				exit(EXIT_FAILURE);
 			}
 			break;
@@ -98,11 +100,15 @@ int main(int argc, char *argv[]){
 			gfx_KML = true;
 			break;
 		case 'G':
+			if(hiking){
+				fputs("*F* Only one GPX file can be loaded at a time\n", stderr);
+				exit(EXIT_FAILURE);
+			}
 			hiking = new GPX(optarg);
 			hiking->Dump();
 			break;
 		case '?':	// unknown option
-			printf("unknown option: -%c\n", optopt);
+			fprintf(stderr, "unknown option: -%c\n", optopt);
 		case 'h':
 		case ':':	// no argument provided (or missing argument)
 			if(optopt == 's'){
@@ -126,6 +132,8 @@ int main(int argc, char *argv[]){
 				"-K : export telemetry as KML file\n"
 				"\n"
 				"-G<file> : load a GPX file\n"
+				"-S<file> : load a story file\n"
+				"\tOnly a GPX or a story can be loadded, not both\n"
 				"\n"
 				"-V : Don't generate video, keep PNG files\n"
 				"-F : don't fail if the target directory exists\n"

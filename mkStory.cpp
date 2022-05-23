@@ -74,7 +74,11 @@ int main(int argc, char *argv[]){
 	int opt;
 	while(( opt = getopt(argc, argv, ":vdhG:F")) != -1){
 		switch(opt){
-		case 'G': {
+		case 'G':
+			if(Gpx){
+				fputs("*F* Only one GPX file can be loaded at a time\n", stderr);
+				exit(EXIT_FAILURE);
+			} else {
 				Gpx = new GPX(optarg);
 				if(verbose)
 					Gpx->Dump();
@@ -222,14 +226,15 @@ CAUTION : 'p' has been removed from getopt !!
 	fputs("GPMFStory 1.0\n", story);	// Header to identify a story
 	fprintf(story, "s%s\n", Gpx->getMin().strLocalTime().c_str());	// Starting time
 
-	fputs("# Format : Index, latitude, longitude, altitude, timestamps (ignored)\n", story);
+	fputs("# Format : Index, latitude, longitude, altitude, distance (km - ignored), timestamps (ignored)\n", story);
 	for(int vidx = 0; vidx < (int)videos.size(); vidx++){
 		for(; idx < videos[vidx].beginning.idx; idx++){	// GPX before the video
 			auto &gpx = (*Gpx)[idx];
-			fprintf(story,"p%05d, %f, %f, %f, %s\n",
+			fprintf(story,"p%05d, %f, %f, %f, %.3f, %s\n",
 				idx,
 				gpx.getLatitude(), gpx.getLongitude(),
-				gpx.getAltitude(), gpx.strLocalTime().c_str()
+				gpx.getAltitude(), gpx.getCumulativeDistance() / 1000,
+				gpx.strLocalHour().c_str()
 			);
 		}
 
@@ -238,10 +243,11 @@ CAUTION : 'p' has been removed from getopt !!
 
 		for(; idx < videos[vidx].end.idx; idx++){	// GPX before the video
 			auto &gpx = (*Gpx)[idx];
-			fprintf(story,"p%05d, %f, %f, %f, %s\n",
+			fprintf(story,"p%05d, %f, %f, %f, %.3f, %s\n",
 				idx,
 				gpx.getLatitude(), gpx.getLongitude(),
-				gpx.getAltitude(), gpx.strLocalTime().c_str()
+				gpx.getAltitude(), gpx.getCumulativeDistance() / 1000,
+				gpx.strLocalHour().c_str()
 			);
 		}
 
@@ -251,11 +257,12 @@ CAUTION : 'p' has been removed from getopt !!
 
 	for(; idx < (int)Gpx->getSampleCount(); idx++){	// Remaining
 		auto &gpx = (*Gpx)[idx];
-		fprintf(story,"p%05d, %f, %f, %f, %s\n",
-			idx,
-			gpx.getLatitude(), gpx.getLongitude(),
-			gpx.getAltitude(), gpx.strLocalTime().c_str()
-		);
+			fprintf(story,"p%05d, %f, %f, %f, %.3f, %s\n",
+				idx,
+				gpx.getLatitude(), gpx.getLongitude(),
+				gpx.getAltitude(), gpx.getCumulativeDistance() / 1000,
+				gpx.strLocalHour().c_str()
+			);
 	}
 	
 	fclose(story);
