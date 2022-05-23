@@ -42,10 +42,10 @@ public:
 	void Consider( int idx, GPSCoordinate &p ){
 		if(this->beginning.idx == -1){	// Initialize with the 1st point
 			this->beginning.idx = this->end.idx = idx;
-			this->beginning.distance = this->getFirst().Distance(p);
-			this->end.distance = this->getLast().Distance(p);
+			this->beginning.distance = this->getFirst().Estrangement(p);
+			this->end.distance = this->getLast().Estrangement(p);
 		} else {
-			double dst = this->getFirst().Distance(p);
+			double dst = this->getFirst().Estrangement(p);
 			if(dst < this->beginning.distance){	// New guessed beginning point
 				this->beginning.idx = idx;
 				this->beginning.distance = dst;
@@ -53,7 +53,7 @@ public:
 				this->end.idx = -1;			// invalidate end point
 				this->end.distance = NAN;
 			} else {
-				dst = this->getLast().Distance(p);
+				dst = this->getLast().Estrangement(p);
 				if(std::isnan(this->end.distance) || dst < this->end.distance){	// new guessed end point
 					this->end.idx = idx;
 					this->end.distance = dst;
@@ -148,16 +148,16 @@ CAUTION : 'p' has been removed from getopt !!
 		if(verbose){
 			video.Dump();
 			printf("*I* Distance vs min : %.0fm, max %.0fm\n",
-				video.getMin().Distance(Gpx->getMin()),
-				video.getMax().Distance(Gpx->getMax())
+				video.getMin().Estrangement(Gpx->getMin()),
+				video.getMax().Estrangement(Gpx->getMax())
 			);
 		}
 
 		if( !Gpx->sameArea(video.getMin()) ||
 			!Gpx->sameArea(video.getMax()) ){
 				fprintf(stderr, "*W* This video seems outside the GPX trace (%.0fm and %.0fm)\n", 
-					video.getMin().Distance(Gpx->getMin()),
-					video.getMax().Distance(Gpx->getMax())
+					video.getMin().Estrangement(Gpx->getMin()),
+					video.getMax().Estrangement(Gpx->getMax())
 				);
 
 				if(!force){
