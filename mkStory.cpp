@@ -233,7 +233,7 @@ CAUTION : 'p' has been removed from getopt !!
 		}
 
 		fprintf(story, "# video's starting timestamps : %s\n", videos[vidx].getFirst().strLocalTime().c_str() );
-		fprintf(story, "v%s\n", videos[vidx].c_str());
+		fprintf(story, "v%s\n", basename(videos[vidx].c_str()));
 
 		for(; idx < videos[vidx].end.idx; idx++){	// GPX before the video
 			auto &gpx = (*Gpx)[idx];
