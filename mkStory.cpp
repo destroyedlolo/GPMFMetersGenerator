@@ -185,20 +185,20 @@ CAUTION : 'p' has been removed from getopt !!
 	int prev = -1;			// Prev index
 	bool issue = false;	// Did we detected an issue ?
 
-//		  GX013158.MP4| 99999 | 100000.0 | 99999 | 100000.0 | 
-	puts(" ----------------------------------------------------------------------");
-	puts("|    video     |         Beginning         |            End            | Status");
-	puts("|              | Index | Estrgmt  | CumDst | Index | Estrgmt  | CumDst |");
 	puts(" ----------------------------------------------------------------------");
 	printf("| GPX : %s -> %s\n", Gpx->getMin().strLocalTime().c_str(), Gpx->getMax().strLocalTime().c_str());
 	printf("| Distance traveled : %.0f m\n", Gpx->getLast().getCumulativeDistance());
-	puts(" ----------------------------------------------------------------------");
+	puts(" --------------------------------------------------------------------------------------------------------");
+	puts("|    video     |         Beginning         |            End            |            Timestamps           | Status");
+	puts("|              | Index | Estrgmt  | CumDis | Index | Estrgmt  | CumDis |       GPX      |       GoPro    |");
+	puts(" --------------------------------------------------------------------------------------------------------");
 	for(auto &v : videos){
-		printf("| %12s | %05d | %8.1f | %6.0f | %05d | %8.1f | %6.0f | %s | ",
+		printf("| %12s | %05d | %8.1f | %6.0f | %05d | %8.1f | %6.0f | %s -> %s | %s -> %s | ",
 			basename(v.c_str()),
 			v.beginning.idx, v.beginning.distance, (*Gpx)[v.beginning.idx].getCumulativeDistance(),
 			v.end.idx, v.end.distance, (*Gpx)[v.end.idx].getCumulativeDistance(),
-			v.getFirst().strLocalHour(true).c_str()
+			(*Gpx)[v.beginning.idx].strLocalHour(true).c_str(), (*Gpx)[v.end.idx].strLocalHour(true).c_str(),
+			v.getFirst().strLocalHour(true).c_str(), v.getLast().strLocalHour(true).c_str()
 		);
 
 		if(v.end.idx == -1){
