@@ -122,7 +122,7 @@ CAUTION : 'p' has been removed from getopt !!
 				"\n"
 				"mkStory [-options] video.mp4 ...\n"
 				"Known opts :\n"
-				"-G<file> : GPX of the hicking\n"
+				"-G<file> : GPX of the hiking\n"
 #if 0
 				"-p<val> : Proximity threshold (default: 1m)\n"
 #endif
