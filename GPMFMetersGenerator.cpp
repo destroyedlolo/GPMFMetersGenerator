@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:S:")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -101,10 +101,18 @@ int main(int argc, char *argv[]){
 			break;
 		case 'G':
 			if(hiking){
-				fputs("*F* Only one GPX file can be loaded at a time\n", stderr);
+				fputs("*F* Only one GPX or Story file can be loaded at a time\n", stderr);
 				exit(EXIT_FAILURE);
 			}
 			hiking = new GPX(optarg);
+			hiking->Dump();
+			break;
+		case 'S':
+			if(hiking){
+				fputs("*F* Only one GPX or Story file can be loaded at a time\n", stderr);
+				exit(EXIT_FAILURE);
+			}
+			hiking = new GPX(optarg, true);
 			hiking->Dump();
 			break;
 		case '?':	// unknown option

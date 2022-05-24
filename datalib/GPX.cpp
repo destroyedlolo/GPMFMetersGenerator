@@ -118,7 +118,7 @@ void GPX::Dump( void ){
 	printf("*I* %u memorised GPX\n", this->getSampleCount());
 }
 
-GPX::GPX( const char *file ){
+void GPX::readGPX( const char *file ){
 	FILE *f;
 
 	if(!(f = fopen(file, "r"))){
@@ -234,6 +234,34 @@ GPX::GPX( const char *file ){
 	}
 
 	fclose(f);
+}
+
+void GPX::readStory( const char *file ){
+	FILE *f;
+
+	if(!(f = fopen(file, "r"))){
+		perror(file);
+		exit(EXIT_FAILURE);
+	}
+	
+	if(!fgets(buff, sizeof(buff), f)){
+		fputs("*F* Can't read Story's magic\n", stderr);
+		exit(EXIT_FAILURE);
+	}
+	buff[strcspn(buff,"\n")] = 0;
+	puts(buff);
+
+	while(fgets(buff, sizeof(buff), f)){
+		puts(buff);
+	}
+	fclose(f);
+}
+
+GPX::GPX( const char *file, bool story ){
+	if(story)
+		readStory( file );
+	else
+		readGPX( file );
 }
 
 bool GPX::sameArea( GPSCoordinate &coord, uint32_t proximity_threshold){

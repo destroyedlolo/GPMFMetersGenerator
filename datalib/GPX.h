@@ -21,9 +21,15 @@ struct GpxData : public GPSCoordinate {
 };
 
 class GPX : public samplesCollection<GpxData> {
+	void readGPX( const char * );
+	void readStory( const char * );
 
 public:
-	GPX( const char * );
+		/* Read hiking traces from a GPX file or from a Story file
+		 * -> file : file to be read
+		 * -> story : true if it'a a story file
+		 */
+	GPX( const char *, bool story = false );
 
 	void Dump( void );
 

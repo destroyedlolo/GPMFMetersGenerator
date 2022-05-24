@@ -272,7 +272,7 @@ CAUTION : 'p' has been removed from getopt !!
 		 * boundary
 		 */
 	fputs("GPMFStory 1.0\n", story);	// Header to identify a story
-	fprintf(story, "#GPX starting time\n%s\n", Gpx->getMin().strLocalTime().c_str());
+	fprintf(story, "#GPX starting time : %s\n", Gpx->getMin().strLocalTime().c_str());
 
 	fputs("#Video'name, starting Index, ending Index\n", story);
 	for(auto &v : videos)
