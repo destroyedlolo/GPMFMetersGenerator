@@ -1,5 +1,16 @@
 /* PathGraphic
  * Generate path graphics
+ *
+ * Note about stories :
+ * - background's shadow is not changed
+ * - traces BEFORE the actual video are in gray
+ * - traces AFTER the actual video remain white
+ * - traces of other previous videos are in darker blue
+ * - traces of the actual video remain blue
+ * - traces of videos after the current one is in light blue
+ *
+ * The algorithm relies on the video to be part of the story
+ * (otherwise, it is considered as the last)
  */
 #include "PathGfx.h"
 
@@ -48,6 +59,14 @@ void PathGfx::calcScales( void ){
 }
 
 void PathGfx::drawGPX(cairo_t *cr, int offset){
+	if(offset){	// drawing shadow
+		cairo_set_line_width(cr, 2);
+		cairo_set_source_rgba(cr, 0,0,0, 0.55);
+	} else {	// drawing path
+		cairo_set_source_rgb(cr, 1,1,1);
+		cairo_set_line_width(cr, 2);
+	}
+
 	bool first = true;
 
 	for(auto p : this->hiking->getSamples()){
@@ -96,14 +115,8 @@ void PathGfx::generateBackground( void ){
 	cairo_t *cr = cairo_create(this->background);
 
 	if(this->hiking){
-		cairo_set_line_width(cr, 2);
-		cairo_set_source_rgba(cr, 0,0,0, 0.55);
-		drawGPX(cr, 2);
-
-			/* Draw path */
-		cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
-		cairo_set_line_width(cr, 2);
-		drawGPX(cr, 0);
+		drawGPX(cr, 2);	// Shadow
+		drawGPX(cr, 0);	// Path
 	} else {
 			/* Draw shadow */
 		cairo_set_line_width(cr, 4);
