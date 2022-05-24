@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <cassert>
 
 #define BUFFLEN	1024
 
@@ -102,7 +103,16 @@ void GPX::Dump( void ){
 	printtm(this->getMax().getGMT());
 	puts("");
 
+	if(this->isStory())
+		printf("\tIt's a story with %lu videos loaded\n", this->videos.size());
+
 	if(debug){
+		if(this->isStory()){
+			puts("\tStory's videos :");
+			for( auto v: this->videos )
+				printf("\t\t%s : %05d -> %05d\n", v.c_str(), v.start, v.end);
+		}
+
 		puts("*D* Memorized CPX data");
 		for(auto p : samples){
 			printf("\tLatitude : %.3f deg\n", p.getLatitude());
@@ -258,13 +268,26 @@ void GPX::readStory( const char *file ){
 		exit(EXIT_FAILURE);
 	}
 
-		/* Reading videos anchors */
+		/* Reading videos anchors
+		 *	Rude checks are done here (assert()) as we are relying on
+		 *	formating made by mkStory.
+		 */
 	while(fgets(buff, sizeof(buff), f)){
 		if(*buff == '#')
 			continue;
 		if(*buff == '*')
 			break;
-		printf(buff);
+
+		char *indexes = strchr(buff, ',');
+		assert(indexes);
+
+		*indexes++ = 0;
+
+		int istart, iend;
+		assert( sscanf(indexes, "%d, %d", &istart, &iend) == 2 );
+
+		StoryVideo nv(buff, istart, iend);
+		this->videos.push_back(nv);
 	}
 
 		/* Reading GPX data */

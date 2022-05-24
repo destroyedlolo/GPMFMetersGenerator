@@ -1,5 +1,5 @@
 /* GPX
- * 	Impersonates GPX data
+ * 	Impersonates GPX data and extended Story
  */
 
 #ifndef GPX_H
@@ -21,7 +21,18 @@ struct GpxData : public GPSCoordinate {
 	}
 };
 
+struct StoryVideo : public std::string {
+	int start;
+	int end;
+
+	StoryVideo( const char *name, int astart, int aend ) : 
+		std::string(name), start(astart), end(aend) {}
+
+};
+
 class GPX : public samplesCollection<GpxData> {
+	std::vector<StoryVideo> videos;
+
 	void readGPX( const char * );
 	void readStory( const char * );
 
@@ -42,6 +53,8 @@ public:
 		 * -> proximity_threshold in degree
 		 */
 	bool sameArea( GPSCoordinate &, uint32_t proximity_threshold = 0 );
+
+	bool isStory( void ){ return(!this->videos.empty()); }
 };
 
 #endif
