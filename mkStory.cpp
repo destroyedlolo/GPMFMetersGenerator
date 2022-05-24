@@ -222,9 +222,26 @@ CAUTION : 'p' has been removed from getopt !!
 		/* As we're relying on previous processing, we don't have to check
 		 * boundary
 		 */
-	idx = 0;
 	fputs("GPMFStory 1.0\n", story);	// Header to identify a story
-	fprintf(story, "s%s\n", Gpx->getMin().strLocalTime().c_str());	// Starting time
+	fprintf(story, "#GPX starting time\n%s\n", Gpx->getMin().strLocalTime().c_str());
+
+	fputs("#Video'name, starting Index, ending Index\n", story);
+	for(auto &v : videos)
+		fprintf(story, "%s, %05d, %05d\n", basename(v.c_str()), v.beginning.idx, v.end.idx);
+
+	fputs("#GPX data\n*GPX\n", story);
+	fputs("#latitude, longitude, altitude, sample_time, cumulative_distance\n", story);
+	for( idx = 0; idx < (int)Gpx->getSampleCount(); idx++ ){
+		auto &gpx = (*Gpx)[idx];
+		fprintf(story, "%f, %f, %f, %lu, %f\n",
+			gpx.getLatitude(), gpx.getLongitude(),
+			gpx.getAltitude(), gpx.getSampleTime(),
+			gpx.getCumulativeDistance()
+		);
+	}
+			
+
+#if 0 
 
 	fputs("# Format : Index, latitude, longitude, altitude, distance (km - ignored), timestamps (ignored)\n", story);
 	for(int vidx = 0; vidx < (int)videos.size(); vidx++){
@@ -264,7 +281,8 @@ CAUTION : 'p' has been removed from getopt !!
 				gpx.strLocalHour().c_str()
 			);
 	}
-	
+#endif
+
 	fclose(story);
 
 }
