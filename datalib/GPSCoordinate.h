@@ -17,9 +17,9 @@ class GPSCoordinate {
 
 public :
 	GPSCoordinate(){}
-	GPSCoordinate( double alat, double along, double alt, time_t ast): 
+	GPSCoordinate( double alat, double along, double alt, time_t ast, double adst = 0): 
 		latitude(alat), longitude(along), altitude(alt),
-		sample_time(ast), cumulative_distance(0){}
+		sample_time(ast), cumulative_distance(adst){}
 
 	void set(double alat, double along, double alt, time_t ast) {
 		this->latitude = alat;
@@ -27,6 +27,13 @@ public :
 		this->altitude = alt;
 		this->sample_time = ast;
 	}
+	void set( GPSCoordinate &nv ){
+		this->latitude = nv.getLatitude();
+		this->longitude = nv.getLongitude();
+		this->altitude = nv.getAltitude();
+		this->sample_time = nv.getSampleTime();
+	}
+
 	void setLatitude( double alat ){ this->latitude = alat; }
 	void setLongitude( double along ){ this->longitude = along; }
 	void setAltitude( double alt ){ this->altitude = alt; }

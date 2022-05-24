@@ -118,6 +118,33 @@ void GPX::Dump( void ){
 	printf("*I* %u memorised GPX\n", this->getSampleCount());
 }
 
+void GPX::updMinMax( GpxData &nv ){
+	if(!this->getSampleCount()){
+		this->getMin().set( static_cast<GPSCoordinate &>(nv) );
+		this->getMax().set( static_cast<GPSCoordinate &>(nv) );
+	} else {
+		if(nv.getLatitude() < this->getMin().getLatitude())
+			this->getMin().setLatitude(nv.getLatitude());
+		if(nv.getLatitude() > this->getMax().getLatitude())
+			this->getMax().setLatitude(nv.getLatitude());
+
+		if(nv.getLongitude() < this->getMin().getLongitude())
+			this->getMin().setLongitude(nv.getLongitude());
+		if(nv.getLongitude() > this->getMax().getLongitude())
+			this->getMax().setLongitude(nv.getLongitude());
+
+		if(nv.getAltitude() < this->getMin().getAltitude())
+			this->getMin().setAltitude(nv.getAltitude());
+		if(nv.getAltitude() > this->getMax().getAltitude())
+			this->getMax().setAltitude(nv.getAltitude());
+
+		if(this->getMin().getSampleTime() > nv.getSampleTime())
+			this->getMin().setSampleTime(nv.getSampleTime());
+		if(this->getMax().getSampleTime() < nv.getSampleTime())
+			this->getMax().setSampleTime(nv.getSampleTime());
+	}
+}
+
 void GPX::readGPX( const char *file ){
 	FILE *f;
 
@@ -198,34 +225,10 @@ void GPX::readGPX( const char *file ){
 		}
 #endif
 
-			/* Update min/max */
-		if(!this->getSampleCount()){
-			this->getMin().set( lat, lgt, alt, time );
-			this->getMax().set( lat, lgt, alt, time );
-		} else {
-			if(lat < this->getMin().getLatitude())
-				this->getMin().setLatitude(lat);
-			if(lat > this->getMax().getLatitude())
-				this->getMax().setLatitude(lat);
-
-			if(lgt < this->getMin().getLongitude())
-				this->getMin().setLongitude(lgt);
-			if(lgt > this->getMax().getLongitude())
-				this->getMax().setLongitude(lgt);
-
-			if(alt < this->getMin().getAltitude())
-				this->getMin().setAltitude(alt);
-			if(alt > this->getMax().getAltitude())
-				this->getMax().setAltitude(alt);
-
-			if(this->getMin().getSampleTime() > time)
-				this->getMin().setSampleTime(time);
-			if(this->getMax().getSampleTime() < time)
-				this->getMax().setSampleTime(time);
-		}
 
 			/* store the new sample */
 		GpxData nv(lat, lgt, alt, time);
+		updMinMax(nv);
 		if(!this->samples.empty())
 			nv.addDistance( this->getLast() );
 	
@@ -249,11 +252,38 @@ void GPX::readStory( const char *file ){
 		exit(EXIT_FAILURE);
 	}
 	buff[strcspn(buff,"\n")] = 0;
-	puts(buff);
-
-	while(fgets(buff, sizeof(buff), f)){
-		puts(buff);
+	if(strcmp(buff, "GPMFStory 1.0")){
+		fputs("*F* Story's magic not found\n", stderr);
+		exit(EXIT_FAILURE);
 	}
+
+		/* Reading videos anchors */
+	while(fgets(buff, sizeof(buff), f)){
+		if(*buff == '#')
+			continue;
+		if(*buff == '*')
+			break;
+		printf(buff);
+	}
+
+		/* Reading GPX data */
+	while(fgets(buff, sizeof(buff), f)){
+		double lat, lgt, alt;
+		time_t st;
+		double dst;
+
+		if(*buff == '#')
+			continue;
+
+		if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
+			fputs("*F* Failed to read GPX contents\n", stderr);
+			exit(EXIT_FAILURE);
+		}
+		GpxData nv(lat, lgt, alt, st, dst);
+		updMinMax(nv);
+		this->samples.push_back(nv);
+	}
+	
 	fclose(f);
 }
 

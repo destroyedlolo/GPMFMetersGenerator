@@ -15,14 +15,17 @@ struct GpxData : public GPSCoordinate {
 	GpxData(
 		double alatitude, double alongitude,
 		double aaltitude,
-		time_t asample_time
-	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time) {
+		time_t asample_time,
+		double adistance = 0
+	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time, adistance) {
 	}
 };
 
 class GPX : public samplesCollection<GpxData> {
 	void readGPX( const char * );
 	void readStory( const char * );
+
+	void updMinMax( GpxData & );
 
 public:
 		/* Read hiking traces from a GPX file or from a Story file
