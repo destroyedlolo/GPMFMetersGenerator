@@ -345,3 +345,32 @@ bool GPX::currentVideo(const char *vname){
 
 	return true;
 }
+
+GPX::pkind GPX::positionKind(int idx){
+	if(this->current_video_idx == -1)
+		return pkind::AFTERTRACE;
+
+	int r = this->videos[this->current_video_idx].whithin(idx);
+
+	if(r<0){	// Before
+		for(int i=this->current_video_idx-1; i>=0; i--){
+			r = this->videos[i].whithin(idx);
+			if(r>0)	// b/w the previous one and checked one
+				return pkind::BEFORETRACE;
+			else if(!r)	// inside the checked one
+				return pkind::BEFOREVIDEO;
+		}
+		return pkind::BEFORETRACE;	// before the 1st video
+	} else if(!r)	// within the video
+		return pkind::CURRENTVIDEO;
+	else { // after
+		for(int i=this->current_video_idx-1; i<(int)this->videos.size(); i++){
+			r = this->videos[i].whithin(idx);
+			if(r<0)	// b/w the checked and the next
+				return pkind::AFTERTRACE;
+			else if(!r)	// inside checked one
+				return pkind::AFTERVIDEO;
+		}
+		return pkind::AFTERTRACE;
+	}
+}

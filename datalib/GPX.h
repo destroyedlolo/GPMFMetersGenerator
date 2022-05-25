@@ -28,6 +28,19 @@ struct StoryVideo : public std::string {
 	StoryVideo( const char *name, int astart, int aend ) : 
 		std::string(name), start(astart), end(aend) {}
 
+		/* check if given index is part of the video
+		 * -1 : before
+		 *  0 : part of it
+		 *  1 : after
+		 */
+	int whithin( int idx ){
+		if(idx < this->start)
+			return -1;
+		else if(idx > this->end)
+			return 1;
+		else
+			return 0;
+	}
 };
 
 class GPX : public samplesCollection<GpxData> {
@@ -68,7 +81,9 @@ public:
 		CURRENTVIDEO,	// Inside the current video
 		AFTERVIDEO,		// Inside a video after the current one
 		BEFOREVIDEO		// Inside a video before the current one
-	} positionKind(int idx);
+	};
+
+	enum pkind positionKind(int idx);
 };
 
 #endif
