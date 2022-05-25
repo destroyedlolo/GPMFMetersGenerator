@@ -31,7 +31,7 @@ void AltitudeGfx::calcScales( void ){
 	this->offx = extents.x_advance + 10;
 
 		/* Scales */
-	if(this->hiking){
+	if(this->hiking && this->hiking->isStory()){
 		this->min_h = (((int)this->hiking->getMin().getAltitude())/50)*50;
 		this->max_h = (((int)this->hiking->getMax().getAltitude())/50 + 1)*50;
 		this->scale_w = (double)(this->SX - offx)/(double)this->hiking->getSampleCount();
@@ -155,7 +155,7 @@ void AltitudeGfx::generateBackground( void ){
 	cairo_stroke(cr);
 
 		// Draw Shadow
-	if(this->hiking)
+	if(this->hiking && this->hiking->isStory())
 		drawGPX(cr, 3);
 	else
 		drawGPMF(cr, 3);
@@ -170,6 +170,9 @@ void AltitudeGfx::generateBackground( void ){
 	cairo_line_to(cr, this->offx, this->SY - (this->video.getFirst().getAltitude() - this->min_h)*this->scale_h);
 
 	cairo_fill(cr);
+
+	if(this->hiking && this->hiking->isStory())
+		drawGPX(cr, 0);
 
 		/* Cleaning */
 	cairo_pattern_destroy(pat);
