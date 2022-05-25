@@ -61,6 +61,14 @@ public:
 		 * <- false if not found
 		 */
 	bool currentVideo(const char *);
+
+	enum pkind {
+		AFTERTRACE=0,		// A trace outside any video and after the current video
+		BEFORETRACE,	// A trace outside any video and before the current video
+		CURRENTVIDEO,	// Inside the current video
+		AFTERVIDEO,		// Inside a video after the current one
+		BEFOREVIDEO		// Inside a video before the current one
+	} positionKind(int idx);
 };
 
 #endif

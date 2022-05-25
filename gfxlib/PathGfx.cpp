@@ -69,8 +69,9 @@ void PathGfx::drawGPX(cairo_t *cr, int offset){
 
 	bool first = true;
 
-	for(auto p : this->hiking->getSamples()){
+	for(int idx=0; idx < (int)this->hiking->getSampleCount(); idx++){
 		int x,y;
+		auto &p = this->hiking->getSamples()[idx];
 
 		posXY(p.getLatitude(), p.getLongitude(), x, y);
 		x = this->off_x + (x-this->min_x) * this->scale + offset;
