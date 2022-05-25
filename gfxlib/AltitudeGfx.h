@@ -14,6 +14,12 @@ class AltitudeGfx : public Gfx {
 	int delta_h;
 	double scale_h, scale_w;	// Scales
 
+	/* Draw external GPX data
+	 * cr -> cairo context
+	 * offset -> offset the curve (do draw shadows)
+	 */
+	void drawGPX(cairo_t *cr, int offset);
+
 	/* Draw GPMF data
 	 * -> offset : move the curve (used to draw the shadow)
 	 * -> current : current position.
