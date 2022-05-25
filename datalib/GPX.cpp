@@ -311,7 +311,7 @@ void GPX::readStory( const char *file ){
 	fclose(f);
 }
 
-GPX::GPX( const char *file, bool story ){
+GPX::GPX( const char *file, bool story ) : current_video_idx(-1){
 	if(story)
 		readStory( file );
 	else
@@ -327,5 +327,21 @@ bool GPX::sameArea( GPSCoordinate &coord, uint32_t proximity_threshold){
 		this->getMax().getLongitude() + proximity_threshold < coord.getLongitude() )
 		return false;
 	
+	return true;
+}
+
+bool GPX::currentVideo(const char *vname){
+	for(this->current_video_idx = 0; this->current_video_idx < (int)this->videos.size(); this->current_video_idx++)
+		if(this->videos[this->current_video_idx] == vname)
+			break;
+
+	if(this->current_video_idx == (int)this->videos.size()){
+		this->current_video_idx = -1;
+		return false;	
+	}
+
+	if(debug)
+		printf("*d* Video found in story at index %d\n", this->current_video_idx);
+
 	return true;
 }

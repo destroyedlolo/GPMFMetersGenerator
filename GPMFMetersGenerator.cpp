@@ -211,8 +211,11 @@ int main(int argc, char *argv[]){
 		printf("*I* images will be generated in '%s'\n", targetDir);
 
 	GPVideo video(argv[optind]);
-
 	video.Dump();
+
+	if(hiking)	// Specify the current video
+		if(!hiking->currentVideo(basename(argv[optind])))
+			fprintf(stderr, "*W* '%s' is not part of loaded story\n", basename(argv[optind]));
 
 		/* Generate videos */
 	if(gfx_speed){

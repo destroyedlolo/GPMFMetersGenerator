@@ -32,6 +32,7 @@ struct StoryVideo : public std::string {
 
 class GPX : public samplesCollection<GpxData> {
 	std::vector<StoryVideo> videos;
+	int current_video_idx;	// Current video index
 
 	void readGPX( const char * );
 	void readStory( const char * );
@@ -55,6 +56,11 @@ public:
 	bool sameArea( GPSCoordinate &, uint32_t proximity_threshold = 0 );
 
 	bool isStory( void ){ return(!this->videos.empty()); }
+
+		/* Specify which is the current video
+		 * <- false if not found
+		 */
+	bool currentVideo(const char *);
 };
 
 #endif
