@@ -74,6 +74,9 @@ public:
 		 * <- false if not found
 		 */
 	bool currentVideo(const char *);
+	StoryVideo &getCurrentStoryVideo( void ){
+		return this->videos[ this->current_video_idx ];
+	}
 
 	enum pkind {
 		AFTERTRACE=0,		// A trace outside any video and after the current video
