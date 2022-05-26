@@ -110,14 +110,21 @@ void AltitudeGfx::drawGPX(cairo_t *cr, int offset){
 					cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
 					break;
 				case GPX::pkind::AFTERVIDEO :
-					cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+					cairo_set_source_rgb(cr, 0.3, 0.4, 0.7);
 					break;
 				case GPX::pkind::BEFORETRACE :
 					cairo_set_source_rgb(cr, 1,1,1);
 					break;
 				case GPX::pkind::CURRENTVIDEO :
-					cairo_set_source_rgb(cr, 0,1,0);
-					break;
+					if(!first)	// draw previous gfx
+						cairo_line_to(cr, x, y);
+					for(; idx < (int)this->hiking->getSampleCount(); idx++)	// skiping
+						if(this->hiking->positionKind(idx) != GPX::pkind::CURRENTVIDEO){
+							idx--;
+							break;
+						}
+					first = true;
+					continue;
 				}
 			}
 		}
@@ -140,7 +147,7 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
 		cairo_set_line_width(cr, 5);
 	} else if(current != (uint32_t)-2){	/* Drawing curve */
 		cairo_set_line_width(cr, 3);
-		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);	/* Set white color */
+		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);	
 	}
 
 	if(this->hiking && this->hiking->isStory()){
@@ -156,7 +163,7 @@ void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
 			if(current == i){
 				cairo_stroke(cr);
 				cairo_move_to(cr, x, y);
-				cairo_set_source_rgb(cr, 1,0,0);
+				cairo_set_source_rgb(cr, 0.3, 0.5, 0.8);
 			}
 		}
 
