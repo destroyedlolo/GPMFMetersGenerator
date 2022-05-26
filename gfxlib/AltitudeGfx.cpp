@@ -1,5 +1,15 @@
 /* AltitudeGraphic
  * Generate altitude graphics
+ *
+
+The altitudes diverge between the phone and the GoPro GPS:
+- first because the signal quality can be bad
+- second, the GoPro may start recording video before all satellites are acquired.
+
+Unfortunately, there is no sure way to determine which one is right. As a result :
+- when a story is used, only GPX altitudes are taken into account to draw the graphs while GoPro data is displayed in the label
+- otherwise, only GoPro data is used, and the graph is limited to this data. And this, even when a GPX file is loaded (by the way, there is no reliable way to link GPMF and GPX data but using stories).
+
  */
 #include "AltitudeGfx.h"
 
@@ -48,6 +58,11 @@ void AltitudeGfx::calcScales( void ){
 	if(!this->delta_h)
 		this->delta_h = this->range_h/5;
 
+	if(this->hiking && this->hiking->isStory()){	// No offset here as we're not drawing a shadow
+		this->soffx = this->offx + this->hiking->getCurrentStoryVideo().start * this->scale_w;
+		this->sscale_w = (double)(this->hiking->getCurrentStoryVideo().end - this->hiking->getCurrentStoryVideo().start)/(double)this->video.getSampleCount() * this->scale_w;
+	}
+
 	cairo_destroy(cr);
 }
 
@@ -70,26 +85,40 @@ void AltitudeGfx::drawGPX(cairo_t *cr, int offset){
 		int x = this->offx + idx*this->scale_w + offset;
 		int y = this->SY - (p.getAltitude() - this->min_h)*this->scale_h + offset;
 
-		if(kind != prec && !offset){
+		if(kind != prec){
 			prec = kind;
-			if(!first){
-				cairo_stroke(cr);	// Draw previous trace
-				first = true;		// start a new one
-			}
-			switch(kind){
-			case GPX::pkind::AFTERTRACE :
-				cairo_set_source_rgb(cr, .85,.85,.85);
-				break;
-			case GPX::pkind::BEFOREVIDEO :
-				cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
-				break;
-			case GPX::pkind::AFTERVIDEO :
-				cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
-				break;
-			case GPX::pkind::BEFORETRACE :
-			case GPX::pkind::CURRENTVIDEO :
-				cairo_set_source_rgb(cr, 1,1,1);
-				break;
+			if(offset){	// shadow
+				if(kind == GPX::pkind::CURRENTVIDEO){	// entering in the current video
+					this->drawGPMF(cr, offset, (uint32_t)-2);
+					for(; idx < (int)this->hiking->getSampleCount(); idx++)	// skiping
+						if(this->hiking->positionKind(idx) != GPX::pkind::CURRENTVIDEO){
+							idx--;
+							break;
+						} 
+					continue;
+				}
+			} else {
+				if(!first){
+					cairo_stroke(cr);	// Draw previous trace
+					first = true;		// start a new one
+				}
+				switch(kind){
+				case GPX::pkind::AFTERTRACE :
+					cairo_set_source_rgb(cr, .85,.85,.85);
+					break;
+				case GPX::pkind::BEFOREVIDEO :
+					cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
+					break;
+				case GPX::pkind::AFTERVIDEO :
+					cairo_set_source_rgb(cr, 0.3, 0.4, 0.6);
+					break;
+				case GPX::pkind::BEFORETRACE :
+					cairo_set_source_rgb(cr, 1,1,1);
+					break;
+				case GPX::pkind::CURRENTVIDEO :
+					cairo_set_source_rgb(cr, 0,1,0);
+					break;
+				}
 			}
 		}
 		if(first){
@@ -106,39 +135,62 @@ void AltitudeGfx::drawGPX(cairo_t *cr, int offset){
 }
 
 void AltitudeGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
-	if(current == uint32_t(-1)){	/* Drawing shadow */
+	if(current == (uint32_t)-1){	/* Drawing shadow */
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
 		cairo_set_line_width(cr, 5);
-	} else {	/* Drawing curve */
+	} else if(current != (uint32_t)-2){	/* Drawing curve */
 		cairo_set_line_width(cr, 3);
 		cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);	/* Set white color */
 	}
 
-	for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
-		int x = this->offx + i*this->scale_w + offset;
-		int y = this->SY - (this->video[i].getAltitude() - this->min_h)*this->scale_h + offset;
+	if(this->hiking && this->hiking->isStory()){
+		for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
+			int x = this->soffx + i*this->sscale_w + offset;
+			int y = this->SY - (this->video[i].getAltitude() - this->min_h)*this->scale_h + offset;
 
-		if(!i)	/* First plot */
-			cairo_move_to(cr, x, y);
-		else
-			cairo_line_to(cr, x, y);
+			if(!i && current != uint32_t(-2))	/* First plot */
+				cairo_move_to(cr, x, y);
+			else
+				cairo_line_to(cr, x, y);
 
-		if(current == i){
-			cairo_stroke(cr);
-			cairo_move_to(cr, x, y);
-			cairo_set_source_rgb(cr, 1,1,1);
+			if(current == i){
+				cairo_stroke(cr);
+				cairo_move_to(cr, x, y);
+				cairo_set_source_rgb(cr, 1,0,0);
+			}
 		}
-	}
 
-	if(current != uint32_t(-1))
-		cairo_stroke(cr);
-	else
-		cairo_stroke_preserve(cr);
+		if(current != (uint32_t)-2)
+			cairo_stroke(cr);
+	} else {
+		for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
+			int x = this->offx + i*this->scale_w + offset;
+			int y = this->SY - (this->video[i].getAltitude() - this->min_h)*this->scale_h + offset;
+
+			if(!i)	/* First plot */
+				cairo_move_to(cr, x, y);
+			else
+				cairo_line_to(cr, x, y);
+
+			if(current == i){
+				cairo_stroke(cr);
+				cairo_move_to(cr, x, y);
+				cairo_set_source_rgb(cr, 1,1,1);
+			}
+		}
+
+		if(current != uint32_t(-1))
+			cairo_stroke(cr);
+		else
+			cairo_stroke_preserve(cr);
+	}
 }
 
 void AltitudeGfx::generateBackground( void ){
 	cairo_t *cr = cairo_create(this->background);
 
+	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_set_font_size(cr, 27);
 	cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */
 	cairo_set_line_width(cr, 1);
 
@@ -177,7 +229,6 @@ void AltitudeGfx::generateBackground( void ){
 		/* Cleaning */
 	cairo_pattern_destroy(pat);
 	cairo_destroy(cr);
-
 }
 
 void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int index, GPMFdata &current){
