@@ -4,11 +4,8 @@
 
 The altitudes diverge between the phone and the GoPro GPS:
 - first because the signal quality can be bad
-- second, the GoPro may start recording video before all satellites are acquired.
-
-Unfortunately, there is no sure way to determine which one is right. As a result :
-- when a story is used, only GPX altitudes are taken into account to draw the graphs while GoPro data is displayed in the label
-- otherwise, only GoPro data is used, and the graph is limited to this data. And this, even when a GPX file is loaded (by the way, there is no reliable way to link GPMF and GPX data but using stories).
+- second, the GoPro may start recording video before all satellites are acquired
+This can create a jump / break when switching from GPX to GoPro samples.
 
  */
 #include "AltitudeGfx.h"
