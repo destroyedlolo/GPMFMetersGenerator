@@ -276,7 +276,7 @@ CAUTION : 'p' has been removed from getopt !!
 
 	fputs("#Video'name, starting Index, ending Index\n", story);
 	for(auto &v : videos)
-		fprintf(story, "%s, %05d, %05d\n", basename(v.c_str()), v.beginning.idx, v.end.idx);
+		fprintf(story, "%s, %5d, %5d\n", basename(v.c_str()), v.beginning.idx, v.end.idx);
 
 	fputs("#GPX data\n*GPX\n", story);
 	fputs("#latitude, longitude, altitude, sample_time, cumulative_distance\n", story);
