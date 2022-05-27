@@ -42,6 +42,7 @@ void GPVideo::readGPMF( void ){
 	GPMF_stream metadata_stream, * ms = &metadata_stream;
 	size_t payloadres = 0;
 	time_t time = (time_t)-1;
+	unsigned char gfix = 0;
 
 	if(debug)
 		printf("*d* payloads : %u\n", payloads);
@@ -76,6 +77,16 @@ void GPVideo::readGPMF( void ){
 			printf("from %.3f to %.3f seconds\n", tstart, tend);
 
 		while(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("STRM"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) )){	// Looks for stream
+
+			if(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("GPSF"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) )){	// find out GPS fix if any
+				if(GPMF_Type(ms) != GPMF_TYPE_UNSIGNED_LONG || GPMF_StructSize(ms) != 4){
+					puts("*E* found GPSF which doesn't contain expected data");
+					continue;
+				}
+				uint32_t *data = (uint32_t *)GPMF_RawData(ms);
+				gfix = BYTESWAP32(*data);
+			}
+
 			if(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("GPSU"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) )){	// find out GPS time if any
 				if(GPMF_Type(ms) != GPMF_TYPE_UTC_DATE_TIME){
 					puts("*E* found GPSU which doesn't contain a date");
@@ -170,13 +181,14 @@ void GPVideo::readGPMF( void ){
 							double drift;
 
 							if(debug)
-								printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f\n",
+								printf("t:%.3f l:%.3f l:%.3f a:%.3f 2d:%.3f 3d:%.3f gfix:%u\n",
 									tstart + i*tstep,
 									tmpbuffer[i*elements + 0],	/* latitude */
 									tmpbuffer[i*elements + 1],	/* longitude */
 									tmpbuffer[i*elements + 2],	/* altitude */
 									tmpbuffer[i*elements + 3],	/* speed2d */
-									tmpbuffer[i*elements + 4]	/* speed3d */
+									tmpbuffer[i*elements + 4],	/* speed3d */
+									gfix
 								);
 
 							if(!!(drift = addSample(
@@ -186,7 +198,8 @@ void GPVideo::readGPMF( void ){
 								tmpbuffer[i*elements + 2],	/* altitude */
 								tmpbuffer[i*elements + 3],	/* speed2d */
 								tmpbuffer[i*elements + 4],	/* speed3d */
-								time
+								time,
+								gfix
 							))){
 								if(verbose)
 									printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
@@ -207,7 +220,7 @@ void GPVideo::readGPMF( void ){
 		GPMF_Free(ms);
 }
 
-double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time ){
+double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix ){
 	double ret=0;
 
 		/* Convert speed from m/s to km/h */
@@ -220,6 +233,7 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 		this->getMax().set( lat, lgt, alt, time );
 		this->getMin().spd2d = this->getMax().spd2d = s2d;
 		this->getMin().spd3d = this->getMax().spd3d = s3d;
+		this->getMin().gfix = this->getMax().gfix = gfix;
 	} else {
 		if(lat < this->getMin().getLatitude())
 			this->getMin().setLatitude(lat);
@@ -252,6 +266,12 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 			if(this->getMax().getSampleTime() == (time_t)-1 || this->getMax().getSampleTime() < time)
 				this->getMax().setSampleTime(time);
 		}
+
+		if(gfix < this->getMin().gfix)
+			this->getMin().gfix = gfix;
+		if(gfix > this->getMax().gfix)
+			this->getMax().gfix = gfix;
+
 	}
 
 		/* manage multipart timing */
@@ -267,7 +287,7 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 			printf("accepted : %f, next:%f\n", sec, this->nextsample);
 
 			/* store the new sample */
-		GPMFdata nv(lat, lgt, alt, s2d, s3d, time);
+		GPMFdata nv(lat, lgt, alt, s2d, s3d, time, gfix);
 		if(!this->samples.empty())
 			nv.addDistance( this->getLast() );
 
@@ -380,6 +400,7 @@ void GPVideo::Dump( void ){
 	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", this->getMin().getAltitude(), this->getMax().getAltitude(), this->getMax().getAltitude() - this->getMin().getAltitude());
 	printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", this->getMin().spd2d, this->getMax().spd2d, this->getMax().spd2d - this->getMin().spd2d);
 	printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", this->getMin().spd3d, this->getMax().spd3d, this->getMax().spd3d - this->getMin().spd3d);
+	printf("\tgfix : %u -> %u\n", this->getMin().gfix, this->getMax().gfix);
 	printf("\tDistance covered : %f m\n", this->getLast().getCumulativeDistance() );
 
 	printf("\tTime : ");

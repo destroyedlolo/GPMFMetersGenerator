@@ -250,7 +250,13 @@ CAUTION : 'p' has been removed from getopt !!
 			v.getFirst().strLocalHour(true).c_str(), v.getLast().strLocalHour(true).c_str()
 		);
 
-		if(v.end.idx == -1){
+		if(!v.getMax().gfix){
+			puts(" No GPS");
+			issue = true;
+		} else if(!v.getMin().gfix){
+			puts(" Partial GPS");
+			issue = true;
+		} else if(v.end.idx == -1){
 			puts(" Not ending");
 			issue = true;
 		} else if(prev > v.beginning.idx){
@@ -291,6 +297,5 @@ CAUTION : 'p' has been removed from getopt !!
 			
 
 	fclose(story);
-
 }
 

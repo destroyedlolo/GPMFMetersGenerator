@@ -192,6 +192,8 @@ For each of the videos, the summary displays:
 - **Timestamps** (*and you can see severe drifts of GPX ones due to a brain-damaged algorithm : the GoPro one is accurate as got from the GPS itself*).
 - A "**quality status**" as following :
   - **ok** - seems to be good
+  - **No GPS** - No satellite locked 
+  - **Partial GPS** - Missing satellite during the video
   - **not ending** - can't find an ending point for the video (generally due to the GPX to stopped before the video or a video not part of this hiking)
   - **Overlapping** - videos overlap (or due to a mistake in mkStory guesses, or because one of the video is not part of the hiking).
 
