@@ -268,6 +268,8 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 
 			/* store the new sample */
 		GPMFdata nv(lat, lgt, alt, s2d, s3d, time);
+		if(!this->samples.empty())
+			nv.addDistance( this->getLast() );
 
 			/* insert the new sample in the list */
 		this->samples.push_back(nv);
@@ -378,6 +380,7 @@ void GPVideo::Dump( void ){
 	printf("\tAltitude : %.3f m - %.3f m (%.3f)\n", this->getMin().getAltitude(), this->getMax().getAltitude(), this->getMax().getAltitude() - this->getMin().getAltitude());
 	printf("\tSpeed2d : %.3f km/h - %.3f km/h (%.3f)\n", this->getMin().spd2d, this->getMax().spd2d, this->getMax().spd2d - this->getMin().spd2d);
 	printf("\tSpeed3d : %.3f km/h - %.3f km/h (%.3f)\n", this->getMin().spd3d, this->getMax().spd3d, this->getMax().spd3d - this->getMin().spd3d);
+	printf("\tDistance covered : %f m\n", this->getLast().getCumulativeDistance() );
 
 	printf("\tTime : ");
 	printtm(this->getMin().getGMT());
@@ -387,12 +390,13 @@ void GPVideo::Dump( void ){
 
 	if(debug){
 		puts("*D* Memorized video data");
-    for(auto p : samples){
+    	for(auto p : samples){
 			printf("\tLatitude : %.3f deg\n", p.getLatitude());
 			printf("\tLongitude : %.3f deg\n", p.getLongitude());
 			printf("\tAltitude : %.3f m\n", p.getAltitude());
 			printf("\tSpeed2d : %.3f km/h\n", p.spd2d);
 			printf("\tSpeed3d : %.3f km/h\n", p.spd3d);
+			printf("\tCumulative distance : %f m\n", p.getCumulativeDistance() );
 
 			printf("\tTime : ");
 			printtm(p.getGMT());

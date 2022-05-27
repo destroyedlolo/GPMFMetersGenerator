@@ -14,6 +14,16 @@ class AltitudeGfx : public Gfx {
 	int delta_h;
 	double scale_h, scale_w;	// Scales
 
+		/* Story's overwriting */
+	int soffx;			// Video's own offset
+	double sscale_w;	// Video sample to GPX ones
+
+	/* Draw external GPX data
+	 * cr -> cairo context
+	 * offset -> offset the curve (do draw shadows)
+	 */
+	void drawGPX(cairo_t *cr, int offset);
+
 	/* Draw GPMF data
 	 * -> offset : move the curve (used to draw the shadow)
 	 * -> current : current position.
