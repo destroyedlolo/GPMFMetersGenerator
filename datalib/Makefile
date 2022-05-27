@@ -1,5 +1,5 @@
 # makefile created automaticaly by LFMakeMaker
-# LFMakeMaker 1.6 (May  9 2022 15:11:43) (c)LFSoft 1997
+# LFMakeMaker 1.6 (May  7 2022 20:46:23) (c)LFSoft 1997
 
 gotoall: all
 
@@ -11,6 +11,9 @@ opts=-lm
 Context.o : Context.cpp Context.h Makefile 
 	$(cc) -c -o Context.o Context.cpp $(opts) 
 
+GPSCoordinate.o : GPSCoordinate.cpp GPSCoordinate.h Makefile 
+	$(cc) -c -o GPSCoordinate.o GPSCoordinate.cpp $(opts) 
+
 GPVideo.o : GPVideo.cpp ../gpmf-parser/GPMF_parser.h \
   ../gpmf-parser/GPMF_utils.h ../gpmf-parser/demo/GPMF_mp4reader.h \
   Context.h GPVideo.h GPSCoordinate.h samplesCollection.h Makefile 
@@ -20,7 +23,8 @@ GPX.o : GPX.cpp ../datalib/Context.h GPX.h GPSCoordinate.h \
   samplesCollection.h Makefile 
 	$(cc) -c -o GPX.o GPX.cpp $(opts) 
 
-../libdatalib.a : GPX.o GPVideo.o Context.o Makefile 
-	 ar rcs  ../libdatalib.a GPX.o GPVideo.o Context.o 
+../libdatalib.a : GPX.o GPVideo.o GPSCoordinate.o Context.o Makefile 
+	 ar rcs  ../libdatalib.a GPX.o GPVideo.o GPSCoordinate.o \
+  Context.o 
 
 all: ../libdatalib.a 

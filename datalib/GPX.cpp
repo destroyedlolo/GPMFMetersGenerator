@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <cassert>
 
 #define BUFFLEN	1024
 
@@ -94,6 +95,7 @@ void GPX::Dump( void ){
 	printf("\tlatitude : %f -> %f (%f)\n", this->getMin().getLatitude(), this->getMax().getLatitude(), this->getMax().getLatitude() - this->getMin().getLatitude());
 	printf("\tlongitude : %f -> %f (%f)\n", this->getMin().getLongitude(), this->getMax().getLongitude(), this->getMax().getLongitude() - this->getMin().getLongitude());
 	printf("\taltitude: %f -> %f (%f)\n", this->getMin().getAltitude(), this->getMax().getAltitude(), this->getMax().getAltitude() - this->getMin().getAltitude());
+	printf("\tDistance covered : %f m\n", this->getLast().getCumulativeDistance() );
 
 	printf("\tTime : ");
 	printtm(this->getMin().getGMT());
@@ -101,12 +103,22 @@ void GPX::Dump( void ){
 	printtm(this->getMax().getGMT());
 	puts("");
 
+	if(this->isStory())
+		printf("\tIt's a story with %lu videos loaded\n", this->videos.size());
+
 	if(debug){
+		if(this->isStory()){
+			puts("\tStory's videos :");
+			for( auto v: this->videos )
+				printf("\t\t%s : %05d -> %05d\n", v.c_str(), v.start, v.end);
+		}
+
 		puts("*D* Memorized CPX data");
 		for(auto p : samples){
 			printf("\tLatitude : %.3f deg\n", p.getLatitude());
 			printf("\tLongitude : %.3f deg\n", p.getLongitude());
 			printf("\tAltitude : %.3f m\n", p.getAltitude());
+			printf("\tCom distance : %.0f m\n", p.getCumulativeDistance());
 
 			printf("\tTime : ");
 			printtm(p.getGMT());
@@ -117,7 +129,34 @@ void GPX::Dump( void ){
 	printf("*I* %u memorised GPX\n", this->getSampleCount());
 }
 
-GPX::GPX( const char *file ){
+void GPX::updMinMax( GpxData &nv ){
+	if(!this->getSampleCount()){
+		this->getMin().set( static_cast<GPSCoordinate &>(nv) );
+		this->getMax().set( static_cast<GPSCoordinate &>(nv) );
+	} else {
+		if(nv.getLatitude() < this->getMin().getLatitude())
+			this->getMin().setLatitude(nv.getLatitude());
+		if(nv.getLatitude() > this->getMax().getLatitude())
+			this->getMax().setLatitude(nv.getLatitude());
+
+		if(nv.getLongitude() < this->getMin().getLongitude())
+			this->getMin().setLongitude(nv.getLongitude());
+		if(nv.getLongitude() > this->getMax().getLongitude())
+			this->getMax().setLongitude(nv.getLongitude());
+
+		if(nv.getAltitude() < this->getMin().getAltitude())
+			this->getMin().setAltitude(nv.getAltitude());
+		if(nv.getAltitude() > this->getMax().getAltitude())
+			this->getMax().setAltitude(nv.getAltitude());
+
+		if(this->getMin().getSampleTime() > nv.getSampleTime())
+			this->getMin().setSampleTime(nv.getSampleTime());
+		if(this->getMax().getSampleTime() < nv.getSampleTime())
+			this->getMax().setSampleTime(nv.getSampleTime());
+	}
+}
+
+void GPX::readGPX( const char *file ){
 	FILE *f;
 
 	if(!(f = fopen(file, "r"))){
@@ -197,40 +236,86 @@ GPX::GPX( const char *file ){
 		}
 #endif
 
-			/* Update min/max */
-		if(!this->getSampleCount()){
-			this->getMin().set( lat, lgt, alt, time );
-			this->getMax().set( lat, lgt, alt, time );
-		} else {
-			if(lat < this->getMin().getLatitude())
-				this->getMin().setLatitude(lat);
-			if(lat > this->getMax().getLatitude())
-				this->getMax().setLatitude(lat);
-
-			if(lgt < this->getMin().getLongitude())
-				this->getMin().setLongitude(lgt);
-			if(lgt > this->getMax().getLongitude())
-				this->getMax().setLongitude(lgt);
-
-			if(alt < this->getMin().getAltitude())
-				this->getMin().setAltitude(alt);
-			if(alt > this->getMax().getAltitude())
-				this->getMax().setAltitude(alt);
-
-			if(this->getMin().getSampleTime() > time)
-				this->getMin().setSampleTime(time);
-			if(this->getMax().getSampleTime() < time)
-				this->getMax().setSampleTime(time);
-		}
 
 			/* store the new sample */
 		GpxData nv(lat, lgt, alt, time);
+		updMinMax(nv);
+		if(!this->samples.empty())
+			nv.addDistance( this->getLast() );
 	
 			/* insert the new sample in the list */
 		this->samples.push_back(nv);
 	}
 
 	fclose(f);
+}
+
+void GPX::readStory( const char *file ){
+	FILE *f;
+
+	if(!(f = fopen(file, "r"))){
+		perror(file);
+		exit(EXIT_FAILURE);
+	}
+	
+	if(!fgets(buff, sizeof(buff), f)){
+		fputs("*F* Can't read Story's magic\n", stderr);
+		exit(EXIT_FAILURE);
+	}
+	buff[strcspn(buff,"\n")] = 0;
+	if(strcmp(buff, "GPMFStory 1.0")){
+		fputs("*F* Story's magic not found\n", stderr);
+		exit(EXIT_FAILURE);
+	}
+
+		/* Reading videos anchors
+		 *	Rude checks are done here (assert()) as we are relying on
+		 *	formating made by mkStory.
+		 */
+	while(fgets(buff, sizeof(buff), f)){
+		if(*buff == '#')
+			continue;
+		if(*buff == '*')
+			break;
+
+		char *indexes = strchr(buff, ',');
+		assert(indexes);
+
+		*indexes++ = 0;
+
+		int istart, iend;
+		assert( sscanf(indexes, "%d, %d", &istart, &iend) == 2 );
+
+		StoryVideo nv(buff, istart, iend);
+		this->videos.push_back(nv);
+	}
+
+		/* Reading GPX data */
+	while(fgets(buff, sizeof(buff), f)){
+		double lat, lgt, alt;
+		time_t st;
+		double dst;
+
+		if(*buff == '#')
+			continue;
+
+		if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
+			fputs("*F* Failed to read GPX contents\n", stderr);
+			exit(EXIT_FAILURE);
+		}
+		GpxData nv(lat, lgt, alt, st, dst);
+		updMinMax(nv);
+		this->samples.push_back(nv);
+	}
+	
+	fclose(f);
+}
+
+GPX::GPX( const char *file, bool story ) : current_video_idx(-1){
+	if(story)
+		readStory( file );
+	else
+		readGPX( file );
 }
 
 bool GPX::sameArea( GPSCoordinate &coord, uint32_t proximity_threshold){
@@ -243,4 +328,49 @@ bool GPX::sameArea( GPSCoordinate &coord, uint32_t proximity_threshold){
 		return false;
 	
 	return true;
+}
+
+bool GPX::currentVideo(const char *vname){
+	for(this->current_video_idx = 0; this->current_video_idx < (int)this->videos.size(); this->current_video_idx++)
+		if(this->videos[this->current_video_idx] == vname)
+			break;
+
+	if(this->current_video_idx == (int)this->videos.size()){
+		this->current_video_idx = -1;
+		return false;	
+	}
+
+	if(debug)
+		printf("*d* Video found in story at index %d\n", this->current_video_idx);
+
+	return true;
+}
+
+GPX::pkind GPX::positionKind(int idx){
+	if(this->current_video_idx == -1)
+		return pkind::AFTERTRACE;
+
+	int r = this->videos[this->current_video_idx].whithin(idx);
+
+	if(r<0){	// Before
+		for(int i=this->current_video_idx-1; i>=0; i--){
+			r = this->videos[i].whithin(idx);
+			if(r>0)	// b/w the previous one and checked one
+				return pkind::BEFORETRACE;
+			else if(!r)	// inside the checked one
+				return pkind::BEFOREVIDEO;
+		}
+		return pkind::BEFORETRACE;	// before the 1st video
+	} else if(!r)	// within the video
+		return pkind::CURRENTVIDEO;
+	else { // after
+		for(int i=this->current_video_idx-1; i<(int)this->videos.size(); i++){
+			r = this->videos[i].whithin(idx);
+			if(r<0)	// b/w the checked and the next
+				return pkind::AFTERTRACE;
+			else if(!r)	// inside checked one
+				return pkind::AFTERVIDEO;
+		}
+		return pkind::AFTERTRACE;
+	}
 }
