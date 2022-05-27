@@ -2,6 +2,14 @@
 
 If you are updating from a previous version, pay particular attention to the changes in **bold**: they highlight an ascendant compatibility break.
 
+## 3.xx
+
+### 3.00
+
+- Add **mkStory**
+- Add story support in **GPMFMetersGenerator**
+- Altitude and path stickers improved when story used
+
 ## 2.xx
 
 ### 2.03

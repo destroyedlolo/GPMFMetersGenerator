@@ -34,7 +34,7 @@
 
 	/* Configuration */
 
-#define VERSION "3.00a1"
+#define VERSION "3.00"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
