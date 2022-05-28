@@ -212,9 +212,9 @@ void AltitudeGfx::generateBackground( void ){
 
 		// Draw Shadow
 	if(this->hiking && this->hiking->isStory())
-		drawGPX(cr, 3);
+		this->drawGPX(cr, 3);
 	else
-		drawGPMF(cr, 3);
+		this->drawGPMF(cr, 3);
 
 	cairo_pattern_t *pat = cairo_pattern_create_linear(this->offx,this->SY - this->range_h*this->scale_h, this->offx,this->SY);
 	cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.25);
@@ -256,7 +256,7 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_stroke(cr);
 
 		/* Draw Altitude curve */
-	drawGPMF(cr, 0, index);
+	this->drawGPMF(cr, 0, index);
 
 		/* Display the label */
 	char t[8];

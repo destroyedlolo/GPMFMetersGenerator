@@ -238,6 +238,9 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 	s3d *= 3.6;
 
 		/* update Min / Max */
+	if(dop > this->dop)
+		this->dop = dop;
+
 	if(this->getSamples().empty()){	/* First data */
 		this->getMin().set( lat, lgt, alt, time );
 		this->getMax().set( lat, lgt, alt, time );
@@ -302,18 +305,21 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 			printf("accepted : %f, next:%f\n", sec, this->nextsample);
 
 			/* store the new sample */
-		GPMFdata nv(lat, lgt, alt, s2d, s3d, time, gfix, dop);
+		GPMFdata nv(lat, lgt, alt, s2d, s3d, time, gfix, this->dop);
 		if(!this->samples.empty())
 			nv.addDistance( this->getLast() );
 
 			/* insert the new sample in the list */
 		this->samples.push_back(nv);
+
+			/* reset pertinent fields */
+		this->dop = 0;
 	}
 
 	return ret;
 }
 
-GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0) {
+GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0), dop(0) {
 
 	/* Ensure it's the 1st part of a GoPro video
 	 *
@@ -433,6 +439,7 @@ void GPVideo::Dump( void ){
 			printf("\tSpeed2d : %.3f km/h\n", p.spd2d);
 			printf("\tSpeed3d : %.3f km/h\n", p.spd3d);
 			printf("\tCumulative distance : %f m\n", p.getCumulativeDistance() );
+			printf("\tgfix : %u, dop : %u\n", p.gfix, p.dop);
 
 			printf("\tTime : ");
 			printtm(p.getGMT());
