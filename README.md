@@ -199,6 +199,35 @@ For each of the videos, the summary displays:
   - **not ending** - can't find an ending point for the video (generally due to the GPX to stopped before the video or a video not part of this hiking)
   - **Overlapping** - videos overlap (or due to a mistake in mkStory guesses, or because one of the video is not part of the hiking).
 
+Bad example :
+```
+*I* results summaries
+ ----------------------------------------------------------------------
+| GPX : 2022-05-27T13:53:49+0200 -> 2022-05-27T14:46:59+0200
+| Distance traveled : 4240 m
+ --------------------------------------------------------------------------------------------------------
+|    video     |         Beginning         |            End            |            Timestamps           | Status
+|              | Index | Estrgmt  | CumDis | Index | Estrgmt  | CumDis |       GPX      |       GoPro    |
+ --------------------------------------------------------------------------------------------------------
+| GX013845.MP4 | 00091 |  12071.4 |    285 | 00092 |  12071.8 |    287 | 13:57 -> 13:57 | 13:58 -> 13:59 |  No GPS
+| GX013846.MP4 | 00091 |  12071.4 |    285 | 00092 |  12071.8 |    287 | 13:57 -> 13:57 | 13:59 -> 14:00 |  No GPS
+| GX013850.MP4 | 00091 |  12071.4 |    285 | 00092 |  12071.8 |    287 | 13:57 -> 13:57 | 14:05 -> 14:06 |  No GPS
+| GX013851.MP4 | 00091 |  12071.4 |    285 | 00092 |  12071.8 |    287 | 13:57 -> 13:57 | 14:07 -> 14:07 |  No GPS
+| GX013853.MP4 | 00091 |  12071.4 |    285 | 00225 |   2627.8 |    792 | 13:57 -> 14:03 | 14:09 -> 14:09 |  No GPS
+| GX013854.MP4 | 00225 |   2627.8 |    792 | 00226 |   2631.7 |    798 | 14:03 -> 14:03 | 14:10 -> 14:10 |  No GPS
+| GX013856.MP4 | 00225 |   2463.8 |    792 | 00226 |   2316.1 |    798 | 14:03 -> 14:03 | 14:11 -> 14:12 |  No GPS
+| GX013861.MP4 | 00281 |      9.3 |   1036 | 00300 |     10.7 |   1107 | 14:05 -> 14:06 | 14:31 -> 14:32 |  Weak signal
+| GX013865.MP4 | 00385 |      8.8 |   1458 | 00389 |     17.9 |   1472 | 14:09 -> 14:10 | 14:53 -> 14:54 |  Weak signal
+| GX013870.MP4 | 00530 |      2.3 |   1890 | 00538 |      6.0 |   1906 | 14:16 -> 14:16 | 15:14 -> 15:15 |  ok
+| GX013872.MP4 | 00568 |      2.1 |   2028 | 00569 |      4.9 |   2029 | 14:17 -> 14:17 | 15:23 -> 15:24 |  ok
+| GX013875.MP4 | 00668 |      3.4 |   2431 | 00670 |      5.5 |   2439 | 14:22 -> 14:22 | 15:42 -> 15:42 |  ok
+| GX013877.MP4 | 00736 |      2.5 |   2610 | 00790 |      4.1 |   2774 | 14:24 -> 14:27 | 15:50 -> 15:53 |  Weak signal
+| GX013882.MP4 | 01120 |      4.3 |   3810 | 01128 |      5.4 |   3838 | 14:40 -> 14:41 | 16:38 -> 16:39 |  Weak signal
+| GX013883.MP4 | 01128 |      2.4 |   3838 | 01192 |      4.0 |   4052 | 14:41 -> 14:43 | 16:39 -> 16:41 |  ok
+| GX013885.MP4 | 01259 |      5.9 |   4236 | 01260 |     14.4 |   4238 | 14:46 -> 14:46 | 16:49 -> 16:49 |  ok
+*W* At least Problem has been detected
+```
+
 ## what to do in case of issues
 
 Generated .story file are flat files : if mkStory didn't do right job, you may edit it to sheat indexes. Adding '-d' option at mkStory invocation will help to know GPX's indexes (but it's very verbose). 
