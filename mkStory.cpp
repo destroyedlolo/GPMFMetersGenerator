@@ -250,7 +250,19 @@ CAUTION : 'p' has been removed from getopt !!
 			v.getFirst().strLocalHour(true).c_str(), v.getLast().strLocalHour(true).c_str()
 		);
 
-		if(v.end.idx == -1){
+		if(!v.getMax().gfix){
+			puts(" No GPS");
+			issue = true;
+		} else if(!v.getMin().gfix){
+			puts(" Partial GPS");
+			issue = true;
+		} else if(v.getMin().dop > 500){
+			puts(" Bad signal");
+			issue = true;
+		} else if(v.getMax().dop > 500){
+			puts(" Weak signal");
+			issue = true;
+		} else if(v.end.idx == -1){
 			puts(" Not ending");
 			issue = true;
 		} else if(prev > v.beginning.idx){
@@ -261,9 +273,9 @@ CAUTION : 'p' has been removed from getopt !!
 	}
 
 	if(issue){
-		fputs("*W* At least Problem has been detected", stderr);
+		fputs("*W* At least Problem has been detected\n", stderr);
 		if(!force){
-			fputs("*F* Use '-F' flag to accept it", stderr);
+			fputs("*F* Use '-F' flag to accept it\n", stderr);
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -291,6 +303,5 @@ CAUTION : 'p' has been removed from getopt !!
 			
 
 	fclose(story);
-
 }
 

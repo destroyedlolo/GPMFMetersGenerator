@@ -15,15 +15,19 @@
 
 struct GPMFdata : public GPSCoordinate {
 	double spd2d, spd3d;
+	unsigned char gfix;		// GPS fixe
+	uint16_t dop;		// GPS Dilution of Precision
 
 	GPMFdata(){};
 	GPMFdata( 
 		double alatitude, double alongitude,
 		double aaltitude,
 		double aspd2d, double aspd3d,
-		time_t asample_time
+		time_t asample_time,
+		unsigned char agfix,
+		uint16_t adop
 	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time),
-		spd2d(aspd2d), spd3d(aspd3d){
+		spd2d(aspd2d), spd3d(aspd3d), gfix(agfix), dop(adop){
 	}
 };
 
@@ -49,7 +53,7 @@ protected:
 	 * The sample is stored only if its took at least SAMPLE seconds after the
 	 * last stored sample.
 	 */
-	double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time );
+	double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix, uint16_t dop );
 
 public:
 		/* Read and parse 1st video */
