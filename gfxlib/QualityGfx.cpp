@@ -45,11 +45,23 @@ void QualityGfx::calcScales( void ){
 }
 
 void QualityGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
+	cairo_pattern_t *pat;
+
 	if(offset){	// drawing shadow
 		cairo_set_line_width(cr, 4);
 		cairo_set_source_rgba(cr, 0,0,0, 0.55);
 	} else {	// drawing path
-		cairo_set_source_rgb(cr, 1,1,1);
+		pat = cairo_pattern_create_linear(0,0, 0,this->SY);
+		cairo_pattern_add_color_stop_rgb(pat, 0, 
+			this->linearcomponent(this->max_h, 150, 0, 500, 1),
+			this->linearcomponent(this->max_h, 150, 1, 500, 0),
+		0);
+		cairo_pattern_add_color_stop_rgb(pat, 1,
+			this->linearcomponent(this->min_h, 150, 0, 500, 1),
+			this->linearcomponent(this->min_h, 150, 1, 500, 0),
+		0);
+		cairo_set_source(cr, pat);
+
 		cairo_set_line_width(cr, 2);
 	}
 
@@ -61,18 +73,15 @@ void QualityGfx::drawGPMF(cairo_t *cr, int offset, uint32_t current){
 			cairo_move_to(cr, x, y);
 		else
 			cairo_line_to(cr, x, y);
-
-		if(current == i){
-			cairo_stroke(cr);
-			cairo_move_to(cr, x, y);
-			cairo_set_source_rgb(cr, 1,1,1);
-		}
 	}
 
 	if(current != uint32_t(-1))
 		cairo_stroke(cr);
 	else
 		cairo_stroke_preserve(cr);
+
+	if(!offset)
+		cairo_pattern_destroy(pat);
 }
 
 void QualityGfx::generateBackground( void ){
@@ -109,6 +118,9 @@ void QualityGfx::generateBackground( void ){
 	cairo_fill(cr);
 
 	cairo_pattern_destroy(pat);
+
+	this->drawGPMF(cr, 0);
+
 	cairo_destroy(cr);
 }
 
@@ -132,9 +144,6 @@ void QualityGfx::generateOneGfx(const char *fulltarget, char *filename, int inde
 	cairo_fill(cr);
 	cairo_stroke(cr);
 
-		/* Draw Altitude curve */
-	this->drawGPMF(cr, 0, index);
-
 		/* Display the label */
 	char t[10];
 	sprintf(t, "%5d (%c)", current.dop, current.gfix+'0');
@@ -146,7 +155,10 @@ void QualityGfx::generateOneGfx(const char *fulltarget, char *filename, int inde
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_set_source_rgb(cr,
+		this->linearcomponent(current.dop, 150, 0, 500, 1),
+		this->linearcomponent(current.dop, 150, 1, 500, 0),
+	0);
 	cairo_move_to(cr, this->posLabel, this->offy);
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
@@ -179,4 +191,24 @@ void QualityGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 		/* Generate video */
 	if(genvideo)
 		generateVideo(fulltarget, filename, "qual", "quality");
+}
+
+double QualityGfx::linearcomponent( uint16_t val, uint16_t u1, double v1, uint16_t u2, double v2 ){
+	if(u1 == u2)
+		return v1;
+	if(val < u1)
+		return v1;
+	if(val > u2)
+		return v2;
+
+	double a = (double)(v2-v1)/(double)(u2-u1);
+	double b = v1 - a*u1;
+
+	double res = a*val + b;
+	if(res < 0)
+		return 0;
+	if(res > 255)
+		return 255;
+	else
+		return res;
 }

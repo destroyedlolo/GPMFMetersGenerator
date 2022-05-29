@@ -28,6 +28,8 @@ protected:
 	void generateBackground( void );
 	void generateOneGfx( const char *, char *, int , GPMFdata & );
 
+	double linearcomponent( uint16_t val, uint16_t u1, double v1, uint16_t u2, double v2 );
+
 public:
 	QualityGfx(GPVideo &v, GPX *h);
 
