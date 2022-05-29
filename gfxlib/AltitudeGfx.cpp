@@ -16,7 +16,7 @@ This can create a jump / break when switching from GPX to GoPro samples.
 #include <cstring>
 #include <cmath>
 
-AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h) : Gfx( 600,300, v, h ) {
+AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h) : Gfx( 600,300, v, h ), soffx(0) {
 	this->calcScales();
 }
 
@@ -212,9 +212,9 @@ void AltitudeGfx::generateBackground( void ){
 
 		// Draw Shadow
 	if(this->hiking && this->hiking->isStory())
-		drawGPX(cr, 3);
+		this->drawGPX(cr, 3);
 	else
-		drawGPMF(cr, 3);
+		this->drawGPMF(cr, 3);
 
 	cairo_pattern_t *pat = cairo_pattern_create_linear(this->offx,this->SY - this->range_h*this->scale_h, this->offx,this->SY);
 	cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.25);
@@ -256,7 +256,7 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_stroke(cr);
 
 		/* Draw Altitude curve */
-	drawGPMF(cr, 0, index);
+	this->drawGPMF(cr, 0, index);
 
 		/* Display the label */
 	char t[8];
@@ -276,7 +276,10 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 
 		/* Display the spot */
 	cairo_set_line_width(cr, 5);
-	cairo_arc(cr, this->soffx + index*this->scale_w, this->SY - (current.getAltitude() - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
+	cairo_arc(cr,
+		(this->soffx ? this->soffx : this->offx) + index*(this->soffx ? this->sscale_w : this->scale_w),
+		this->SY - (current.getAltitude() - this->min_h)*this->scale_h,
+	8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);

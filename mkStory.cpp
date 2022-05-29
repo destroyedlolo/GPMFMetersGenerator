@@ -17,7 +17,7 @@
 #include "datalib/GPVideo.h"
 #include "datalib/GPX.h"
 
-#define VERSION "3.00"
+#include "Version.h"
 
 GPX *Gpx = NULL;	// external original GPX data
 

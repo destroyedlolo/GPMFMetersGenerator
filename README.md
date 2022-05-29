@@ -80,7 +80,7 @@ Due to SD card's FAT limitation, GoPro camera split too longs videos in shorter 
 
 As of V2.03, **GPMFMetersGenerator** detects by itself the presence of additionnal part.
 
-## Widgets
+## Activity related stickers
 
 ![Screenshot](Images/Screenshot.png)
 
@@ -118,8 +118,18 @@ Displays the north-facing path. By loading an external **GPX files**, the global
 
 :scroll: by adding a **story**, the full session is displayed, and the part covered by videos highlighted.
 
+## Technical stickers
 
-### KML and GPX file generation
+### GPS signal quality
+
+![DoP and Fixes](Images/DoP.png)
+
+This sticker displays the GPS' [Dilution of Precision](https://en.wikipedia.org/wiki/Dilution_of_precision_(navigation)) where values **< 500** are considered as good, and the signal Fix that can be :
+- 0 : no lock
+- 2 : 2D only lock
+- 3 : 3D lock
+
+## KML and GPX file generation
 
 **GPMFMetersGenerator** can export GoPro's metrics into [KML](https://en.wikipedia.org/wiki/Keyhole_Markup_Language) or [GPX](https://en.wikipedia.org/wiki/GPS_Exchange_Format) file than can be included in a 3rd party GIS like **Google Map**, **Google Earth**, **OpenStreetMap** or such.
 

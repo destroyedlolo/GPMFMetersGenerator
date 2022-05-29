@@ -31,10 +31,11 @@
 #include "gfxlib/PathGfx.h"
 #include "gfxlib/SpeedTrkGfx.h"
 #include "gfxlib/Export.h"
+#include "gfxlib/QualityGfx.h"
 
 	/* Configuration */
 
-#define VERSION "3.00"
+#include "Version.h"
 
 	/* Which gfx to generate */
 static char gfx_speed = 0;	/* 0,2,3,b */
@@ -43,6 +44,7 @@ static bool gfx_path = false;
 static char gfx_strk = 0;	/* 0,2,3 */
 static bool gfx_GPX = false;
 static bool gfx_KML = false;
+static bool gfx_quality = false;
 
 GPX *hiking = NULL;	// full hiking trace
 
@@ -51,7 +53,7 @@ int main(int argc, char *argv[]){
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:S:")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:S:q")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -92,6 +94,9 @@ int main(int argc, char *argv[]){
 				fputs("*E* Only 2, 3 are recognized as -k option\n", stderr);
 				exit(EXIT_FAILURE);
 			}
+			break;
+		case 'q':
+			gfx_quality = true;
 			break;
 		case 'X':
 			gfx_GPX = true;
@@ -136,6 +141,7 @@ int main(int argc, char *argv[]){
 				"-k[2|3] : enable speed tracker gfx (default 2d, 3: 3d)\n"
 				"-a : enable altitude gfx\n"
 				"-p : enable path gfx\n"
+				"-q : enable quality gfx\n"
 				"-X : export telemetry as GPX file\n"
 				"-K : export telemetry as KML file\n"
 				"\n"
@@ -225,6 +231,11 @@ int main(int argc, char *argv[]){
 
 	if(gfx_altitude){
 		AltitudeGfx gfx( video, hiking );
+		gfx.GenerateAllGfx(targetDir, targetFile);
+	}
+
+	if(gfx_quality){
+		QualityGfx gfx( video, hiking );
 		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 

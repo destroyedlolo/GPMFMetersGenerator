@@ -45,6 +45,11 @@ private:
 	double voffset;		// part's timing offset
 	double lastTiming;	// last timing
 
+		/* fields to ensure each sample contains a pertinent value
+		 * when stored (e.g : for dop, the maximum value b/w sample)
+		 */
+	uint16_t dop;
+
 protected:
 	void readGPMF( void );
 
