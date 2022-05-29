@@ -16,7 +16,7 @@ This can create a jump / break when switching from GPX to GoPro samples.
 #include <cstring>
 #include <cmath>
 
-AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h) : Gfx( 600,300, v, h ) {
+AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h) : Gfx( 600,300, v, h ), soffx(0) {
 	this->calcScales();
 }
 
@@ -276,7 +276,10 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 
 		/* Display the spot */
 	cairo_set_line_width(cr, 5);
-	cairo_arc(cr, (this->soffx ? this->soffx : this->offx) + index*this->scale_w, this->SY - (current.getAltitude() - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
+	cairo_arc(cr,
+		(this->soffx ? this->soffx : this->offx) + index*(this->soffx ? this->sscale_w : this->scale_w),
+		this->SY - (current.getAltitude() - this->min_h)*this->scale_h,
+	8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
