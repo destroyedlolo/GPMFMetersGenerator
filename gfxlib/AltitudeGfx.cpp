@@ -276,7 +276,7 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 
 		/* Display the spot */
 	cairo_set_line_width(cr, 5);
-	cairo_arc(cr, this->soffx + index*this->scale_w, this->SY - (current.getAltitude() - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
+	cairo_arc(cr, (this->soffx ? this->soffx : this->offx) + index*this->scale_w, this->SY - (current.getAltitude() - this->min_h)*this->scale_h , 8, 0, 2 * M_PI);
 	cairo_stroke_preserve(cr);
 	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	cairo_fill(cr);
