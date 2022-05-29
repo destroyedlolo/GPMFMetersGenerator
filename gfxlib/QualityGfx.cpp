@@ -10,7 +10,7 @@
 #include <cstring>
 #include <cmath>
 
-QualityGfx::QualityGfx(GPVideo &v, GPX *h) : Gfx( 600,150, v, h ) {
+QualityGfx::QualityGfx(GPVideo &v, GPX *h) : Gfx( 600,300, v, h ) {
 	this->calcScales();
 }
 
@@ -26,7 +26,7 @@ void QualityGfx::calcScales( void ){
 	this->posLabel = this->SX - extents.x_advance - 55;
 
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size(cr, 20);
+	cairo_set_font_size(cr, 27);
 	cairo_text_extents(cr, "8888", &extents);
 	this->offx = extents.x_advance + 10;
 
@@ -88,7 +88,7 @@ void QualityGfx::generateBackground( void ){
 	cairo_t *cr = cairo_create(this->background);
 
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size(cr, 20);
+	cairo_set_font_size(cr, 27);
 	cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */
 	cairo_set_line_width(cr, 1);
 
