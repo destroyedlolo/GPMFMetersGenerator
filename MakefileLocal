@@ -11,7 +11,8 @@ opts=-lm -L. -lgfxlib -ldatalib -lGPMF $(shell pkg-config --cflags cairo ) $(she
 GPMFMetersGenerator.o : GPMFMetersGenerator.cpp datalib/Context.h \
   datalib/GPVideo.h datalib/GPX.h gfxlib/SpeedGfx.h \
   gfxlib/AltitudeGfx.h gfxlib/PathGfx.h gfxlib/SpeedTrkGfx.h \
-  gfxlib/Export.h Version.h libgfxlib.a libdatalib.a MakefileLocal 
+  gfxlib/Export.h gfxlib/QualityGfx.h Version.h libgfxlib.a \
+  libdatalib.a MakefileLocal 
 	$(cc) -c -o GPMFMetersGenerator.o GPMFMetersGenerator.cpp \
   $(opts) 
 
