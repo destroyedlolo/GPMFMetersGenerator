@@ -127,7 +127,7 @@ int main(int argc, char *argv[]){
 			if(optopt == 's'){
 				gfx_speed = '2';
 				break;
-			} else if(optopt == 's'){
+			} else if(optopt == 'k'){
 				gfx_strk = '2';
 				break;
 			}
