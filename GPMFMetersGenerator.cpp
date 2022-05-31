@@ -32,6 +32,7 @@
 #include "gfxlib/SpeedTrkGfx.h"
 #include "gfxlib/Export.h"
 #include "gfxlib/QualityGfx.h"
+#include "gfxlib/TrkStatGfx.h"
 
 	/* Configuration */
 
@@ -45,6 +46,7 @@ static char gfx_strk = 0;	/* 0,2,3 */
 static bool gfx_GPX = false;
 static bool gfx_KML = false;
 static bool gfx_quality = false;
+static bool gfx_trkstt = false;
 
 GPX *hiking = NULL;	// full hiking trace
 
@@ -53,7 +55,7 @@ int main(int argc, char *argv[]){
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:S:q")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:S:qt")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -83,6 +85,9 @@ int main(int argc, char *argv[]){
 			break;
 		case 'p':
 			gfx_path = true;
+			break;
+		case 't':
+			gfx_trkstt = true;
 			break;
 		case 'k':
 			switch(*optarg){
@@ -142,6 +147,8 @@ int main(int argc, char *argv[]){
 				"-a : enable altitude gfx\n"
 				"-p : enable path gfx\n"
 				"-q : enable quality gfx\n"
+				"-t : enable Trekking statistics\n"
+				"\n"
 				"-X : export telemetry as GPX file\n"
 				"-K : export telemetry as KML file\n"
 				"\n"
@@ -246,6 +253,11 @@ int main(int argc, char *argv[]){
 
 	if(gfx_strk){
 		SpeedTrkGfx gfx( video, hiking, gfx_strk );
+		gfx.GenerateAllGfx(targetDir, targetFile);
+	}
+
+	if(gfx_trkstt){
+		TrekkingStatGfx gfx( video, hiking );
 		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 
