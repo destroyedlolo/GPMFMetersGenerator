@@ -258,7 +258,6 @@ void TrekkingStatGfx::generateBackground( void ){
 	cairo_t *cr = cairo_create(this->background);
 
 	if(icn){
-puts("*****");
 		cairo_save(cr);
 		cairo_set_source_surface(cr, icn, this->dst_x-imgTrekking.width, 2);
 		cairo_rectangle(cr, this->dst_x-imgTrekking.width, 2, imgTrekking.width, imgTrekking.height);
