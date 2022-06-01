@@ -120,7 +120,7 @@ Displays the north-facing path. By loading an external **GPX files**, the global
 
 ## Technical stickers
 
-### GPS signal quality
+### <a name="GPSqual"></a>GPS signal quality
 
 ![DoP and Fixes](Images/DoP.png)
 
@@ -141,8 +141,10 @@ Primarily designed for activities such as hiking, trekking, ski touring, mountai
 
 ## data matching
 
-Unfortunately, GPS data gathered by your phone and GoPro are not exactly the same  : lost of satellites, precision issues or simply the fact the GoPro may start recording without having fully acquired satellites.
-In addition, I noticed the tracking application I'm using, Decathlon Coach, generates incomplete or crappy data GPX (especially when "Auto Stop" is enabled).
+Unfortunately, GPS position gathered by your phone and GoPro are not exactly the same  : satellites lost, precision issues or simply the fact the GoPro may start recording without having fully acquired satellites (use [GPS signal quality](#GPSqual) stickers to check your signal quality).
+Even worst, the altitude is *calculated* by GPSes : Android's algorithm is less precise compared to GoPro one and tends to smooth the result.
+
+This is leading to *jumps* when switching between GPX and GoPro curves.
 
 ## mkStory
 
