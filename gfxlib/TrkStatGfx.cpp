@@ -219,8 +219,14 @@ static struct {
   "\000\000\000\000",
 };
 
-TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h) : Gfx( 250,100, v, h ) {
+TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h) : Gfx( 250,100, v, h ), sDistance(0) {
 	this->calcScales();
+
+	if(this->hiking && this->hiking->isStory()){
+		StoryVideo &sv = this->hiking->getCurrentStoryVideo();
+		this->sDistance = this->hiking->getSamples()[sv.start].getCumulativeDistance();
+	}
+	
 }
 
 void TrekkingStatGfx::calcScales( void ){
@@ -283,7 +289,7 @@ void TrekkingStatGfx::generateOneGfx(const char *fulltarget, char *filename, int
 
 	cairo_text_extents_t extents;
 	char t[16];
-	sprintf(t, "%8.3f km", current.getCumulativeDistance()/1000);
+	sprintf(t, "%8.3f km", (current.getCumulativeDistance() + this->sDistance)/1000);
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, 35);
 	cairo_text_extents(cr, t, &extents);

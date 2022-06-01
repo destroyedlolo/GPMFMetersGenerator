@@ -7,7 +7,7 @@
 #include "Gfx.h"
 
 class TrekkingStatGfx : public Gfx {
-	long Distance;
+	long sDistance;		// Original distance covered by the story
 	int dst_x, dst_y;
 
 protected:
