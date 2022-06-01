@@ -219,7 +219,7 @@ static struct {
   "\000\000\000\000",
 };
 
-TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h) : Gfx( 250,100, v, h ), sDistance(0) {
+TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h) : Gfx( 300,100, v, h ), sDistance(0) {
 	this->calcScales();
 
 	if(this->hiking && this->hiking->isStory()){
@@ -258,6 +258,7 @@ void TrekkingStatGfx::generateBackground( void ){
 	cairo_t *cr = cairo_create(this->background);
 
 	if(icn){
+puts("*****");
 		cairo_save(cr);
 		cairo_set_source_surface(cr, icn, this->dst_x-imgTrekking.width, 2);
 		cairo_rectangle(cr, this->dst_x-imgTrekking.width, 2, imgTrekking.width, imgTrekking.height);
