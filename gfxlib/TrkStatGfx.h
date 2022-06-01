@@ -8,7 +8,10 @@
 
 class TrekkingStatGfx : public Gfx {
 	long sDistance;		// Original distance covered by the story
+	time_t beginning;	// Beginning of the journey
+
 	int dst_x, dst_y;
+	int duration_x, duration_y;
 
 protected:
 	void calcScales( void );

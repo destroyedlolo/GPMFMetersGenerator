@@ -14,6 +14,22 @@ std::string GPSCoordinate::strLocalHour( bool HM_only ){
 	return std::string(buf);
 }
 
+std::string GPSCoordinate::diffTime( time_t begin ){
+	int d = difftime( this->sample_time, begin );
+
+	int j = d / 86400;
+	int h = (d % 86400)/3600;
+	int m = (d % 3600)/60;
+
+	char t[60];
+	if(j)
+		sprintf(t, "%2d %02d:%02d", j, h, m);
+	else
+		sprintf(t, "%02d:%02d", h, m);
+
+	return t;
+}
+
 double GPSCoordinate::Estrangement( GPSCoordinate &other ){
 		double a = this->toRadian(other.getLatitude());
 		double b = this->toRadian(this->getLatitude());
