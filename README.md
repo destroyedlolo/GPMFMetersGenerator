@@ -251,13 +251,13 @@ Generated .story file are flat files : if mkStory didn't do right job, you may e
  
 ## TODO list
 
-Here the list of already known needed improvements (as of V2)
+Here the list of already known needed improvements (as of V3)
 
 - [X] Multi part video handling
 - [X] Speedup images generation
 - [X] Colorizes past figures
 - [X] Show full journey using external GPX trace file (*need to create a Fixer as the ones I got are crappy*)
 - [X] Generate GPX and KML from telemetry
-- [ ] Inlays video's path on a map
-- [ ] Add threading support to parallelise images' generation.
-- [ ] Better support of timewrap video (for the moment, the result is a bit crappy)
+- [ ] Inlays video's path on a map (**high probability** : most have)
+- [ ] Post process GPX data to get better altitudes (**meddium probability** : it will require lot of development - does it worth it ?)
+- [ ] Add threading support to parallelise images' generation (**low probability** : requires a bit of code redesign, but the gain won't be so significant as most of the time spent is by video encoding, which is already parallelized). 
