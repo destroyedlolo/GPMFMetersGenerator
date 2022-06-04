@@ -226,7 +226,7 @@ int main(int argc, char *argv[]){
 	GPVideo video(argv[optind]);
 	video.Dump();
 
-	if(hiking)	// Specify the current video
+	if(hiking && hiking->isStory())	// Specify the current video
 		if(!hiking->currentVideo(basename(argv[optind])))
 			fprintf(stderr, "*W* '%s' is not part of loaded story\n", basename(argv[optind]));
 
