@@ -70,10 +70,12 @@ public:
 
 	bool isStory( void ){ return(!this->videos.empty()); }
 
-		/* Specify which is the current video
+		/* Update this->current_video_idx with the index of the given video
 		 * <- false if not found
 		 */
 	bool currentVideo(const char *);
+
+		/* Retrieve current video information */
 	StoryVideo &getCurrentStoryVideo( void ){
 		return this->videos[ this->current_video_idx ];
 	}

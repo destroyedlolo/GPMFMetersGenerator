@@ -4,6 +4,11 @@ If you are updating from a previous version, pay particular attention to the cha
 
 ## 3.xx
 
+### 3.01
+
+- Add **hicking figures** (Distance & Duration)
+In a story, figures cover the full journey
+
 ### 3.00
 
 - Add **mkStory**

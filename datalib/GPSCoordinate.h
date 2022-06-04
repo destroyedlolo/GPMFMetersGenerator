@@ -53,6 +53,7 @@ public :
 	struct tm *getLocalTime( void ){ return localtime(&this->sample_time); }
 	std::string strLocalTime( void );
 	std::string strLocalHour( bool HM_only = false );
+	std::string diffTime( time_t begin );	// return the duration begin -> this
 
 		/* from https://forums.futura-sciences.com/mathematiques-superieur/306536-calcul-de-distance-entre-2-points-dont-jai-coordonnees-geographiques-longitude-latitude.html#post2315609 */
 	double Estrangement( GPSCoordinate &other );
