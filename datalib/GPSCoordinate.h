@@ -39,9 +39,7 @@ public :
 	void setAltitude( double alt ){ this->altitude = alt; }
 	void setSampleTime( time_t ast ){ this->sample_time = ast; }
 
-	double addDistance( GPSCoordinate &other ){
-		return( this->cumulative_distance = this->Estrangement(other) + other.getCumulativeDistance() );
-	}
+	double addDistance( GPSCoordinate &other );
 
 	double getLatitude( void ){ return this->latitude; }
 	double getLongitude( void ){ return this->longitude; }

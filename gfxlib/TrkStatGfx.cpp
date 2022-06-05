@@ -579,7 +579,7 @@ void TrekkingStatGfx::generateOneGfx(const char *fulltarget, char *filename, int
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_set_source_rgb(cr, 1,1,1);
 	cairo_move_to(cr, (this->SX - extents.x_advance)-2, this->dst_y);
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
@@ -592,7 +592,7 @@ void TrekkingStatGfx::generateOneGfx(const char *fulltarget, char *filename, int
 	cairo_show_text(cr, duration.c_str());
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_set_source_rgb(cr, 1,1,1);
 	cairo_move_to(cr, (this->SX - extents.x_advance)-2, this->duration_y);
 	cairo_show_text(cr, duration.c_str());
 	cairo_stroke(cr);
