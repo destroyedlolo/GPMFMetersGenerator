@@ -38,3 +38,12 @@ double GPSCoordinate::Estrangement( GPSCoordinate &other ){
 
 		return( R*acos(sin(a)*sin(b) + cos(a)*cos(b)*cos(c-d)) );
 }
+
+double GPSCoordinate::addDistance( GPSCoordinate &other ){
+	double est = this->Estrangement(other);
+	this->cumulative_distance = other.getCumulativeDistance();
+	if(!std::isnan(est))
+		this->cumulative_distance += est;
+
+	return( this->cumulative_distance );
+}
