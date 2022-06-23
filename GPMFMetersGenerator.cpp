@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:S:qt")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:apk:VXKG:S:qtQ")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -102,6 +102,9 @@ int main(int argc, char *argv[]){
 			break;
 		case 'q':
 			gfx_quality = true;
+			break;
+		case 'Q':
+			enfquality = true;
 			break;
 		case 'X':
 			gfx_GPX = true;
@@ -157,6 +160,7 @@ int main(int argc, char *argv[]){
 				"\tOnly a GPX or a story can be loadded, not both\n"
 				"\n"
 				"-V : Don't generate video, keep PNG files\n"
+				"-Q : enforce quality by removing samples where GoP is > 500\n"
 				"-F : don't fail if the target directory exists\n"
 				"-v : turn verbose on\n"
 				"-d : turn debugging messages on\n"
