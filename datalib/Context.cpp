@@ -4,6 +4,7 @@
 
 bool verbose = false;
 bool debug = false;
+bool enfquality = false;
 
 void printtm( struct tm *t ){
 	printf( "%4d-%02d-%02d %02d:%02d:%02d ", 

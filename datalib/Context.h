@@ -9,6 +9,8 @@
 extern bool verbose;
 extern bool debug;
 
+extern bool enfquality;
+
 	/* Utilities */
 
 #include <ctime>

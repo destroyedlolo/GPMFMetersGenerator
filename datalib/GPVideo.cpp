@@ -141,6 +141,12 @@ void GPVideo::readGPMF( void ){
 				}
 				uint16_t *data = (unsigned short *)GPMF_RawData(ms);
 				dop = BYTESWAP16(*data);
+
+				if(enfquality && dop > 500){
+					if(verbose)
+						puts("*W* Sample ignored due to bad DoP");
+					continue;
+				}
 			}
 
 			if(GPMF_OK != GPMF_FindNext(ms, STR2FOURCC("GPS5"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) ))	// No GPS data in this stream ... skipping
