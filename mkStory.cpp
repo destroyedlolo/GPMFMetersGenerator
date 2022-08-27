@@ -270,6 +270,8 @@ CAUTION : 'p' has been removed from getopt !!
 			issue = true;
 		} else
 			puts(" ok");
+
+		prev = v.beginning.idx;
 	}
 
 	if(issue){
