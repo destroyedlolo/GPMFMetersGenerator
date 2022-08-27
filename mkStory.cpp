@@ -159,7 +159,8 @@ CAUTION : 'p' has been removed from getopt !!
 
 		if( !Gpx->sameArea(video.getMin()) ||
 			!Gpx->sameArea(video.getMax()) ){
-				fprintf(stderr, "*W* This video seems outside the GPX trace (%.0fm and %.0fm)\n", 
+				fprintf(stderr, "*W* '%s' seems outside the GPX trace (%.0fm and %.0fm)\n",
+					video.c_str(),
 					video.getMin().Estrangement(Gpx->getMin()),
 					video.getMax().Estrangement(Gpx->getMax())
 				);
