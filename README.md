@@ -139,29 +139,37 @@ This sticker displays the GPS' [Dilution of Precision](https://en.wikipedia.org/
 
 # Stories
 
-Primarily designed for activities such as hiking, trekking, ski touring, mountain biking, or simply strolling, **stories** attempt to establish the timeline between a GPX track and GoPro videos to generate additional figures.
+While doing long activities such as hiking, trekking, ski touring, mountain biking, or simply strolling, generally we are recording only small interesting parts and not the global session. In parallel, phones' sport tracker applications can provide complete trace of the activity.
+
+**Stories**  attempt to establish the timeline between a GPX track coming from your phone and the GoPro videos metadata to get a global view of your activity in videos.
+
+
+| :exclamation: | **Notez-bien :** Stories are for advanced users and are not mandatory to generate stickers. Especially, they are unuseful if you want to generate stickers for a single video :sunglasses:  |
+|-------------|----------------------------|
 
 ## data matching
 
 Unfortunately, GPS position gathered by your phone and GoPro are not exactly the same  : satellites lost, precision issues or simply the fact the GoPro may start recording without having fully acquired satellites (use [GPS signal quality](#GPSqual) stickers to check your signal quality).
-Even worst, the altitude is *calculated* by GPSes : Android's algorithm is less precise compared to GoPro one and tends to smooth the result.
+
+Even worst, the altitude is *calculated* by GPSes : Android's algorithm is by far less precise compared to GoPro one and tends to smooth the result.
 
 This is leading to *jumps* when switching between GPX and GoPro curves.
 
 ## mkStory
 
-Based on locations and chronology, mkStory will try to guess when each provided videos stars and ends on a GPX file timeline.
+**mkStory** tries to match videos' metadata with phone provided GPX timeline.
 
 ```
 $ ./mkStory -h
 
-mkStory v0.01a01
+mkStory v3.03.00
 (c) L.Faillie (destroyedlolo) 2022
 
 mkStory [-options] video.mp4 ...
 Known opts :
 -G<file> : GPX of the hiking
 -F : force video inclusion
+-P : use position instead of GPX' timestamps
 
 -v : turn verbose on
 -d : turn debugging messages on
@@ -244,7 +252,16 @@ Bad example :
 
 ## what to do in case of issues
 
-Generated .story file are flat files : if mkStory didn't do right job, you may edit it to sheat indexes. Adding '-d' option at mkStory invocation will help to know GPX's indexes (but it's very verbose). 
+Generated .story file are flat files : if mkStory didn't do right job, you may edit it to sheat indexes. Adding '-v' or even '-d' option at mkStory invocation will help to know GPX's indexes (but it's very verbose).
+
+### Time vs position based guessing
+
+By default, mkStory uses timestamps for matching.
+
+In some cases, the GPX files do not contain reliable timestamps (for example, when using *autopause* on **Decathlon coach**, the timestamps are totally crap). In this case, use the '**-P**' flag to switch to "positioning" mode: mkStory will attempt to guess the insertion points of the videos based on positional matches.
+
+| :warning: | "Positioning" mode is much more *random* than timestamp mode.<br> The results are better if there is no path overlap, but in the case of a round trip, it is really difficult to have a correct result (I am working on a better algorithm).  |
+|-------------|----------------------------|
 
 # Small tutorials
 
