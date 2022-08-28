@@ -194,6 +194,35 @@ CAUTION : 'p' has been removed from getopt !!
 	int idx;	// GPX's index
 
 	if(gpxts){
+		idx = 0;
+		bool over = false;
+		for(auto &v : videos){
+			if(over){
+				fprintf(stderr, "*F* '%s' Can't find ending (and it's not the last video)\n", v.c_str());
+				exit(EXIT_FAILURE);
+			}
+
+			while( v.getFirst().diffTimeF( (*Gpx)[idx].getSampleTime()) > 0){
+				if(++idx >= (int)Gpx->getSampleCount()){
+					fprintf(stderr, "*F* '%s' Can't find beginning\n", v.c_str());
+					exit(EXIT_FAILURE);
+				}
+			}
+			v.beginning.idx = idx;
+			v.beginning.distance = v.getFirst().Estrangement((*Gpx)[idx]);
+
+			while( v.getLast().diffTimeF( (*Gpx)[idx].getSampleTime()) > 0){
+				if(++idx >= (int)Gpx->getSampleCount())
+					break;
+				
+			}
+			if(idx >= (int)Gpx->getSampleCount()){
+				over = true;
+				idx--;	// The GoPro may have been stopped after the tracker
+			}
+			v.end.idx = idx;
+			v.end.distance = v.getLast().Estrangement((*Gpx)[idx]);
+		}
 	} else {
 		/* **
 		 * Try to match based on positions ...
