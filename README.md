@@ -252,8 +252,6 @@ Bad example :
 
 ## what to do in case of issues
 
-Generated .story file are flat files : if mkStory didn't do right job, you may edit it to sheat indexes. Adding '-v' or even '-d' option at mkStory invocation will help to know GPX's indexes (but it's very verbose).
-
 ### Time vs position based guessing
 
 By default, mkStory uses timestamps for matching.
@@ -262,6 +260,10 @@ In some cases, the GPX files do not contain reliable timestamps (for example, wh
 
 | :warning: | "Positioning" mode is much more *random* than timestamp mode.<br> The results are better if there is no path overlap, but in the case of a round trip, it is really difficult to have a correct result (I am working on a better algorithm).  |
 |-------------|----------------------------|
+
+### Last chance : manuel edition (good luck)
+
+Generated .story file are flat files : if mkStory didn't do right job, you may edit it to sheat indexes. Adding '-v' or even '-d' option at mkStory invocation will help to know GPX's indexes (but it's very verbose).
 
 # Small tutorials
 
