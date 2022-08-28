@@ -13,7 +13,7 @@ GPMFMetersGenerator [options] file.MP4
 (launch GPMFMetersGenerator with **-h** argument to have a list of reconized options)
 ```
 $ ./GPMFMetersGenerator -h
-GPMFMetersGenerator v3.00a1
+GPMFMetersGenerator v3.03.00
 (c) L.Faillie (destroyedlolo) 2022
 
 GPMFMetersGenerator [-options] Video.mp4
@@ -24,6 +24,8 @@ Known options :
 -a : enable altitude gfx
 -p : enable path gfx
 -q : enable quality gfx
+-t : enable Trekking statistics
+
 -X : export telemetry as GPX file
 -K : export telemetry as KML file
 
@@ -31,8 +33,8 @@ Known options :
 -S<file> : load a story file
 	Only a GPX or a story can be loadded, not both
 
--Q : enforce quality by removing samples where GoP is > 500
 -V : Don't generate video, keep PNG files
+-Q : enforce quality by removing samples where GoP is > 500
 -F : don't fail if the target directory exists
 -v : turn verbose on
 -d : turn debugging messages on
@@ -136,6 +138,8 @@ This sticker displays the GPS' [Dilution of Precision](https://en.wikipedia.org/
 **GPMFMetersGenerator** can export GoPro's metrics into [KML](https://en.wikipedia.org/wiki/Keyhole_Markup_Language) or [GPX](https://en.wikipedia.org/wiki/GPS_Exchange_Format) file than can be included in a 3rd party GIS like **Google Map**, **Google Earth**, **OpenStreetMap** or such.
 
 ![Google Earth](Images/KML.png)
+
+---
 
 # Stories
 
