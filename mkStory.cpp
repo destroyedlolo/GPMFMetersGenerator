@@ -135,7 +135,7 @@ CAUTION : 'p' has been removed from getopt !!
 				"-p<val> : Proximity threshold (default: 1m)\n"
 #endif
 				"-F : force video inclusion\n"
-				"-T : use GPX' timestamps\n"
+				"-P : use position instead of GPX' timestamps\n"
 				"\n"
 				"-v : turn verbose on\n"
 				"-d : turn debugging messages on\n"
