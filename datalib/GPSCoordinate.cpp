@@ -30,6 +30,10 @@ std::string GPSCoordinate::diffTime( time_t begin ){
 	return t;
 }
 
+double GPSCoordinate::diffTimeF( time_t begin ){
+	return difftime( this->sample_time, begin );
+}
+
 double GPSCoordinate::Estrangement( GPSCoordinate &other ){
 		double a = this->toRadian(other.getLatitude());
 		double b = this->toRadian(this->getLatitude());

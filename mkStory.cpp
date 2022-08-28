@@ -69,10 +69,15 @@ FILE *story = NULL;
 
 int main(int argc, char *argv[]){
 	bool force = false;	// force video inclusion
+	bool gpxpos = false;	// use gpx' position instead of timestamps
 
-			/* Reading arguments */
+
+			/* **
+			 * Reading arguments
+			 * **/
+
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhG:F")) != -1){
+	while(( opt = getopt(argc, argv, ":vdhG:FP")) != -1){
 		switch(opt){
 		case 'G':
 			if(Gpx){
@@ -112,6 +117,9 @@ CAUTION : 'p' has been removed from getopt !!
 		case 'F':
 			force = true;
 			break;
+		case 'P':
+			gpxpos = true;
+			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
 		case 'h':
@@ -127,6 +135,7 @@ CAUTION : 'p' has been removed from getopt !!
 				"-p<val> : Proximity threshold (default: 1m)\n"
 #endif
 				"-F : force video inclusion\n"
+				"-P : use position instead of GPX' timestamps\n"
 				"\n"
 				"-v : turn verbose on\n"
 				"-d : turn debugging messages on\n"
@@ -146,6 +155,11 @@ CAUTION : 'p' has been removed from getopt !!
 		exit(EXIT_FAILURE);		
 	}
 
+
+		/* **
+		 * Read videos
+		 * **/
+
 	for(; optind < argc; optind++){
 		GPVideoExt video(argv[optind]);	// load the first chunk
 
@@ -159,7 +173,8 @@ CAUTION : 'p' has been removed from getopt !!
 
 		if( !Gpx->sameArea(video.getMin()) ||
 			!Gpx->sameArea(video.getMax()) ){
-				fprintf(stderr, "*W* This video seems outside the GPX trace (%.0fm and %.0fm)\n", 
+				fprintf(stderr, "*W* '%s' seems outside the GPX trace (%.0fm and %.0fm)\n",
+					video.c_str(),
 					video.getMin().Estrangement(Gpx->getMin()),
 					video.getMax().Estrangement(Gpx->getMax())
 				);
@@ -172,14 +187,66 @@ CAUTION : 'p' has been removed from getopt !!
 		videos.push_back(video);
 	}
 
-	int idx;
-	for( idx = 0; idx < (int)Gpx->getSampleCount(); idx++ ){
-		auto &gpx = (*Gpx)[idx];
 
-		for(auto &v : videos)
-			v.Consider( idx, gpx );
+		/* **
+		 * Guess where videos are placed in the hiking
+		 * **/
+
+	int idx;	// GPX's index
+
+	if(!gpxpos){
+		idx = 0;
+		bool over = false;
+		for(auto &v : videos){
+			if(over){
+				fprintf(stderr, "*F* '%s' Can't find ending (and it's not the last video)\n", v.c_str());
+				exit(EXIT_FAILURE);
+			}
+
+			while( v.getFirst().diffTimeF( (*Gpx)[idx].getSampleTime()) > 0){
+				if(++idx >= (int)Gpx->getSampleCount()){
+					fprintf(stderr, "*F* '%s' Can't find beginning\n", v.c_str());
+					exit(EXIT_FAILURE);
+				}
+			}
+			v.beginning.idx = idx;
+			v.beginning.distance = v.getFirst().Estrangement((*Gpx)[idx]);
+
+			while( v.getLast().diffTimeF( (*Gpx)[idx].getSampleTime()) > 0){
+				if(++idx >= (int)Gpx->getSampleCount())
+					break;
+				
+			}
+			if(idx >= (int)Gpx->getSampleCount()){
+				over = true;
+				idx--;	// The GoPro may have been stopped after the tracker
+			}
+			v.end.idx = idx;
+			v.end.distance = v.getLast().Estrangement((*Gpx)[idx]);
+		}
+	} else {
+		/* **
+		 * Try to match based on positions ...
+		 *
+		 * The problem is informations may diverge between GoPro's and phone.
+		 * GPS accuracies
+		 * Time on the GPX tracking
+		 *
+		 * **/
+
+
+			// As even timestamps are not guaranteed, videos are took individually
+		for( idx = 0; idx < (int)Gpx->getSampleCount(); idx++ ){
+			auto &gpx = (*Gpx)[idx];
+
+			for(auto &v : videos)
+				v.Consider( idx, gpx );
+		}
 	}
 
+		/* **
+		 * Displaying
+		 * **/
 
 	if(verbose){
 		puts("*I* Results\n"
@@ -234,44 +301,88 @@ CAUTION : 'p' has been removed from getopt !!
 	int prev = -1;			// Prev index
 	bool issue = false;	// Did we detected an issue ?
 
-	puts(" ----------------------------------------------------------------------");
-	printf("| GPX : %s -> %s\n", Gpx->getMin().strLocalTime().c_str(), Gpx->getMax().strLocalTime().c_str());
-	printf("| Distance traveled : %.0f m\n", Gpx->getLast().getCumulativeDistance());
-	puts(" --------------------------------------------------------------------------------------------------------");
-	puts("|    video     |         Beginning         |            End            |            Timestamps           | Status");
-	puts("|              | Index | Estrgmt  | CumDis | Index | Estrgmt  | CumDis |       GPX      |       GoPro    |");
-	puts(" --------------------------------------------------------------------------------------------------------");
-	for(auto &v : videos){
-		printf("| %12s | %05d | %8.1f | %6.0f | %05d | %8.1f | %6.0f | %s -> %s | %s -> %s | ",
-			basename(v.c_str()),
-			v.beginning.idx, v.beginning.distance, (*Gpx)[v.beginning.idx].getCumulativeDistance(),
-			v.end.idx, v.end.distance, (*Gpx)[v.end.idx].getCumulativeDistance(),
-			(*Gpx)[v.beginning.idx].strLocalHour(true).c_str(), (*Gpx)[v.end.idx].strLocalHour(true).c_str(),
-			v.getFirst().strLocalHour(true).c_str(), v.getLast().strLocalHour(true).c_str()
-		);
+	if(!gpxpos){
+		puts(" ----------------------------------------------------------------------");
+		printf("| GPX : %s -> %s\n", Gpx->getMin().strLocalTime().c_str(), Gpx->getMax().strLocalTime().c_str());
+		printf("| Distance traveled : %.0f m\n", Gpx->getLast().getCumulativeDistance());
+		puts(" --------------------------------------------------------------------------------------------------------");
+		puts("|    video     |         Beginning         |            End            |            Timestamps           | Status");
+		puts("|              | Index | Estrgmt  | CumDis | Index | Estrgmt  | CumDis |       GPX      |       GoPro    |");
+		puts(" --------------------------------------------------------------------------------------------------------");
+		for(auto &v : videos){
+			printf("| %12s | %05d | %8.1f | %6.0f | %05d | %8.1f | %6.0f | %s -> %s | %s -> %s | ",
+				basename(v.c_str()),
+				v.beginning.idx, v.beginning.distance, (*Gpx)[v.beginning.idx].getCumulativeDistance(),
+				v.end.idx, v.end.distance, (*Gpx)[v.end.idx].getCumulativeDistance(),
+				(*Gpx)[v.beginning.idx].strLocalHour(true).c_str(), (*Gpx)[v.end.idx].strLocalHour(true).c_str(),
+				v.getFirst().strLocalHour(true).c_str(), v.getLast().strLocalHour(true).c_str()
+			);
 
-		if(!v.getMax().gfix){
-			puts(" No GPS");
-			issue = true;
-		} else if(!v.getMin().gfix){
-			puts(" Partial GPS");
-			issue = true;
-		} else if(v.getMin().dop > 500){
-			puts(" Bad signal");
-			issue = true;
-		} else if(v.getMax().dop > 500){
-			puts(" Weak signal");
-			issue = true;
-		} else if(v.end.idx == -1){
-			puts(" Not ending");
-			issue = true;
-		} else if(prev > v.beginning.idx){
-			puts(" Overlapping");
-			issue = true;
-		} else
-			puts(" ok");
+			if(!v.getMax().gfix){
+				puts(" No GPS");
+				issue = true;
+			} else if(!v.getMin().gfix){
+				puts(" Partial GPS");
+				issue = true;
+			} else if(v.getMin().dop > 500){
+				puts(" Bad signal");
+				issue = true;
+			} else if(v.getMax().dop > 500){
+				puts(" Weak signal");
+				issue = true;
+			} else if(v.end.idx == -1){
+				puts(" Not ending");
+				issue = true;
+			} else if(prev > v.beginning.idx){
+				puts(" Overlapping");
+				issue = true;
+			} else
+				puts(" ok");
 
-		prev = v.beginning.idx;
+			prev = v.beginning.idx;
+		}
+	} else {
+		puts(" ----------------------------------------------------------------------");
+		printf("| GPX : %s -> %s\n", Gpx->getMin().strLocalTime().c_str(), Gpx->getMax().strLocalTime().c_str());
+		printf("| Distance traveled : %.0f m\n", Gpx->getLast().getCumulativeDistance());
+		puts(" ------------------------------------------------------------------------------------------------------------");
+		puts("|    video     |    Beginning     |       End        |       Lenght         |           Timestamps           | Status");
+		puts("|              | Index | Estrgmt  | Index | Estrgmt  |    GPX   |   GoPro   |      GPX      |       GoPro    |");
+		puts(" ------------------------------------------------------------------------------------------------------------");
+		for(auto &v : videos){
+			printf("| %12s | %05d | %8.1f | %05d | %8.1f | %8.1f | %8.1f | %s -> %s | %s -> %s | ",
+				basename(v.c_str()),
+				v.beginning.idx, v.beginning.distance,
+				v.end.idx, v.end.distance,
+				(*Gpx)[v.end.idx].getCumulativeDistance() - (*Gpx)[v.beginning.idx].getCumulativeDistance(),
+				v.getLast().getCumulativeDistance(),
+				(*Gpx)[v.beginning.idx].strLocalHour(true).c_str(), (*Gpx)[v.end.idx].strLocalHour(true).c_str(),
+				v.getFirst().strLocalHour(true).c_str(), v.getLast().strLocalHour(true).c_str()
+			);
+
+			if(!v.getMax().gfix){
+				puts(" No GPS");
+				issue = true;
+			} else if(!v.getMin().gfix){
+				puts(" Partial GPS");
+				issue = true;
+			} else if(v.getMin().dop > 500){
+				puts(" Bad signal");
+				issue = true;
+			} else if(v.getMax().dop > 500){
+				puts(" Weak signal");
+				issue = true;
+			} else if(v.end.idx == -1){
+				puts(" Not ending");
+				issue = true;
+			} else if(prev > v.beginning.idx){
+				puts(" Overlapping");
+				issue = true;
+			} else
+				puts(" ok");
+
+			prev = v.beginning.idx;
+		}
 	}
 
 	if(issue){
@@ -282,7 +393,11 @@ CAUTION : 'p' has been removed from getopt !!
 		}
 	}
 
-		/* As we're relying on previous processing, we don't have to check
+		/* **
+		 * Generate the story
+		 * **
+		 *
+		 * As we're relying on previous processing, we don't have to check
 		 * boundary
 		 */
 	fputs("GPMFStory 1.0\n", story);	// Header to identify a story
