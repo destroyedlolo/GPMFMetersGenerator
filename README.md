@@ -122,6 +122,12 @@ Displays the north-facing path. By loading an external **GPX files**, the global
 
 :scroll: by adding a **story**, the full session is displayed, and the part covered by videos highlighted.
 
+### Trekking statistics
+
+![Trekking statistics](Images/Stats.png)
+
+Display **distance travelled** and **duration** since the beginning of the video *or* of the full hiking if included in a story. 
+
 ## Technical stickers
 
 ### <a name="GPSqual"></a>GPS signal quality
