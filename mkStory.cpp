@@ -69,14 +69,15 @@ FILE *story = NULL;
 
 int main(int argc, char *argv[]){
 	bool force = false;	// force video inclusion
-	bool gpxts = false;	// use gpx' timestamps
+	bool gpxpos = false;	// use gpx' position instead of timestamps
+
 
 			/* **
 			 * Reading arguments
 			 * **/
 
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhG:FT")) != -1){
+	while(( opt = getopt(argc, argv, ":vdhG:FP")) != -1){
 		switch(opt){
 		case 'G':
 			if(Gpx){
@@ -116,8 +117,8 @@ CAUTION : 'p' has been removed from getopt !!
 		case 'F':
 			force = true;
 			break;
-		case 'T':
-			gpxts = true;
+		case 'P':
+			gpxpos = true;
 			break;
 		case '?':	// unknown option
 			printf("unknown option: -%c\n", optopt);
@@ -193,7 +194,7 @@ CAUTION : 'p' has been removed from getopt !!
 
 	int idx;	// GPX's index
 
-	if(gpxts){
+	if(!gpxpos){
 		idx = 0;
 		bool over = false;
 		for(auto &v : videos){
@@ -300,7 +301,7 @@ CAUTION : 'p' has been removed from getopt !!
 	int prev = -1;			// Prev index
 	bool issue = false;	// Did we detected an issue ?
 
-	if(gpxts){
+	if(!gpxpos){
 		puts(" ----------------------------------------------------------------------");
 		printf("| GPX : %s -> %s\n", Gpx->getMin().strLocalTime().c_str(), Gpx->getMax().strLocalTime().c_str());
 		printf("| Distance traveled : %.0f m\n", Gpx->getLast().getCumulativeDistance());
