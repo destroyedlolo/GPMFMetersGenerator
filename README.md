@@ -13,7 +13,7 @@ GPMFMetersGenerator [options] file.MP4
 (launch GPMFMetersGenerator with **-h** argument to have a list of reconized options)
 ```
 $ ./GPMFMetersGenerator -h
-GPMFMetersGenerator v3.03.00
+GPMFMetersGenerator v3.04.00
 (c) L.Faillie (destroyedlolo) 2022
 
 GPMFMetersGenerator [-options] Video.mp4
@@ -21,7 +21,8 @@ GPMFMetersGenerator [-options] Video.mp4
 Known options :
 -s[2|3|b] : enable speed gfx (default 2d, 3: 3d, b: both)
 -k[2|3] : enable speed tracker gfx (default 2d, 3: 3d)
--a : enable altitude gfx
+-a : enable altitude gfx and draw curve from GoPro video
+-A : enable altitude gfx and draw curve from GPX/story
 -p : enable path gfx
 -q : enable quality gfx
 -t : enable Trekking statistics
@@ -31,7 +32,7 @@ Known options :
 
 -G<file> : load a GPX file
 -S<file> : load a story file
-	Only a GPX or a story can be loadded, not both
+        Only a GPX or a story can be loadded, not both
 
 -V : Don't generate video, keep PNG files
 -Q : enforce quality by removing samples where GoP is > 500
@@ -121,6 +122,11 @@ Displays the north-facing path. By loading an external **GPX files**, the global
 ![Video + story Altitude](Images/Altitude2.png)
 
 :scroll: by adding a **story**, the full session is displayed, and the part covered by videos highlighted.
+Current video data are took from
+- '**-a**' flag : from the GoPro meta data. 
+- '**-A**' flag : from the data contained in the GPX file (which includes the stories). Data of the GPX files can be smoothed if obtained from transcoding tables (WGS84, EGM96, ...) creating *unsightly "jumps"* when switching from GPX curves to GoPro data. With '-A' the graphs are only based on GPX data.
+
+The floating dot and the value displayed always come from GoPro data.
 
 ### Trekking statistics
 
@@ -162,8 +168,7 @@ While doing long activities such as hiking, trekking, ski touring, mountain biki
 Unfortunately, GPS position gathered by your phone and GoPro are not exactly the same  : satellites lost, precision issues or simply the fact the GoPro may start recording without having fully acquired satellites (use [GPS signal quality](#GPSqual) stickers to check your signal quality).
 
 Even worst, the altitude is *calculated* by GPSes : Android's algorithm is by far less precise compared to GoPro one and tends to smooth the result.
-
-This is leading to *jumps* when switching between GPX and GoPro curves.
+This is leading to *jumps* when switching between GPX and GoPro curves. See GPMFMetersGenerator '**-a**' vs '**-A**' discuss above.
 
 ## mkStory
 
