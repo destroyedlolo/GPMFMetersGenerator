@@ -4,6 +4,18 @@ If you are updating from a previous version, pay particular attention to the cha
 
 ## 3.xx
 
+### 3.04
+
+- Add '**-A**' flag to force GPX data usage on altitude graphic
+
+### 3.03
+
+- mkStory can guess video inclusion based on timestamps
+
+### 3.02
+
+- Add **quality enforcement** flag to remove samples when DoP > 500
+
 ### 3.01
 
 - Add **hicking figures** (Distance & Duration)
