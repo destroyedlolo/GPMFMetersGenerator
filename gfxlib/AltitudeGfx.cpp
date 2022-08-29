@@ -227,7 +227,7 @@ static struct {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
 
-AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h) : Gfx( 600,300, v, h ), soffx(0) {
+AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h, bool aforcegpx) : Gfx( 600,300, v, h ), soffx(0), forcegpx(aforcegpx) {
 	this->calcScales();
 }
 
@@ -324,15 +324,19 @@ void AltitudeGfx::drawGPX(cairo_t *cr, int offset){
 					cairo_set_source_rgb(cr, 1,1,1);
 					break;
 				case GPX::pkind::CURRENTVIDEO :
-					if(!first)	// draw previous gfx
-						cairo_line_to(cr, x, y);
-					for(; idx < (int)this->hiking->getSampleCount(); idx++)	// skiping
-						if(this->hiking->positionKind(idx) != GPX::pkind::CURRENTVIDEO){
-							idx--;
-							break;
-						}
-					first = true;
-					continue;
+					if(this->forcegpx){
+						cairo_set_source_rgb(cr, 0.11, 0.65, 0.88);
+					} else {
+						if(!first)	// draw previous gfx
+							cairo_line_to(cr, x, y);
+						for(; idx < (int)this->hiking->getSampleCount(); idx++)	// skiping
+							if(this->hiking->positionKind(idx) != GPX::pkind::CURRENTVIDEO){
+								idx--;
+								break;
+							}
+						first = true;
+						continue;
+					}
 				}
 			}
 		}
@@ -491,7 +495,8 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_stroke(cr);
 
 		/* Draw Altitude curve */
-	this->drawGPMF(cr, 0, index);
+	if(!this->forcegpx)
+		this->drawGPMF(cr, 0, index);
 
 		/* Display the label */
 	char t[8];

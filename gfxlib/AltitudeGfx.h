@@ -18,6 +18,8 @@ class AltitudeGfx : public Gfx {
 	int soffx;			// Video's own offset
 	double sscale_w;	// Video sample to GPX ones
 
+	bool forcegpx;		// Use GPX for drawing the curve
+
 	/* Draw external GPX data
 	 * cr -> cairo context
 	 * offset -> offset the curve (do draw shadows)
@@ -38,7 +40,7 @@ protected:
 	void generateOneGfx( const char *, char *, int , GPMFdata & );
 
 public:
-	AltitudeGfx(GPVideo &v, GPX *h);
+	AltitudeGfx(GPVideo &v, GPX *h, bool forcegpx);
 
 	void GenerateAllGfx( const char *dir, char *file );
 };
