@@ -206,9 +206,16 @@ void GPX::readGPX( const char *file ){
 
 		struct tm t;
 		memset(&t, 0, sizeof(struct tm));
+
 		if(!strptime(buff, "<time>%FT%T%z", &t)){
-			puts("*E* can't read time");
-			exit(EXIT_FAILURE);
+				/* Some GPX editors (like https://gpx.studio/) don't
+				 * keep the timezone and force 'Z' or ... nothing.
+				 * As fallback, try to read the timestamp without timezone
+				 */
+			if(!strptime(buff, "<time>%FT%T", &t)){
+				puts("*E* can't read time");
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		long int sample_offset = t.tm_gmtoff;
