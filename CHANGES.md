@@ -4,6 +4,11 @@ If you are updating from a previous version, pay particular attention to the cha
 
 ## 3.xx
 
+### 3.05
+
+Some GPX editors (like https://gpx.studio/) don't keep the timezone and force 'Z' or ... nothing.
+As fallback, try to read the timestamp without timezone.
+
 ### 3.04
 
 - Add '**-A**' flag to force GPX data usage on altitude graphic
