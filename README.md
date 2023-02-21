@@ -285,8 +285,10 @@ Generated .story file are flat files : if mkStory didn't do right job, you may e
 
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/suNsHcW_mJ0/0.jpg)](https://www.youtube.com/watch?v=suNsHcW_mJ0 "How to add your GoPro tracks into Google Earth (or Maps)")
 [![IMAGE ALT TEXT](http://img.youtube.com/vi/9xHZUzn8XDk/0.jpg)](https://www.youtube.com/watch?v=9xHZUzn8XDk "Add GoPro's telemetry stickers on your videos using GPMFMetersGenerator and Shotcut")
- 
-## TODO list
+
+---
+
+# TODO list
 
 Here the list of already known needed improvements (as of V3)
 
@@ -299,3 +301,11 @@ Here the list of already known needed improvements (as of V3)
 - [ ] Inlays video's path on a map (**high probability** : must have)
 - [ ] Post process GPX data to get better altitudes (**meddium probability** : it will require lot of development - does it worth it ?)
 - [ ] Add threading support to parallelise images' generation (**low probability** : requires a bit of code redesign, but the gain won't be so significant as most of the time spent is by video encoding, which is already parallelized). 
+
+---
+
+# Licencing and contributing
+
+**GPMFMetersGenerator** is covered by [Creative Commons-BY-NC](http://creativecommons.org/licenses/by-nc/3.0/) preventing *vampires* to abuse open source developers kindness : Please raise a ticket if you want to integrate it in a commercial product.
+
+**Feel free to participate** : code improvements, new features implementation, beer to developers, gifts, thanks messages :clap: ... Participations help to make projects alive.
