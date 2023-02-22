@@ -124,7 +124,7 @@ Displays the north-facing path. By loading an external **GPX files**, the global
 :scroll: by adding a **story**, the full session is displayed, and the part covered by videos highlighted.
 Current video data are took from
 - '**-a**' flag : from the GoPro meta data. 
-- '**-A**' flag : from the data contained in the GPX file (which includes the stories). Data of the GPX files can be smoothed if obtained from transcoding tables (WGS84, EGM96, ...) creating *unsightly "jumps"* when switching from GPX curves to GoPro data. With '-A' the graphs are only based on GPX data.
+- '**-A**' flag : from the data contained in the GPX tracking (from a GPX file or from a stories). Data of the GPX files can be smoothed if obtained from transcoding tables (WGS84, EGM96, ...) creating *unsightly "jumps"* when switching from GPX curves to GoPro data. With '-A' the graphs are only based on GPX data.
 
 The floating dot and the value displayed always come from GoPro data.
 
