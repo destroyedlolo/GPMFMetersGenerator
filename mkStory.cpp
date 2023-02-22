@@ -165,7 +165,7 @@ CAUTION : 'p' has been removed from getopt !!
 
 		if(verbose){
 			video.Dump();
-			printf("*I* Distance vs min : %.0fm, max %.0fm\n",
+			printf("*I* Video distance vs GPX : min %.0fm, max %.0fm\n",
 				video.getMin().Estrangement(Gpx->getMin()),
 				video.getMax().Estrangement(Gpx->getMax())
 			);
