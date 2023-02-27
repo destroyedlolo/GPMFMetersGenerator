@@ -26,7 +26,10 @@ double proximity = 1;	// Proximity threshold
 							// (bellow this distance, places are considered to 
 #endif							// be the same.
 
-	/* Extended GPVideo */
+	/* Extended GPVideo
+	 * Add video's name
+	 * Try to guess where the video is inserted into the global journey
+	 */
 class GPVideoExt : public GPVideo, public std::string {
 public:
 	struct closest {
@@ -38,7 +41,7 @@ public:
 
 	GPVideoExt( char *n ) : GPVideo(n), std::string(n){}
 
-		/* update beginning & end as per a given value */
+		/* Search if the given coordinate is a better beginning or ending point */
 	void Consider( int idx, GPSCoordinate &p ){
 		if(this->beginning.idx == -1){	// Initialize with the 1st point
 			this->beginning.idx = this->end.idx = idx;
