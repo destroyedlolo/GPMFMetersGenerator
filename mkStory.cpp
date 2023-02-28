@@ -198,7 +198,7 @@ CAUTION : 'p' has been removed from getopt !!
 
 		int idx;	// GPX's index
 
-		if(!gpxpos){
+		if(!gpxpos){	// Use timestamps
 			idx = 0;
 			bool over = false;
 			for(auto &v : videos){
@@ -431,6 +431,31 @@ CAUTION : 'p' has been removed from getopt !!
 
 		if(verbose)
 			puts("*I* Videos only mode");
+
+		if(!(story = fopen("story", "w"))){
+			perror("story");
+			exit(EXIT_FAILURE);		
+		}
+
+		fputs("GPMFStory 2.0\n", story);	// Header to identify a story
+
+		bool first = true;
+		for(; optind < argc; optind++){
+			GPVideo video(argv[optind]);	// Read video's data
+
+			if(first){
+				first = false;
+				auto p = video.getFirst();
+				fputs("# starting time :", story);
+				printtm(p.getLocalTime(), story);
+				fputs("\n", story);
+				fprintf(story, "*start %lu\n", p.getSampleTime());
+			}
+
+			fprintf(story, "*Video %s\n", argv[optind]);
+		}
+
+		fclose(story);
 	}
 }
 

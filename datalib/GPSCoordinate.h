@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <string>
+#include <ctime>
 
 #define R (6371000)	// terrestrial radius
 
