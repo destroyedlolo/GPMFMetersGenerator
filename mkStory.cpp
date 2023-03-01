@@ -129,7 +129,7 @@ CAUTION : 'p' has been removed from getopt !!
 		case ':':	// no argument provided (or missing argument)
 			puts(
 				"\nmkStory v" VERSION "\n"
-				"(c) L.Faillie (destroyedlolo) 2022\n"
+				"(c) L.Faillie (destroyedlolo) 2022-23\n"
 				"\n"
 				"mkStory [-options] video.mp4 ...\n"
 				"Known opts :\n"

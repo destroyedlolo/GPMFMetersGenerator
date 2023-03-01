@@ -145,7 +145,7 @@ int main(int argc, char *argv[]){
 	
 			puts(
 				"GPMFMetersGenerator v" VERSION "\n"
-				"(c) L.Faillie (destroyedlolo) 2022\n"
+				"(c) L.Faillie (destroyedlolo) 2022-23\n"
 				"\nGPMFMetersGenerator [-options] Video.mp4\n"
 				"\nKnown options :\n"
 				"-s[2|3|b] : enable speed gfx (default 2d, 3: 3d, b: both)\n"
