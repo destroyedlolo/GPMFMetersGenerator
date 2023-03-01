@@ -10,8 +10,8 @@
 
 #include <ctime>
 
-	/* Number of samples per seconds (9) */
-#define SAMPLE (1.0/9.0)
+	/* default number of samples per seconds (9) */
+#define SAMPLE 9
 
 struct GPMFdata : public GPSCoordinate {
 	double spd2d, spd3d;
@@ -40,6 +40,7 @@ private:
 
 		/* GPMF's */
 	double nextsample;			// timing of the next sample to store
+	double sample;				// Sample rate
 
 		/* Multiparts' */
 	double voffset;		// part's timing offset
@@ -62,7 +63,7 @@ protected:
 
 public:
 		/* Read and parse 1st video */
-	GPVideo( char * );
+	GPVideo( char *, unsigned int sample=SAMPLE );
 
 		/* Read and parse another part */
 	void AddPart( char * );

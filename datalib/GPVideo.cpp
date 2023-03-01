@@ -303,10 +303,10 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 	sec += this->voffset;	// shift by this part's offset
 
 	if(this->getSamples().empty() || sec >= this->nextsample){	// store a new sample
-		if(!this->getSamples().empty() && sec > this->nextsample + SAMPLE/2)	// Drifting
-			ret = sec - (this->nextsample + SAMPLE/2);
+		if(!this->getSamples().empty() && sec > this->nextsample + this->sample/2)	// Drifting
+			ret = sec - (this->nextsample + this->sample/2);
 
-		this->nextsample += SAMPLE;
+		this->nextsample += this->sample;
 		if(debug)
 			printf("accepted : %f, next:%f\n", sec, this->nextsample);
 
@@ -325,7 +325,8 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 	return ret;
 }
 
-GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0), dop(0) {
+GPVideo::GPVideo( char *fch, unsigned int asample ) : nextsample(0), voffset(0), dop(0) {
+	this->sample = 1.0/asample;
 
 	/* Ensure it's the 1st part of a GoPro video
 	 *
@@ -439,17 +440,17 @@ void GPVideo::Dump( void ){
 	if(debug){
 		puts("*D* Memorized video data");
     	for(auto p : samples){
-			printf("\tLatitude : %.3f deg\n", p.getLatitude());
-			printf("\tLongitude : %.3f deg\n", p.getLongitude());
-			printf("\tAltitude : %.3f m\n", p.getAltitude());
-			printf("\tSpeed2d : %.3f km/h\n", p.spd2d);
-			printf("\tSpeed3d : %.3f km/h\n", p.spd3d);
-			printf("\tCumulative distance : %f m\n", p.getCumulativeDistance() );
-			printf("\tgfix : %u, dop : %u\n", p.gfix, p.dop);
-
 			printf("\tTime : ");
 			printtm(p.getGMT());
 			puts("");
+
+			printf("\t\tLatitude : %.3f deg\n", p.getLatitude());
+			printf("\t\tLongitude : %.3f deg\n", p.getLongitude());
+			printf("\t\tAltitude : %.3f m\n", p.getAltitude());
+			printf("\t\tSpeed2d : %.3f km/h\n", p.spd2d);
+			printf("\t\tSpeed3d : %.3f km/h\n", p.spd3d);
+			printf("\t\tCumulative distance : %f m\n", p.getCumulativeDistance() );
+			printf("\t\tgfix : %u, dop : %u\n", p.gfix, p.dop);
 		}
 	}
 

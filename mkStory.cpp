@@ -441,7 +441,7 @@ CAUTION : 'p' has been removed from getopt !!
 
 		bool first = true;
 		for(; optind < argc; optind++){
-			GPVideo video(argv[optind]);	// Read video's data
+			GPVideo video(argv[optind], 1);	// Read video's data
 
 			if(first){
 				first = false;
@@ -450,9 +450,21 @@ CAUTION : 'p' has been removed from getopt !!
 				printtm(p.getLocalTime(), story);
 				fputs("\n", story);
 				fprintf(story, "*start %lu\n", p.getSampleTime());
+				fputs("#latitude, longitude, altitude, sample_time, cumulative_distance\n", story);
 			}
 
 			fprintf(story, "*Video %s\n", argv[optind]);
+
+			for(auto s: video.getSamples()){
+				fprintf(story, "%f, %f, %f, %lu, %f\n",
+					s.getLatitude(), s.getLongitude(),
+					s.getAltitude(), s.getSampleTime(),
+					s.getCumulativeDistance()
+				);
+			}
+
+			if(debug)
+				video.Dump();
 		}
 
 		fclose(story);
