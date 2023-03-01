@@ -270,49 +270,50 @@ void GPX::readStory( const char *file ){
 		exit(EXIT_FAILURE);
 	}
 	buff[strcspn(buff,"\n")] = 0;
-	if(strcmp(buff, "GPMFStory 1.0")){
+	if(!strcmp(buff, "GPMFStory 1.0")){
+
+			/* Reading videos anchors
+			 *	Rude checks are done here (assert()) as we are relying on
+			 *	formating made by mkStory).
+			 */
+		while(fgets(buff, sizeof(buff), f)){
+			if(*buff == '#')
+				continue;
+			if(*buff == '*')
+				break;
+
+			char *indexes = strchr(buff, ',');
+			assert(indexes);
+
+			*indexes++ = 0;
+
+			int istart, iend;
+			assert( sscanf(indexes, "%d, %d", &istart, &iend) == 2 );
+
+			StoryVideo nv(buff, istart, iend);
+			this->videos.push_back(nv);
+		}
+
+			/* Reading GPX data */
+		while(fgets(buff, sizeof(buff), f)){
+			double lat, lgt, alt;
+			time_t st;
+			double dst;
+
+			if(*buff == '#')
+				continue;
+
+			if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
+				fputs("*F* Failed to read GPX contents\n", stderr);
+				exit(EXIT_FAILURE);
+			}
+			GpxData nv(lat, lgt, alt, st, dst);
+			updMinMax(nv);
+			this->samples.push_back(nv);
+		}
+	} else {
 		fputs("*F* Story's magic not found\n", stderr);
 		exit(EXIT_FAILURE);
-	}
-
-		/* Reading videos anchors
-		 *	Rude checks are done here (assert()) as we are relying on
-		 *	formating made by mkStory.
-		 */
-	while(fgets(buff, sizeof(buff), f)){
-		if(*buff == '#')
-			continue;
-		if(*buff == '*')
-			break;
-
-		char *indexes = strchr(buff, ',');
-		assert(indexes);
-
-		*indexes++ = 0;
-
-		int istart, iend;
-		assert( sscanf(indexes, "%d, %d", &istart, &iend) == 2 );
-
-		StoryVideo nv(buff, istart, iend);
-		this->videos.push_back(nv);
-	}
-
-		/* Reading GPX data */
-	while(fgets(buff, sizeof(buff), f)){
-		double lat, lgt, alt;
-		time_t st;
-		double dst;
-
-		if(*buff == '#')
-			continue;
-
-		if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
-			fputs("*F* Failed to read GPX contents\n", stderr);
-			exit(EXIT_FAILURE);
-		}
-		GpxData nv(lat, lgt, alt, st, dst);
-		updMinMax(nv);
-		this->samples.push_back(nv);
 	}
 	
 	fclose(f);
