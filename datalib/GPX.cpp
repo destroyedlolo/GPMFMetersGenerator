@@ -311,6 +311,34 @@ void GPX::readStory( const char *file ){
 			updMinMax(nv);
 			this->samples.push_back(nv);
 		}
+	} else if(!strcmp(buff, "GPMFStory 2.0")){
+		unsigned int idx = 0,	// Current index
+			sidx = 0;			// video starting index
+
+		while(fgets(buff, sizeof(buff), f)){
+			buff[strcspn(buff,"\n")] = 0;
+			if(*buff == '#')
+				continue;
+			if(!strncmp(buff, "*Video", 6)){	// Entering new video
+				StoryVideo nv(buff+7, sidx, idx);
+				this->videos.push_back(nv);
+				sidx = idx + 1;
+			} else { // Reading data
+				double lat, lgt, alt;
+				time_t st;
+				double dst;
+
+				if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
+					fputs("*F* Failed to read GPX contents\n", stderr);
+					exit(EXIT_FAILURE);
+				}
+				GpxData nv(lat, lgt, alt, st, dst);
+				updMinMax(nv);
+				this->samples.push_back(nv);
+
+				idx++;
+			}
+		}
 	} else {
 		fputs("*F* Story's magic not found\n", stderr);
 		exit(EXIT_FAILURE);

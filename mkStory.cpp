@@ -449,11 +449,9 @@ CAUTION : 'p' has been removed from getopt !!
 				fputs("# starting time :", story);
 				printtm(p.getLocalTime(), story);
 				fputs("\n", story);
-				fprintf(story, "*start %lu\n", p.getSampleTime());
+//				fprintf(story, "*start %lu\n", p.getSampleTime());
 				fputs("#latitude, longitude, altitude, sample_time, cumulative_distance\n", story);
 			}
-
-			fprintf(story, "*Video %s\n", argv[optind]);
 
 			for(auto s: video.getSamples()){
 				fprintf(story, "%f, %f, %f, %lu, %f\n",
@@ -462,6 +460,8 @@ CAUTION : 'p' has been removed from getopt !!
 					s.getCumulativeDistance()
 				);
 			}
+
+			fprintf(story, "*Video\t%s\n", argv[optind]);
 
 			if(debug)
 				video.Dump();
