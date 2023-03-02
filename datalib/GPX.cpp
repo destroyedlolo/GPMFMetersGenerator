@@ -400,7 +400,7 @@ GPX::pkind GPX::positionKind(int idx){
 	} else if(!r)	// within the video
 		return pkind::CURRENTVIDEO;
 	else { // after
-		for(int i=this->current_video_idx-1; i<(int)this->videos.size(); i++){
+		for(int i=this->current_video_idx+1; i<(int)this->videos.size(); i++){
 			r = this->videos[i].whithin(idx);
 			if(r<0)	// b/w the checked and the next
 				return pkind::AFTERTRACE;
