@@ -481,7 +481,6 @@ TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h) : Gfx( 250,100, v, h ), sDi
 		this->beginning = this->hiking->getSamples()[0].getSampleTime();
 	} else
 		this->beginning = v[0].getSampleTime();
-	
 }
 
 void TrekkingStatGfx::calcScales( void ){

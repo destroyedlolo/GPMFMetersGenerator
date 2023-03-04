@@ -41,6 +41,9 @@ public :
 	void setSampleTime( time_t ast ){ this->sample_time = ast; }
 
 	double addDistance( GPSCoordinate &other );
+	double addDistance( double d ){
+		return( this->cumulative_distance += d );
+	}
 
 	double getLatitude( void ){ return this->latitude; }
 	double getLongitude( void ){ return this->longitude; }

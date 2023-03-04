@@ -440,8 +440,9 @@ CAUTION : 'p' has been removed from getopt !!
 		fputs("GPMFStory 2.0\n", story);	// Header to identify a story
 
 		bool first = true;
+		double last_cumdistance = 0.0;
 		for(; optind < argc; optind++){
-			GPVideo video(argv[optind], 1);	// Read video's data
+			GPVideo video(argv[optind], 1, last_cumdistance);	// Read video's data
 
 			if(first){
 				first = false;
@@ -449,7 +450,7 @@ CAUTION : 'p' has been removed from getopt !!
 				fputs("# starting time :", story);
 				printtm(p.getLocalTime(), story);
 				fputs("\n", story);
-//				fprintf(story, "*start %lu\n", p.getSampleTime());
+				//				fprintf(story, "*start %lu\n", p.getSampleTime());
 				fputs("#latitude, longitude, altitude, sample_time, cumulative_distance\n", story);
 			}
 
@@ -459,6 +460,8 @@ CAUTION : 'p' has been removed from getopt !!
 					s.getAltitude(), s.getSampleTime(),
 					s.getCumulativeDistance()
 				);
+
+				last_cumdistance = s.getCumulativeDistance();
 			}
 
 			fprintf(story, "*Video\t%s\n", argv[optind]);
