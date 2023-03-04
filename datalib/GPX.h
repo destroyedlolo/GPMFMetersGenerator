@@ -22,7 +22,7 @@ struct GpxData : public GPSCoordinate {
 };
 
 struct StoryVideo : public std::string {
-	int start;
+	int start;	// indexes of this video in this story
 	int end;
 
 	StoryVideo( const char *name, int astart, int aend ) : 
