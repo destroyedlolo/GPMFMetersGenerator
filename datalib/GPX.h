@@ -79,6 +79,12 @@ public:
 	StoryVideo &getCurrentStoryVideo( void ){
 		return this->videos[ this->current_video_idx ];
 	}
+	StoryVideo &getStoryVideo( int idx ){
+		return this->videos[ idx ];
+	}
+	int getIndex(void){
+		return this->current_video_idx;
+	}
 
 	enum pkind {
 		AFTERTRACE=0,		// A trace outside any video and after the current video
