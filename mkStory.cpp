@@ -442,6 +442,8 @@ CAUTION : 'p' has been removed from getopt !!
 		bool first = true;
 		double last_cumdistance = 0.0;
 		for(; optind < argc; optind++){
+			time_t last_time;
+
 			GPVideo video(argv[optind], 1, last_cumdistance);	// Read video's data
 
 			if(first){
@@ -452,6 +454,11 @@ CAUTION : 'p' has been removed from getopt !!
 				fputs("\n", story);
 				//				fprintf(story, "*start %lu\n", p.getSampleTime());
 				fputs("#latitude, longitude, altitude, sample_time, cumulative_distance\n", story);
+			} else {
+				double diff = video.getFirst().diffTimeF(last_time);
+				if(verbose)
+					printf("*I* Time gap : %s min\n", video.getFirst().diffTime(last_time).c_str());
+				
 			}
 
 			for(auto s: video.getSamples()){
@@ -462,6 +469,7 @@ CAUTION : 'p' has been removed from getopt !!
 				);
 
 				last_cumdistance = s.getCumulativeDistance();
+				last_time = s.getSampleTime();
 			}
 
 			fprintf(story, "*Video\t%s\n", argv[optind]);
