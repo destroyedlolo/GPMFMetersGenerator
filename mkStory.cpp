@@ -457,7 +457,7 @@ CAUTION : 'p' has been removed from getopt !!
 			} else {
 				double diff = video.getFirst().diffTimeF(last->getSampleTime());
 				if(verbose)
-					printf("*I* gap : %s min, estrangement : %.2lf\n",
+					printf("*I* gap : %s min, estrangement : %.2lf m\n",
 						video.getFirst().diffTime(last->getSampleTime()).c_str(),
 						video.getFirst().Estrangement(*last)
 					);
