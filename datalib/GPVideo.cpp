@@ -370,7 +370,7 @@ GPVideo::GPVideo( char *fch, unsigned int asample, double cumul_dst ) : nextsamp
 		fputs("*F* Can't get frame count (incorrect MP4 ?)", stderr);
 		exit(EXIT_FAILURE);
 	}
-	if(verbose)
+	if(debug)
 		printf("*I* Video framerate : %.3f (%u frames)\n", (float)this->fr_num / (float)this->fr_dem, frames);
 
 	this->readGPMF( cumul_dst );
@@ -411,7 +411,7 @@ void GPVideo::AddPart( char *fch, double cumul_dst ){
 		puts("*F* Can't get frame count (incorrect MP4 ?)");
 		exit(EXIT_FAILURE);
 	}
-	if(verbose)
+	if(debug)
 		printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
 
 	if(fr_num != this->fr_num || fr_dem != this->fr_dem){
