@@ -10,8 +10,8 @@
 
 #include <ctime>
 
-	/* Number of samples per seconds (9) */
-#define SAMPLE (1.0/9.0)
+	/* default number of samples per seconds (9) */
+#define SAMPLE 9
 
 struct GPMFdata : public GPSCoordinate {
 	double spd2d, spd3d;
@@ -40,6 +40,7 @@ private:
 
 		/* GPMF's */
 	double nextsample;			// timing of the next sample to store
+	double sample;				// Sample rate
 
 		/* Multiparts' */
 	double voffset;		// part's timing offset
@@ -51,21 +52,25 @@ private:
 	uint16_t dop;
 
 protected:
-	void readGPMF( void );
+	void readGPMF( double cumul_dst );
 
 	/* Add a new sample
 	 * Min and Max are always took in account
 	 * The sample is stored only if its took at least SAMPLE seconds after the
 	 * last stored sample.
 	 */
-	double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix, uint16_t dop );
+	double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix, uint16_t dop, double cumul_dst );
 
 public:
-		/* Read and parse 1st video */
-	GPVideo( char * );
+		/* Read and parse 1st video
+		 * fch : first video sample
+		 * sample : number of samples per seconds
+		 * cumul_dst : initial cumulative distance
+		 */
+	GPVideo( char *fch, unsigned int sample=SAMPLE, double cumul_dst = 0.0);
 
 		/* Read and parse another part */
-	void AddPart( char * );
+	void AddPart( char *, double cumul_dst );
 
 	void Dump( void );
 };

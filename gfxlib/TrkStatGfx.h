@@ -7,6 +7,12 @@
 #include "Gfx.h"
 
 class TrekkingStatGfx : public Gfx {
+public:
+	enum gfxtype { NONE=0, HM=1, HMS=2 };
+
+private:
+	gfxtype type;
+
 	long sDistance;		// Original distance covered by the story
 	time_t beginning;	// Beginning of the journey
 
@@ -19,7 +25,7 @@ protected:
 	void generateOneGfx( const char *, char *, int , GPMFdata & );
 
 public:
-	TrekkingStatGfx(GPVideo &v, GPX *h);
+	TrekkingStatGfx(GPVideo &v, GPX *, gfxtype);
 
 	void GenerateAllGfx( const char *dir, char *file );
 };

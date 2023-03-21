@@ -14,8 +14,8 @@ GPMFMetersGenerator [options] file.MP4
 (launch GPMFMetersGenerator with **-h** argument to have a list of reconized options)
 ```
 $ ./GPMFMetersGenerator -h
-GPMFMetersGenerator v3.04.00
-(c) L.Faillie (destroyedlolo) 2022
+GPMFMetersGenerator v4.03.00
+(c) L.Faillie (destroyedlolo) 2022-23
 
 GPMFMetersGenerator [-options] Video.mp4
 
@@ -26,14 +26,15 @@ Known options :
 -A : enable altitude gfx and draw curve from GPX/story
 -p : enable path gfx
 -q : enable quality gfx
--t : enable Trekking statistics
+-t : enable Trekking statistics (HH:MM)
+-T : enable Trekking statistics (HH:MM:SS)
 
 -X : export telemetry as GPX file
 -K : export telemetry as KML file
 
 -G<file> : load a GPX file
 -S<file> : load a story file
-        Only a GPX or a story can be loadded, not both
+	Only a GPX or a story can be loadded, not both
 
 -V : Don't generate video, keep PNG files
 -Q : enforce quality by removing samples where GoP is > 500
@@ -156,22 +157,75 @@ This sticker displays the GPS' [Dilution of Precision](https://en.wikipedia.org/
 
 # Stories
 
-While doing long activities such as hiking, trekking, ski touring, mountain biking, or simply strolling, generally we are recording only small interesting parts and not the global session. In parallel, phones' sport tracker applications can provide complete trace of the activity.
-
-**Stories**  attempt to establish the timeline between a GPX track coming from your phone and the GoPro videos metadata to get a global view of your activity in videos.
-
+A story is a way to group data from several sources : so even if a video covers only a part, telemetry stickers will reflect all the activity.
 
 | :exclamation: | **Notez-bien :** Stories are for advanced users and are not mandatory to generate stickers. Especially, they are unuseful if you want to generate stickers for a single video :sunglasses:  |
 |-------------|----------------------------|
 
-## data matching
+To add a story while generating stickers, provide its file using **-S** option to **GPMFMetersGenerator**.
+
+## Story from a set of videos
+
+You may want to film an activity without being able to do it in one shot (also known as "*have to wait for friends on a long down hill*"). A story can be used to group telemetries of all parts, as if took from a single video.
+
+**some obvious remarks :**
+* If you're doing pauses during your activity, the **distance, path and altitude tracking will be accurate**, but the duration will reflect the difference between the beginning and time of the recording and not the cumulative time of effort.
+* If you stop the recording but continue your activity, the **duration** will be right but not the distance. Altitude and path will contain straight shortcuts.
+
+### mkStory
+
+**mkStory** will build your story from videos only if there is no **-G** provided, so no GPX file.
+
+```
+$ mkStory GX01463[789].MP4 GX01464[0234567].MP4
+*L* Reading 'GX014637.MP4'
+*L* Reading 'GX014638.MP4'
+*L* Reading 'GX014639.MP4'
+*L* Reading 'GX014640.MP4'
+*L* Reading 'GX014642.MP4'
+*L* Reading 'GX014643.MP4'
+*L* Reading 'GX014644.MP4'
+*L* Reading 'GX014645.MP4'
+*L* Reading 'GX014646.MP4'
+*L* Reading 'GX014647.MP4'
+```
+As output, a file "**story**" is generated.
+
+### Continuity issue
+
+Adding **-v** option displays deltas between each video, helping to identify important jumps. 
+```
+$ ~/Projets/GPMFMetersGenerator/mkStory -v GX*.MP4
+*I* Videos only mode
+*L* Reading 'GX014637.MP4'
+*L* Reading 'GX014638.MP4'
+*I* gap : 00:01 min, estrangement : 0.54 m
+*L* Reading 'GX014639.MP4'
+*I* gap : 00:00 min, estrangement : 18.24 m
+*L* Reading 'GX014640.MP4'
+*I* gap : 00:05 min, estrangement : 20.67 m
+```
+
+In addition, **mkStory** will raise an error in case a video's timestamp is lower compared to the previous video one. 
+```
+*F* Video returning backward by 00:-24 minutes
+```
+Use **-F** option to force inclusion.
+
+## Story from a GPX file
+
+While doing long activities such as hiking, trekking, ski touring, mountain biking, or simply strolling, generally we are recording only small interesting parts and not the global session. In parallel, phones' sport tracker applications can provide complete trace of the activity.
+
+**Stories**  attempt to establish the timeline between a GPX track coming from your phone and the GoPro videos metadata to get a global view of your activity in videos.
+
+### data matching
 
 Unfortunately, GPS position gathered by your phone and GoPro are not exactly the same  : satellites lost, precision issues or simply the fact the GoPro may start recording without having fully acquired satellites (use [GPS signal quality](#GPSqual) stickers to check your signal quality).
 
 Even worst, the altitude is *calculated* by GPSes : Android's algorithm is by far less precise compared to GoPro one and tends to smooth the result.
 This is leading to *jumps* when switching between GPX and GoPro curves. See GPMFMetersGenerator '**-a**' vs '**-A**' discuss above.
 
-## mkStory
+### mkStory
 
 **mkStory** tries to match videos' metadata with phone provided GPX timeline.
 
@@ -266,9 +320,9 @@ Bad example :
 *W* At least Problem has been detected
 ```
 
-## what to do in case of issues
+### what to do in case of issues
 
-### Time vs position based guessing
+#### Time vs position based guessing
 
 By default, mkStory uses timestamps for matching.
 
@@ -277,9 +331,11 @@ In some cases, the GPX files do not contain reliable timestamps (for example, wh
 | :warning: | "Positioning" mode is much more *random* than timestamp mode.<br> The results are better if there is no path overlap, but in the case of a round trip, it is really difficult to have a correct result (I am working on a better algorithm).  |
 |-------------|----------------------------|
 
-### Last chance : manuel edition (good luck)
+#### Last chance : manuel edition (good luck)
 
 Generated .story file are flat files : if mkStory didn't do right job, you may edit it to sheat indexes. Adding '-v' or even '-d' option at mkStory invocation will help to know GPX's indexes (but it's very verbose).
+
+---
 
 # Small tutorials
 

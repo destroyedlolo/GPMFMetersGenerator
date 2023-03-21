@@ -270,49 +270,78 @@ void GPX::readStory( const char *file ){
 		exit(EXIT_FAILURE);
 	}
 	buff[strcspn(buff,"\n")] = 0;
-	if(strcmp(buff, "GPMFStory 1.0")){
+	if(!strcmp(buff, "GPMFStory 1.0")){
+
+			/* Reading videos anchors
+			 *	Rude checks are done here (assert()) as we are relying on
+			 *	formating made by mkStory).
+			 */
+		while(fgets(buff, sizeof(buff), f)){
+			if(*buff == '#')
+				continue;
+			if(*buff == '*')
+				break;
+
+			char *indexes = strchr(buff, ',');
+			assert(indexes);
+
+			*indexes++ = 0;
+
+			int istart, iend;
+			assert( sscanf(indexes, "%d, %d", &istart, &iend) == 2 );
+
+			StoryVideo nv(buff, istart, iend);
+			this->videos.push_back(nv);
+		}
+
+			/* Reading GPX data */
+		while(fgets(buff, sizeof(buff), f)){
+			double lat, lgt, alt;
+			time_t st;
+			double dst;
+
+			if(*buff == '#')
+				continue;
+
+			if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
+				fputs("*F* Failed to read GPX contents\n", stderr);
+				exit(EXIT_FAILURE);
+			}
+			GpxData nv(lat, lgt, alt, st, dst);
+			updMinMax(nv);
+			this->samples.push_back(nv);
+		}
+	} else if(!strcmp(buff, "GPMFStory 2.0")){
+		unsigned int idx = 0,	// Current index
+			sidx = 0;			// video starting index
+
+		while(fgets(buff, sizeof(buff), f)){
+			buff[strcspn(buff,"\n")] = 0;
+			if(*buff == '#')
+				continue;
+			if(!strncmp(buff, "*Video", 6)){	// Entering new video
+				StoryVideo nv(buff+7, sidx, idx);
+				this->videos.push_back(nv);
+				sidx = idx + 1;
+			} else { // Reading data
+				double lat, lgt, alt;
+				time_t st;
+				double dst;
+
+				if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
+					fputs("*F* Failed to read GPX contents\n", stderr);
+					exit(EXIT_FAILURE);
+				}
+				GpxData nv(lat, lgt, alt, st, dst);
+				updMinMax(nv);
+				this->samples.push_back(nv);
+
+				idx++;
+			}
+		}
+	} else {
 		fputs("*F* Story's magic not found\n", stderr);
 		exit(EXIT_FAILURE);
-	}
-
-		/* Reading videos anchors
-		 *	Rude checks are done here (assert()) as we are relying on
-		 *	formating made by mkStory.
-		 */
-	while(fgets(buff, sizeof(buff), f)){
-		if(*buff == '#')
-			continue;
-		if(*buff == '*')
-			break;
-
-		char *indexes = strchr(buff, ',');
-		assert(indexes);
-
-		*indexes++ = 0;
-
-		int istart, iend;
-		assert( sscanf(indexes, "%d, %d", &istart, &iend) == 2 );
-
-		StoryVideo nv(buff, istart, iend);
-		this->videos.push_back(nv);
-	}
-
-		/* Reading GPX data */
-	while(fgets(buff, sizeof(buff), f)){
-		double lat, lgt, alt;
-		time_t st;
-		double dst;
-
-		if(*buff == '#')
-			continue;
-
-		if(sscanf(buff, "%lf, %lf, %lf, %lu, %lf", &lat, &lgt, &alt, &st, &dst) != 5){
-			fputs("*F* Failed to read GPX contents\n", stderr);
-			exit(EXIT_FAILURE);
-		}
-		GpxData nv(lat, lgt, alt, st, dst);
-		updMinMax(nv);
-		this->samples.push_back(nv);
 	}
 	
 	fclose(f);
@@ -371,7 +400,7 @@ GPX::pkind GPX::positionKind(int idx){
 	} else if(!r)	// within the video
 		return pkind::CURRENTVIDEO;
 	else { // after
-		for(int i=this->current_video_idx-1; i<(int)this->videos.size(); i++){
+		for(int i=this->current_video_idx+1; i<(int)this->videos.size(); i++){
 			r = this->videos[i].whithin(idx);
 			if(r<0)	// b/w the checked and the next
 				return pkind::AFTERTRACE;

@@ -22,7 +22,7 @@ struct GpxData : public GPSCoordinate {
 };
 
 struct StoryVideo : public std::string {
-	int start;
+	int start;	// indexes of this video in this story
 	int end;
 
 	StoryVideo( const char *name, int astart, int aend ) : 
@@ -78,6 +78,12 @@ public:
 		/* Retrieve current video information */
 	StoryVideo &getCurrentStoryVideo( void ){
 		return this->videos[ this->current_video_idx ];
+	}
+	StoryVideo &getStoryVideo( int idx ){
+		return this->videos[ idx ];
+	}
+	int getIndex(void){
+		return this->current_video_idx;
 	}
 
 	enum pkind {

@@ -37,7 +37,7 @@ static const char *gpmfError( GPMF_ERROR err ){
 	return "???";
 }
 
-void GPVideo::readGPMF( void ){
+void GPVideo::readGPMF( double cumul_dst ){
 	uint32_t payloads = GetNumberPayloads(this->mp4handle);
 	GPMF_stream metadata_stream, * ms = &metadata_stream;
 	size_t payloadres = 0;
@@ -207,7 +207,7 @@ void GPVideo::readGPMF( void ){
 									gfix, dop
 								);
 
-							if(!!(drift = addSample(
+							if(!!(drift = this->addSample(
 								tstart + i*tstep,
 								tmpbuffer[i*elements + 0],	/* latitude */
 								tmpbuffer[i*elements + 1],	/* longitude */
@@ -215,7 +215,8 @@ void GPVideo::readGPMF( void ){
 								tmpbuffer[i*elements + 3],	/* speed2d */
 								tmpbuffer[i*elements + 4],	/* speed3d */
 								time,
-								gfix, dop
+								gfix, dop,
+								cumul_dst
 							))){
 								if(verbose)
 									printf("*W* %.3f seconds : data drifting by %.3f\n", tstart + i*tstep, drift);
@@ -236,7 +237,7 @@ void GPVideo::readGPMF( void ){
 		GPMF_Free(ms);
 }
 
-double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix, uint16_t dop ){
+double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix, uint16_t dop, double cumul_dst ){
 	double ret=0;
 
 		/* Convert speed from m/s to km/h */
@@ -303,17 +304,20 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 	sec += this->voffset;	// shift by this part's offset
 
 	if(this->getSamples().empty() || sec >= this->nextsample){	// store a new sample
-		if(!this->getSamples().empty() && sec > this->nextsample + SAMPLE/2)	// Drifting
-			ret = sec - (this->nextsample + SAMPLE/2);
+		if(!this->getSamples().empty() && sec > this->nextsample + this->sample/2)	// Drifting
+			ret = sec - (this->nextsample + this->sample/2);
 
-		this->nextsample += SAMPLE;
+		this->nextsample += this->sample;
 		if(debug)
 			printf("accepted : %f, next:%f\n", sec, this->nextsample);
 
 			/* store the new sample */
 		GPMFdata nv(lat, lgt, alt, s2d, s3d, time, gfix, this->dop);
+
 		if(!this->samples.empty())
 			nv.addDistance( this->getLast() );
+		else
+			nv.addDistance( cumul_dst );
 
 			/* insert the new sample in the list */
 		this->samples.push_back(nv);
@@ -325,7 +329,8 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 	return ret;
 }
 
-GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0), dop(0) {
+GPVideo::GPVideo( char *fch, unsigned int asample, double cumul_dst ) : nextsample(0), voffset(0), dop(0) {
+	this->sample = 1.0/asample;
 
 	/* Ensure it's the 1st part of a GoPro video
 	 *
@@ -365,10 +370,10 @@ GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0), dop(0) {
 		fputs("*F* Can't get frame count (incorrect MP4 ?)", stderr);
 		exit(EXIT_FAILURE);
 	}
-	if(verbose)
+	if(debug)
 		printf("*I* Video framerate : %.3f (%u frames)\n", (float)this->fr_num / (float)this->fr_dem, frames);
 
-	this->readGPMF();
+	this->readGPMF( cumul_dst );
 
 	CloseSource(this->mp4handle);
 	this->mp4handle = 0;
@@ -384,14 +389,14 @@ GPVideo::GPVideo( char *fch ) : nextsample(0), voffset(0), dop(0) {
 		if(!access(fname, R_OK)){
 			printf("*L* Adding '%s'\n", fname);
 				
-			this->AddPart(fname);
+			this->AddPart(fname, cumul_dst);
 		}
 	}
 	
 	free(fname);
 }
 
-void GPVideo::AddPart( char *fch ){
+void GPVideo::AddPart( char *fch, double cumul_dst ){
 	this->voffset += this->lastTiming;
 
 	this->mp4handle = OpenMP4Source(fch, MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE, 0);
@@ -406,7 +411,7 @@ void GPVideo::AddPart( char *fch ){
 		puts("*F* Can't get frame count (incorrect MP4 ?)");
 		exit(EXIT_FAILURE);
 	}
-	if(verbose)
+	if(debug)
 		printf("*I* Video framerate : %.3f (%u frames)\n", (float)fr_num / (float)fr_dem, frames);
 
 	if(fr_num != this->fr_num || fr_dem != this->fr_dem){
@@ -414,7 +419,7 @@ void GPVideo::AddPart( char *fch ){
 		exit(EXIT_FAILURE);
 	}
 
-	this->readGPMF();
+	this->readGPMF( cumul_dst );
 
 	CloseSource(this->mp4handle);
 	this->mp4handle = 0;
@@ -439,17 +444,17 @@ void GPVideo::Dump( void ){
 	if(debug){
 		puts("*D* Memorized video data");
     	for(auto p : samples){
-			printf("\tLatitude : %.3f deg\n", p.getLatitude());
-			printf("\tLongitude : %.3f deg\n", p.getLongitude());
-			printf("\tAltitude : %.3f m\n", p.getAltitude());
-			printf("\tSpeed2d : %.3f km/h\n", p.spd2d);
-			printf("\tSpeed3d : %.3f km/h\n", p.spd3d);
-			printf("\tCumulative distance : %f m\n", p.getCumulativeDistance() );
-			printf("\tgfix : %u, dop : %u\n", p.gfix, p.dop);
-
 			printf("\tTime : ");
 			printtm(p.getGMT());
 			puts("");
+
+			printf("\t\tLatitude : %.3f deg\n", p.getLatitude());
+			printf("\t\tLongitude : %.3f deg\n", p.getLongitude());
+			printf("\t\tAltitude : %.3f m\n", p.getAltitude());
+			printf("\t\tSpeed2d : %.3f km/h\n", p.spd2d);
+			printf("\t\tSpeed3d : %.3f km/h\n", p.spd3d);
+			printf("\t\tCumulative distance : %f m\n", p.getCumulativeDistance() );
+			printf("\t\tgfix : %u, dop : %u\n", p.gfix, p.dop);
 		}
 	}
 

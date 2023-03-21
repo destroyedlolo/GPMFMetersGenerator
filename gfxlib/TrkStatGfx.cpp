@@ -472,7 +472,7 @@ static struct {
   "\000\000\000\000\000\000\000\000\000\000",
 };
 
-TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h) : Gfx( 250,100, v, h ), sDistance(0) {
+TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h, gfxtype atype) : Gfx( 300,100, v, h ), type(atype), sDistance(0) {
 	this->calcScales();
 
 	if(this->hiking && this->hiking->isStory()){
@@ -481,7 +481,6 @@ TrekkingStatGfx::TrekkingStatGfx(GPVideo &v, GPX *h) : Gfx( 250,100, v, h ), sDi
 		this->beginning = this->hiking->getSamples()[0].getSampleTime();
 	} else
 		this->beginning = v[0].getSampleTime();
-	
 }
 
 void TrekkingStatGfx::calcScales( void ){
@@ -494,7 +493,7 @@ void TrekkingStatGfx::calcScales( void ){
 	this->dst_x = this->SX - extents.x_advance - 5;	// used only for the icon
 	this->dst_y = extents.height + 7;
 
-	cairo_text_extents(cr, "DD HH:MM", &extents);
+	cairo_text_extents(cr, (type == gfxtype::HMS) ? "DD HH:MM:SS" : "DD HH:MM", &extents);
 	this->duration_x = this->SX - extents.x_advance;	// used only for the icon
 	this->duration_y = this->dst_y + extents.height + 25;
 
@@ -584,7 +583,7 @@ void TrekkingStatGfx::generateOneGfx(const char *fulltarget, char *filename, int
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-	std::string duration = current.diffTime( this->beginning );
+	std::string duration = current.diffTime( this->beginning, type == HMS );
 	cairo_text_extents(cr, duration.c_str(), &extents);
 
 	cairo_set_source_rgba(cr, 0,0,0, 0.55);
