@@ -189,6 +189,28 @@ $ mkStory GX01463[789].MP4 GX01464[0234567].MP4
 *L* Reading 'GX014646.MP4'
 *L* Reading 'GX014647.MP4'
 ```
+As output, a file "**story**" is generated.
+
+### Continuity issue
+
+Adding **-v** option displays deltas between each video, helping to identify important jumps. 
+```
+$ ~/Projets/GPMFMetersGenerator/mkStory -v GX*.MP4
+*I* Videos only mode
+*L* Reading 'GX014637.MP4'
+*L* Reading 'GX014638.MP4'
+*I* gap : 00:01 min, estrangement : 0.54 m
+*L* Reading 'GX014639.MP4'
+*I* gap : 00:00 min, estrangement : 18.24 m
+*L* Reading 'GX014640.MP4'
+*I* gap : 00:05 min, estrangement : 20.67 m
+```
+
+In addition, **mkStory** will raise an error in case a video's timestamp is lower compared to the previous video one. 
+```
+*F* Video returning backward by 00:-24 minutes
+```
+Use **-F** option to force inclusion.
 
 ## Story from a GPX file
 
