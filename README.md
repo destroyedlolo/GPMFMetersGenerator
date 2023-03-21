@@ -14,8 +14,8 @@ GPMFMetersGenerator [options] file.MP4
 (launch GPMFMetersGenerator with **-h** argument to have a list of reconized options)
 ```
 $ ./GPMFMetersGenerator -h
-GPMFMetersGenerator v3.04.00
-(c) L.Faillie (destroyedlolo) 2022
+GPMFMetersGenerator v4.03.00
+(c) L.Faillie (destroyedlolo) 2022-23
 
 GPMFMetersGenerator [-options] Video.mp4
 
@@ -26,14 +26,15 @@ Known options :
 -A : enable altitude gfx and draw curve from GPX/story
 -p : enable path gfx
 -q : enable quality gfx
--t : enable Trekking statistics
+-t : enable Trekking statistics (HH:MM)
+-T : enable Trekking statistics (HH:MM:SS)
 
 -X : export telemetry as GPX file
 -K : export telemetry as KML file
 
 -G<file> : load a GPX file
 -S<file> : load a story file
-        Only a GPX or a story can be loadded, not both
+	Only a GPX or a story can be loadded, not both
 
 -V : Don't generate video, keep PNG files
 -Q : enforce quality by removing samples where GoP is > 500
