@@ -2,6 +2,24 @@
 
 If you are updating from a previous version, pay particular attention to the changes with :loudspeaker: sign : they're highlighting an ascendant compatibility break.
 
+## 4.xx
+
+### 4.03
+
+Display seconds in trekking statistics
+
+### 4.02
+
+Handle commulative distance on videos only story
+
+### 4.01
+
+Correcte a bug on 1st video generation
+
+### 4.00
+
+Create stories from videos only.
+
 ## 3.xx
 
 ### 3.05
