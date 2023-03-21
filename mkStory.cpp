@@ -466,7 +466,7 @@ CAUTION : 'p' has been removed from getopt !!
 						force ? 'E':'F',
 						video.getFirst().diffTime(last->getSampleTime()).c_str()
 					);
-					if(force)
+					if(!force)
 						exit(EXIT_FAILURE);
 				}
 			}
