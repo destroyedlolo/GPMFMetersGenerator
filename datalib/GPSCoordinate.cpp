@@ -14,18 +14,25 @@ std::string GPSCoordinate::strLocalHour( bool HM_only ){
 	return std::string(buf);
 }
 
-std::string GPSCoordinate::diffTime( time_t begin ){
+std::string GPSCoordinate::diffTime( time_t begin, bool sec ){
 	int d = difftime( this->sample_time, begin );
 
 	int j = d / 86400;
 	int h = (d % 86400)/3600;
 	int m = (d % 3600)/60;
+	int s = d % 60;
 
 	char t[60];
 	if(j)
 		sprintf(t, "%2d %02d:%02d", j, h, m);
 	else
 		sprintf(t, "%02d:%02d", h, m);
+
+	if(sec){
+		char *x;
+		for(x = t; *x; x++);
+		sprintf(x, ":%02d", s);
+	}
 
 	return t;
 }

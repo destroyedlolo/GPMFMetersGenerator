@@ -46,7 +46,7 @@ static char gfx_strk = 0;	/* 0,2,3 */
 static bool gfx_GPX = false;
 static bool gfx_KML = false;
 static bool gfx_quality = false;
-static bool gfx_trkstt = false;
+static TrekkingStatGfx::gfxtype gfx_trkstt = TrekkingStatGfx::NONE;	/* 0: none, 1: HH:MM, 2: HH:MM:SS */
 
 GPX *hiking = NULL;	// full hiking trace
 
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:aApk:VXKG:S:qtQ")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:aApk:VXKG:S:qtTQ")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -90,7 +90,10 @@ int main(int argc, char *argv[]){
 			gfx_path = true;
 			break;
 		case 't':
-			gfx_trkstt = true;
+			gfx_trkstt = TrekkingStatGfx::HM;
+			break;
+		case 'T':
+			gfx_trkstt = TrekkingStatGfx::HMS;
 			break;
 		case 'k':
 			switch(*optarg){
@@ -154,7 +157,8 @@ int main(int argc, char *argv[]){
 				"-A : enable altitude gfx and draw curve from GPX/story\n"
 				"-p : enable path gfx\n"
 				"-q : enable quality gfx\n"
-				"-t : enable Trekking statistics\n"
+				"-t : enable Trekking statistics (HH:MM)\n"
+				"-T : enable Trekking statistics (HH:MM:SS)\n"
 				"\n"
 				"-X : export telemetry as GPX file\n"
 				"-K : export telemetry as KML file\n"
@@ -270,7 +274,7 @@ int main(int argc, char *argv[]){
 	}
 
 	if(gfx_trkstt){
-		TrekkingStatGfx gfx( video, hiking );
+		TrekkingStatGfx gfx( video, hiking, gfx_trkstt );
 		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 

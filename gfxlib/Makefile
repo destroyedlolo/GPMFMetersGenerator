@@ -36,7 +36,8 @@ SpeedTrkGfx.o : SpeedTrkGfx.cpp SpeedTrkGfx.h Gfx.h \
   ../datalib/Context.h ../datalib/GPVideo.h ../datalib/GPX.h Makefile 
 	$(cc) -c -o SpeedTrkGfx.o SpeedTrkGfx.cpp $(opts) 
 
-TrkStatGfx.o : TrkStatGfx.cpp TrkStatGfx.h Makefile 
+TrkStatGfx.o : TrkStatGfx.cpp TrkStatGfx.h Gfx.h ../datalib/Context.h \
+  ../datalib/GPVideo.h ../datalib/GPX.h Makefile 
 	$(cc) -c -o TrkStatGfx.o TrkStatGfx.cpp $(opts) 
 
 ../libgfxlib.a : TrkStatGfx.o SpeedTrkGfx.o SpeedGfx.o QualityGfx.o \
