@@ -311,19 +311,31 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 		if(debug)
 			printf("accepted : %f, next:%f\n", sec, this->nextsample);
 
-			/* store the new sample */
-		GPMFdata nv(lat, lgt, alt, s2d, s3d, time, gfix, this->dop);
-
-		if(!this->samples.empty())
-			nv.addDistance( this->getLast() );
-		else
+		if(this->getSamples().empty()){	// 1st sample
+			GPMFdata nv( lat, lgt, alt, s2d, s3d, time, gfix, this->dop );
 			nv.addDistance( cumul_dst );
-
-			/* insert the new sample in the list */
-		this->samples.push_back(nv);
+			this->samples.push_back( nv );	// push into the list
+		} else { // sample time
+			GPMFdata nv(
+				lat, lgt,
+				this->calt/this->nbre, this->cs2d/this->nbre, this->cs3d/this->nbre, 
+				time, gfix, this->dop
+			);
+			nv.addDistance( this->getLast() );
+			this->samples.push_back( nv );	// push into the list
+		}
 
 			/* reset pertinent fields */
 		this->dop = 0;
+		this->nbre = 1;
+		this->calt = alt;
+		this->cs2d = s2d;
+		this->cs3d = s3d;
+	} else {
+		this->nbre++;
+		this->calt += alt;
+		this->cs2d += s2d;
+		this->cs3d += s3d;
 	}
 
 	return ret;
