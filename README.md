@@ -353,7 +353,7 @@ Here the list of already known needed improvements (as of V3)
 - [X] Colorizes past figures
 - [X] Show full journey using external GPX trace file (*need to create a Fixer as the ones I got are crappy*)
 - [X] Generate GPX and KML from telemetry
-- [ ] Generate stories directly form a collection of video, without GPX file
+- [X] Generate stories directly form a collection of video, without GPX file
 - [ ] Inlays video's path on a map (**high probability** : must have)
 - [ ] Post process GPX data to get better altitudes (**meddium probability** : it will require lot of development - does it worth it ?)
 - [ ] Add threading support to parallelise images' generation (**low probability** : requires a bit of code redesign, but the gain won't be so significant as most of the time spent is by video encoding, which is already parallelized). 
