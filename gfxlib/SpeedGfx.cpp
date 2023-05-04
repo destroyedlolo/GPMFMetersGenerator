@@ -155,7 +155,7 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 
 	if(this->type == 'b'){
 		cairo_set_source_rgb(cr, 0.2, 0.8, 0.2);
-		sprintf(t, "%4.1f", current.spd2d);
+		sprintf(t, "%4.1f", current.spd3d);
 		cairo_move_to(cr, offlabel, 200);
 		cairo_show_text(cr, t);
 		cairo_stroke(cr);
@@ -163,7 +163,7 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 
 	double val;
 	if(this->type == 'b'){
-		val = this->transforme(current.spd2d * scale);
+		val = this->transforme(current.spd3d * scale);
 
 		cairo_set_line_width(cr, 13);
 		cairo_set_source_rgba(cr, 0.3, 0.6, 0.4, 0.75);

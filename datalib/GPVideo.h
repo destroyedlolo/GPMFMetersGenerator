@@ -51,6 +51,12 @@ private:
 		 */
 	uint16_t dop;
 
+		/* Accumulation to smooth values */
+	double calt;
+	double cs2d, cs3d;
+
+	unsigned int nbre;
+
 protected:
 	void readGPMF( double cumul_dst );
 
