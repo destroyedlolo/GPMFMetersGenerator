@@ -49,6 +49,11 @@ void SpeedGfx::calcScales( void ){
 	cairo_text_extents(cr, t, &extents);
 	
 	this->offlabel = (this->SX - extents.x_advance)/2;
+
+	cairo_set_font_size(cr, 30);
+	cairo_text_extents(cr, "-100%", &extents);
+	this->offgrade = (this->SX - extents.x_advance)/2;
+	
 	cairo_destroy(cr);
 }
 
@@ -113,7 +118,7 @@ void SpeedGfx::generateBackground( void ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current, double prc ){
+void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current, int prc ){
 	cairo_status_t err;
 
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
@@ -140,8 +145,27 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 		 */
 
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-	cairo_set_font_size(cr, LABEL_SZ);
 	char t[8];
+
+	cairo_set_font_size(cr, 30);
+	sprintf(t, "%+4d%%", prc);
+
+	int y = 102 + ((this->type == 'b') ? 0:8);
+	cairo_set_source_rgb(cr, 0,0,0);	/* Background */
+	cairo_move_to(cr, this->offgrade + 4, y + 4);
+	cairo_show_text(cr, t);
+
+	cairo_move_to(cr, this->offgrade, y);
+	if(prc < 0)
+		cairo_set_source_rgb(cr, 0.2, 0.9, 0.2);
+	else if(prc > 0)
+		cairo_set_source_rgb(cr, 0.9, 0.6, 0.2);
+	else
+		cairo_set_source_rgb(cr, 1,1,1);
+	cairo_show_text(cr, t);
+	cairo_stroke(cr);
+
+	cairo_set_font_size(cr, LABEL_SZ);
 	sprintf(t, "%4.1f", (type == '3'? current.spd3d : current.spd2d));
 
 	if(this->type == 'b')
@@ -216,14 +240,14 @@ void SpeedGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 	this->generateBackground();	// Needed for custom background
 
 	uint32_t start = 0;
-	double prc = 0;
+	int prc = 0;
 	for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
 		if(i && this->video[i].diffTimeF(this->video[start].getSampleTime()) >= 0.5  ){
 			double dst = this->video[i].Estrangement(this->video[start]);	// covered distance
 			double diffalt = this->video[i].getAltitude() - this->video[start].getAltitude(); // altitude delta
 
-			if(dst)
-				prc = diffalt/dst*100;
+			if(dst && this->video[i].spd2d > 2)
+				prc = (int)(diffalt/dst*100);
 			else
 				prc = 0;
 
@@ -239,4 +263,3 @@ void SpeedGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 	if(genvideo)
 		generateVideo(fulltarget, filename, "spd", "speed");
 }
-
