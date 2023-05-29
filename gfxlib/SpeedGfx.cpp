@@ -69,7 +69,7 @@ void SpeedGfx::generateBackground( void ){
 	cairo_set_source_rgba(cr, 1,1,1, 0.75);
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size(cr, 30);
-	cairo_move_to(cr, 195, 225);
+	cairo_move_to(cr, 200, 250);
 	cairo_show_text(cr, "km/h");
 	cairo_stroke(cr);
 
@@ -113,7 +113,7 @@ void SpeedGfx::generateBackground( void ){
 	cairo_destroy(cr);
 }
 
-void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current ){
+void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current, double prc ){
 	cairo_status_t err;
 
 	cairo_surface_t *srf = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, this->SX, this->SY);
@@ -123,6 +123,11 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 	}
 
 	cairo_t *cr = cairo_create(srf);
+
+
+		/*
+		 * Copy background
+		 */
 
 	cairo_set_source_surface(cr, this->background, 0, 0);
 	cairo_rectangle(cr, 0,0, this->SX, this->SY);
@@ -134,7 +139,6 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 		 * Generate image
 		 */
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, LABEL_SZ);
 	char t[8];
@@ -144,19 +148,19 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
 	else {
 		cairo_set_source_rgb(cr, 0,0,0);	/* Background */
-		cairo_move_to(cr, offlabel + 4, 170 + 4);
+		cairo_move_to(cr, this->offlabel + 4, 180 + 4);
 		cairo_show_text(cr, t);
 
 		cairo_set_source_rgb(cr, 1,1,1);	/* Foreground */
 	}
-	cairo_move_to(cr, offlabel, 170 - ((this->type == 'b') ? 25:0));
+	cairo_move_to(cr, this->offlabel, 180 - ((this->type == 'b') ? 25:0));
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
 	if(this->type == 'b'){
 		cairo_set_source_rgb(cr, 0.2, 0.8, 0.2);
 		sprintf(t, "%4.1f", current.spd3d);
-		cairo_move_to(cr, offlabel, 200);
+		cairo_move_to(cr, this->offlabel, 200);
 		cairo_show_text(cr, t);
 		cairo_stroke(cr);
 	}
@@ -209,7 +213,27 @@ void SpeedGfx::generateOneGfx( const char *fulltarget, char *filename, int index
 }
 
 void SpeedGfx::GenerateAllGfx( const char *fulltarget, char *filename ){
-	Gfx::GenerateAllGfx( fulltarget, filename );
+	this->generateBackground();	// Needed for custom background
+
+	uint32_t start = 0;
+	double prc = 0;
+	for(uint32_t i = 0; i < this->video.getSampleCount(); i++){
+		if(i && this->video[i].diffTimeF(this->video[start].getSampleTime()) >= 0.5  ){
+			double dst = this->video[i].Estrangement(this->video[start]);	// covered distance
+			double diffalt = this->video[i].getAltitude() - this->video[start].getAltitude(); // altitude delta
+
+			if(dst)
+				prc = diffalt/dst*100;
+			else
+				prc = 0;
+
+			start = i;
+		}
+		this->generateOneGfx(fulltarget, filename, i, this->video[i], prc);
+	}
+
+	if(verbose)
+		puts("");
 
 		/* Generate video */
 	if(genvideo)
