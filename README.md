@@ -97,6 +97,8 @@ As of V2.03, **GPMFMetersGenerator** detects by itself the presence of additionn
 
 Can be based on GPS' 2D or 3D speed figure ... or even both (*mostly for testing purpose*)
 
+As of **v4.05**, slope grade has been added.
+
 ### Speed tracker
 
 ![Speed tracker](Images/Strk.png)
