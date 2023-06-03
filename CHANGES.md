@@ -4,6 +4,10 @@ If you are updating from a previous version, pay particular attention to the cha
 
 ## 4.xx
 
+### 4.05
+
+Add slope grade in speed widget
+
 ### 4.04
 
 Smooth speed (average on SAMPLE's values)
