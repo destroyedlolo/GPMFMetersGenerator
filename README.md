@@ -97,6 +97,8 @@ As of V2.03, **GPMFMetersGenerator** detects by itself the presence of additionn
 
 Can be based on GPS' 2D or 3D speed figure ... or even both (*mostly for testing purpose*)
 
+As of **v4.05**, slope grade has been added.
+
 ### Speed tracker
 
 ![Speed tracker](Images/Strk.png)
@@ -346,7 +348,7 @@ Generated .story file are flat files : if mkStory didn't do right job, you may e
 
 # TODO list
 
-Here the list of already known needed improvements (as of V3)
+Here the list of already known needed improvements
 
 - [X] Multi part video handling
 - [X] Speedup images generation
@@ -354,6 +356,7 @@ Here the list of already known needed improvements (as of V3)
 - [X] Show full journey using external GPX trace file (*need to create a Fixer as the ones I got are crappy*)
 - [X] Generate GPX and KML from telemetry
 - [X] Generate stories directly form a collection of video, without GPX file
+- [X] Slope grade
 - [ ] Inlays video's path on a map (**high probability** : must have)
 - [ ] Post process GPX data to get better altitudes (**meddium probability** : it will require lot of development - does it worth it ?)
 - [ ] Add threading support to parallelise images' generation (**low probability** : requires a bit of code redesign, but the gain won't be so significant as most of the time spent is by video encoding, which is already parallelized). 

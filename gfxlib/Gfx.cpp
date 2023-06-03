@@ -58,6 +58,7 @@ void Gfx::generateVideo( const char *fulltarget, char *filename, const char *ina
 	closedir(dp);
 }
 
+/* Note : this one is overloaded for SpeedGfx */
 void Gfx::GenerateAllGfx( const char *fulltarget, char *filename ){
 	this->generateBackground();	// Needed for custom background
 

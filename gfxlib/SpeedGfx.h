@@ -11,6 +11,7 @@ class SpeedGfx : public Gfx {
 	int range;		// data range
 	double scale;	// computed scale data->gfx
 	int offlabel;	// offset to display the label
+	int offgrade;	// offset for the grade label
 	char type;		// type of graphics to display
 
 	double transforme( double angle );
@@ -18,7 +19,8 @@ class SpeedGfx : public Gfx {
 protected:
 	void calcScales( void );
 	void generateBackground( void );
-	void generateOneGfx( const char *, char *, int , GPMFdata & );
+	void generateOneGfx( const char *, char *, int , GPMFdata & ){};
+	void generateOneGfx( const char *fulltarget, char *filename, int index, GPMFdata &current, int prc );
 	
 public:
 	SpeedGfx(GPVideo &v, GPX *h, char atype='2');
