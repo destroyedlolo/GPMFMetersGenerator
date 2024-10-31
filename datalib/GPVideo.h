@@ -9,6 +9,11 @@
 #include "samplesCollection.h"
 
 #include <ctime>
+#include "../date/include/date/date.h"
+
+using namespace std;
+using namespace date;
+using namespace std::chrono;
 
 	/* default number of samples per seconds (9) */
 #define SAMPLE 9
@@ -27,6 +32,17 @@ struct GPMFdata : public GPSCoordinate {
 		unsigned char agfix,
 		uint16_t adop
 	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time),
+		spd2d(aspd2d), spd3d(aspd3d), gfix(agfix), dop(adop){
+	}
+	GPMFdata( 
+		double alatitude, double alongitude,
+		double aaltitude,
+		double aspd2d, double aspd3d,
+		time_t asample_time,
+		date::sys_time<milliseconds> asample_time_ms,
+		unsigned char agfix,
+		uint16_t adop
+	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time, asample_time_ms),
 		spd2d(aspd2d), spd3d(aspd3d), gfix(agfix), dop(adop){
 	}
 };
@@ -65,7 +81,7 @@ protected:
 	 * The sample is stored only if its took at least SAMPLE seconds after the
 	 * last stored sample.
 	 */
-	double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix, uint16_t dop, double cumul_dst );
+	double addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, date::sys_time<milliseconds> tp, unsigned char gfix, uint16_t dop, double cumul_dst );
 
 public:
 		/* Read and parse 1st video

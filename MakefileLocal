@@ -5,8 +5,16 @@ gotoall: all
 
 
 #The compiler (may be customized for compiler's options).
-cc=g++ -Wall -O2
-opts=-lm -L. -lgfxlib -ldatalib -lGPMF $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo )
+cc=g++ -Wall -O2 -std=c++17
+UNAME_S := $(shell uname -s)
+opts=-lm -L. -lgfxlib -ldatalib -lGPMF $(shell pkg-config --cflags cairo ) $(shell pkg-config --libs cairo ) 
+mopts=-lm -L. -lgfxlib -ldatalib -lGPMF
+ifeq ($(UNAME_S),Darwin)
+  # Make a FAT binary
+  fat=-arch arm64 -arch x86_64 
+else
+  fat=
+endif
 
 GPMFMetersGenerator.o : GPMFMetersGenerator.cpp datalib/Context.h \
   datalib/GPVideo.h datalib/GPX.h gfxlib/SpeedGfx.h \
@@ -16,9 +24,21 @@ GPMFMetersGenerator.o : GPMFMetersGenerator.cpp datalib/Context.h \
 	$(cc) -c -o GPMFMetersGenerator.o GPMFMetersGenerator.cpp \
   $(opts) 
 
+gpmf2gpx.o : gpmf2gpx.cpp datalib/Context.h \
+  datalib/GPVideo.h datalib/GPX.h gfxlib/SpeedGfx.h \
+  gfxlib/AltitudeGfx.h gfxlib/PathGfx.h gfxlib/SpeedTrkGfx.h \
+  gfxlib/Export.h gfxlib/QualityGfx.h gfxlib/TrkStatGfx.h Version.h \
+  libgfxlib.a libdatalib.a MakefileLocal 
+	$(cc) -c -o gpmf2gpx.o gpmf2gpx.cpp \
+  $(mopts) $(fat) 
+
 GPMFMetersGenerator : GPMFMetersGenerator.o libgfxlib.a libdatalib.a \
   MakefileLocal 
 	 $(cc) -o GPMFMetersGenerator GPMFMetersGenerator.o $(opts) 
+
+gpmf2gpx : gpmf2gpx.o libgfxlib.a libdatalib.a \
+  MakefileLocal 
+	 $(cc) -o gpmf2gpx gpmf2gpx.o $(mopts) $(fat)
 
 mkStory.o : mkStory.cpp datalib/Context.h datalib/GPVideo.h \
   datalib/GPX.h Version.h libgfxlib.a libdatalib.a MakefileLocal 
@@ -27,4 +47,4 @@ mkStory.o : mkStory.cpp datalib/Context.h datalib/GPVideo.h \
 mkStory : mkStory.o libgfxlib.a libdatalib.a MakefileLocal 
 	 $(cc) -o mkStory mkStory.o $(opts) 
 
-all: mkStory GPMFMetersGenerator 
+all: gpmf2gpx mkStory GPMFMetersGenerator 

@@ -341,6 +341,14 @@ In some cases, the issue is due to a bad quality of positioning signal (of your 
 
 Generated .story file are flat files : if mkStory didn't do right job, you may edit it to sheat indexes. Adding '-v' or even '-d' option at mkStory invocation will help to know GPX's indexes (but it's very verbose).
 
+### gpmf2gpx
+
+A small commandline utility to extact the GPS log in the GPMF stream to a GPX file.
+
+### GoPro Multiple files
+
+You may be aware GoPro will write multiple files when the file size gets to a certain point, we can recommend [mp4-merge](https://github.com/gyroflow/mp4-merge) as a utility that merge multiple files without damaging their GPMF metadata stream.
+
 ---
 
 # Small tutorials

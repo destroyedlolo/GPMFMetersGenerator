@@ -13,6 +13,7 @@ class Export {
 public:
 	Export( GPVideo &v ): video(v) {}
 
+	void generateGPX( const char *fulltarget, int skipseconds);
 	void generateGPX( const char *fulltarget, char *filename, char *iname );
 	void generateKML( const char *fulltarget, char *filename, char *iname );
 };

@@ -9,6 +9,9 @@
 #include "samplesCollection.h"
 
 #include <ctime>
+#include "../date/include/date/date.h"
+
+using namespace std::chrono;
 
 struct GpxData : public GPSCoordinate {
 	GpxData(){};
@@ -18,6 +21,14 @@ struct GpxData : public GPSCoordinate {
 		time_t asample_time,
 		double adistance = 0
 	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time, adistance) {
+	}
+		GpxData(
+		double alatitude, double alongitude,
+		double aaltitude,
+		time_t asample_time,
+		date::sys_time<milliseconds> asample_time_ms,
+		double adistance = 0
+	) : GPSCoordinate(alatitude, alongitude, aaltitude, asample_time, asample_time_ms, adistance) {
 	}
 };
 

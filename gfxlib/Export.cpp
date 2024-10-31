@@ -6,6 +6,55 @@
 
 #include <cstdio>
 
+void Export::generateGPX( const char *fulltarget, int skipseconds){
+	FILE *f = fopen(fulltarget,"w");
+	if(!f){
+		perror(fulltarget);
+		return;
+	}
+
+	fputs("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+		"<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"1.1\" creator=\"GPMFMetersGenerator\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd\">\n", f);
+	fprintf(f, "\t<metadata>\n"
+	    "\t\t<name>%s</name>\n"
+  		"\t</metadata>\n", fulltarget
+	);
+	fprintf(f, "\t<trk>\n"
+	    "\t\t<name>%s</name>\n"
+		"\t\t<trkseg>\n", fulltarget
+	);
+	
+	time_t st = NULL;
+	for(auto p : this->video.getSamples()){
+		// Skip the initial seconds as its probably not got a satelite lock yet
+		if (st == NULL) {
+			st = p.getSampleTime();
+			continue;
+		} else {
+			if (p.getSampleTime() - st <= skipseconds) {
+				continue;
+			}
+		}
+		fprintf(f, "\t\t\t<trkpt lat=\"%f\" lon=\"%f\">\n", p.getLatitude(), p.getLongitude());
+		fprintf(f, "\t\t\t\t<ele>%f</ele>\n", p.getAltitude());
+		if (p.getSampleTimeMS().time_since_epoch().count() != 0) {
+			fprintf(f, "\t\t\t\t<time>%s</time>\n", date::format("%FT%TZ", p.getSampleTimeMS()).c_str());
+		} else {
+			fprintf(f, "\t\t\t\t<time>%s</time>\n", p.strLocalTime().c_str());
+		}
+		fputs("\t\t\t</trkpt>\n", f);
+	}
+
+	fputs( "\t\t</trkseg>\n"
+		"\t</trk>\n"
+		"</gpx>\n", f);
+
+	fclose(f);
+
+	if(verbose)
+		printf("'%s' generated\n", fulltarget);
+}
+
 void Export::generateGPX( const char *fulltarget, char *filename, char *iname ){
 	sprintf(filename, "%s.gpx", iname);
 
@@ -27,6 +76,9 @@ void Export::generateGPX( const char *fulltarget, char *filename, char *iname ){
 	);
 	
 	for(auto p : this->video.getSamples()){
+		if (p.getLatitude() == 0 && p.getLongitude() == 0) {
+			continue;
+		}
 		fprintf(f, "\t\t\t<trkpt lat=\"%f\" lon=\"%f\">\n", p.getLatitude(), p.getLongitude());
 		fprintf(f, "\t\t\t\t<ele>%f</ele>\n", p.getAltitude());
 		fprintf(f, "\t\t\t\t<time>%s</time>\n", p.strLocalTime().c_str());

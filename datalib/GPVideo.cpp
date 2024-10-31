@@ -9,7 +9,13 @@
 #include <cstring>
 #include <cassert>
 #include <unistd.h>
+#include <chrono>
+#include <iostream>
+#include "../date/include/date/date.h"
 
+using namespace std;
+using namespace date;
+using namespace std::chrono;
 
 extern "C" {
 #include "../gpmf-parser/GPMF_parser.h"
@@ -42,6 +48,7 @@ void GPVideo::readGPMF( double cumul_dst ){
 	GPMF_stream metadata_stream, * ms = &metadata_stream;
 	size_t payloadres = 0;
 	time_t time = (time_t)-1;
+	date::sys_time<std::chrono::milliseconds> tp;
 	unsigned char gfix = 0;
 	uint16_t dop = 1000;
 
@@ -86,6 +93,12 @@ void GPVideo::readGPMF( double cumul_dst ){
 				}
 				uint32_t *data = (uint32_t *)GPMF_RawData(ms);
 				gfix = BYTESWAP32(*data);
+				if (gfix != 3) {
+					if(debug){
+						printf("*E* ignoring poor fix %u\n", (unsigned)gfix);
+					}
+					continue;
+				}
 			}
 
 			if(GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("GPSU"), (GPMF_LEVELS)(GPMF_RECURSE_LEVELS|GPMF_TOLERANT) )){	// find out GPS time if any
@@ -107,7 +120,17 @@ void GPVideo::readGPMF( double cumul_dst ){
 					strncpy(t, p, 16);
 					printf("*I* GPSU : '%s'\n", t);
 				}
-	
+
+				std::string oString;
+				oString = p;
+				istringstream in{oString};
+				// Example is 240907235800.499GPSPS^B
+				in >> parse("%y%m%d%H%M%6S", tp);
+				if (in.fail()) {
+					in.clear();
+					printf("*E* GPSU : Date parse failure for '%s' ", p);
+				}
+
 				struct tm t;
 				memset(&t, 0, sizeof(struct tm));
 				t.tm_year = char2int(p) + 100;
@@ -215,6 +238,7 @@ void GPVideo::readGPMF( double cumul_dst ){
 								tmpbuffer[i*elements + 3],	/* speed2d */
 								tmpbuffer[i*elements + 4],	/* speed3d */
 								time,
+								tp,
 								gfix, dop,
 								cumul_dst
 							))){
@@ -237,7 +261,7 @@ void GPVideo::readGPMF( double cumul_dst ){
 		GPMF_Free(ms);
 }
 
-double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time, unsigned char gfix, uint16_t dop, double cumul_dst ){
+double GPVideo::addSample( double sec, double lat, double lgt, double alt, double s2d, double s3d, time_t time,  date::sys_time<milliseconds> tp, unsigned char gfix, uint16_t dop, double cumul_dst ){
 	double ret=0;
 
 		/* Convert speed from m/s to km/h */
@@ -249,8 +273,8 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 		this->dop = dop;
 
 	if(this->getSamples().empty()){	/* First data */
-		this->getMin().set( lat, lgt, alt, time );
-		this->getMax().set( lat, lgt, alt, time );
+		this->getMin().set( lat, lgt, alt, time, tp );
+		this->getMax().set( lat, lgt, alt, time, tp );
 		this->getMin().spd2d = this->getMax().spd2d = s2d;
 		this->getMin().spd3d = this->getMax().spd3d = s3d;
 		this->getMin().gfix = this->getMax().gfix = gfix;
@@ -288,6 +312,13 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 				this->getMax().setSampleTime(time);
 		}
 
+		if(tp.time_since_epoch().count() != 0){
+			if(this->getMin().getSampleTimeMS().time_since_epoch().count() == tp.time_since_epoch().count() || this->getMin().getSampleTimeMS().time_since_epoch().count() > tp.time_since_epoch().count())
+				this->getMin().setSampleTimeMS(tp);
+			if(this->getMax().getSampleTimeMS().time_since_epoch().count() == tp.time_since_epoch().count() || this->getMax().getSampleTimeMS().time_since_epoch().count() < tp.time_since_epoch().count())
+				this->getMax().setSampleTimeMS(tp);
+		}
+
 		if(gfix < this->getMin().gfix)
 			this->getMin().gfix = gfix;
 		if(gfix > this->getMax().gfix)
@@ -312,14 +343,14 @@ double GPVideo::addSample( double sec, double lat, double lgt, double alt, doubl
 			printf("accepted : %f, next:%f\n", sec, this->nextsample);
 
 		if(this->getSamples().empty()){	// 1st sample
-			GPMFdata nv( lat, lgt, alt, s2d, s3d, time, gfix, this->dop );
+			GPMFdata nv( lat, lgt, alt, s2d, s3d, time, tp, gfix, this->dop );
 			nv.addDistance( cumul_dst );
 			this->samples.push_back( nv );	// push into the list
 		} else { // sample time
 			GPMFdata nv(
 				lat, lgt,
 				this->calt/this->nbre, this->cs2d/this->nbre, this->cs3d/this->nbre, 
-				time, gfix, this->dop
+				time, tp, gfix, this->dop
 			);
 			nv.addDistance( this->getLast() );
 			this->samples.push_back( nv );	// push into the list
@@ -361,9 +392,10 @@ GPVideo::GPVideo( char *fch, unsigned int asample, double cumul_dst ) : nextsamp
 		fputs("*E* filename doesn't correspond to a GoPro video\n", stderr);
 		exit(EXIT_FAILURE);
 	}
+	bool firstfile = true;
 	if(strncmp(fname + len - 12, "GX01", 4) && strncmp(fname + len - 12, "GH01", 4)){
-		fputs("*E* not a GoPro video or not the 1st one\n", stderr);
-		exit(EXIT_FAILURE);
+		printf("*L* not a GoPro named video, or not the 1st one\n");
+		firstfile = false;
 	}
 	len -= 10;	// point to the part number
 
@@ -391,8 +423,8 @@ GPVideo::GPVideo( char *fch, unsigned int asample, double cumul_dst ) : nextsamp
 	this->mp4handle = 0;
 
 
-		/* Check if there are others parts */
-
+		/* Check if there are others parts only if its the first file*/
+ if(firstfile) {
 	for(unsigned int i = 2; i<99; i++){	// As per GoPro, up to 98 parts
 		char buff[3];
 		sprintf(buff, "%02d", i);
@@ -404,6 +436,7 @@ GPVideo::GPVideo( char *fch, unsigned int asample, double cumul_dst ) : nextsamp
 			this->AddPart(fname, cumul_dst);
 		}
 	}
+ }
 	
 	free(fname);
 }

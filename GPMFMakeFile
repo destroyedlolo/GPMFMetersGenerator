@@ -7,6 +7,11 @@ gotoall: all
 #The compiler (may be customized for compiler's options).
 cc=gcc -Wall -O2
 opts=
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+  # Make a FAT binary
+  opts=-arch arm64 -arch x86_64
+endif
 
 gpmf-parser/GPMF_parser.o : gpmf-parser/GPMF_parser.c GPMFMakeFile 
 	$(cc) -c -o gpmf-parser/GPMF_parser.o \
