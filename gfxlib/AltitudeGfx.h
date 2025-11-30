@@ -19,6 +19,7 @@ class AltitudeGfx : public Gfx {
 	double sscale_w;	// Video sample to GPX ones
 
 	bool forcegpx;		// Use GPX for drawing the curve
+	bool nogfx;			// Generate value only
 
 	/* Draw external GPX data
 	 * cr -> cairo context
@@ -40,7 +41,7 @@ protected:
 	void generateOneGfx( const char *, char *, int , GPMFdata & );
 
 public:
-	AltitudeGfx(GPVideo &v, GPX *h, bool forcegpx);
+	AltitudeGfx(GPVideo &v, GPX *h, bool forcegpx, bool nogfx);
 
 	void GenerateAllGfx( const char *dir, char *file );
 };

@@ -227,7 +227,7 @@ static struct {
   "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
 };
 
-AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h, bool aforcegpx) : Gfx( 600,300, v, h ), soffx(0), forcegpx(aforcegpx) {
+AltitudeGfx::AltitudeGfx(GPVideo &v, GPX *h, bool aforcegpx, bool anogfx) : Gfx( 600,300, v, h ), soffx(0), forcegpx(aforcegpx), nogfx(anogfx) {
 	this->calcScales();
 }
 
@@ -420,23 +420,24 @@ void AltitudeGfx::generateBackground( void ){
 
 	cairo_t *cr = cairo_create(this->background);
 
-	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size(cr, 27);
-	cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */
-	cairo_set_line_width(cr, 1);
+	if(!this->nogfx){
+		cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+		cairo_set_font_size(cr, 27);
+		cairo_set_source_rgba(cr, 1,1,1, 0.80);	/* Set white color */
+		cairo_set_line_width(cr, 1);
 
-	char t[8];
-	for(int i = this->min_h; i <= this->max_h; i += this->delta_h){
-		int y = this->SY - (i-this->min_h)*this->scale_h;
-		sprintf(t, "%5d", i);
+		char t[8];
+		for(int i = this->min_h; i <= this->max_h; i += this->delta_h){
+			int y = this->SY - (i-this->min_h)*this->scale_h;
+			sprintf(t, "%5d", i);
 
-		cairo_move_to(cr, 3, y);
-		cairo_show_text(cr, t);
-		cairo_move_to(cr, this->offx, y);
-		cairo_line_to(cr, this->SX, y);
+			cairo_move_to(cr, 3, y);
+			cairo_show_text(cr, t);
+			cairo_move_to(cr, this->offx, y);
+			cairo_line_to(cr, this->SX, y);
+		}
+		cairo_stroke(cr);
 	}
-	cairo_stroke(cr);
-
 
 	if(icn){
 		cairo_save(cr);
@@ -446,28 +447,31 @@ void AltitudeGfx::generateBackground( void ){
 		cairo_restore(cr);
 	}
 
-		// Draw Shadow
-	if(this->hiking && this->hiking->isStory())
-		this->drawGPX(cr, 3);
-	else
-		this->drawGPMF(cr, 3);
+	if(!this->nogfx){
+			// Draw Shadow
+		if(this->hiking && this->hiking->isStory())
+			this->drawGPX(cr, 3);
+		else
+			this->drawGPMF(cr, 3);
 
-	cairo_pattern_t *pat = cairo_pattern_create_linear(this->offx,this->SY - this->range_h*this->scale_h, this->offx,this->SY);
-	cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.25);
-	cairo_pattern_add_color_stop_rgba(pat, 1, 0,0,0, 0.05);
-	cairo_set_source(cr, pat);
+		cairo_pattern_t *pat = cairo_pattern_create_linear(this->offx,this->SY - this->range_h*this->scale_h, this->offx,this->SY);
+		cairo_pattern_add_color_stop_rgba(pat, 0, 0,0,0, 0.25);
+		cairo_pattern_add_color_stop_rgba(pat, 1, 0,0,0, 0.05);
+		cairo_set_source(cr, pat);
 
-	cairo_line_to(cr, this->SX, this->SY);
-	cairo_line_to(cr, this->offx, this->SY);
-	cairo_line_to(cr, this->offx, this->SY - (this->video.getFirst().getAltitude() - this->min_h)*this->scale_h);
+		cairo_line_to(cr, this->SX, this->SY);
+		cairo_line_to(cr, this->offx, this->SY);
+		cairo_line_to(cr, this->offx, this->SY - (this->video.getFirst().getAltitude() - this->min_h)*this->scale_h);
 
-	cairo_fill(cr);
+		cairo_fill(cr);
 
-	if(this->hiking && this->hiking->isStory())
-		drawGPX(cr, 0);
+		if(this->hiking && this->hiking->isStory())
+			drawGPX(cr, 0);
+
+		cairo_pattern_destroy(pat);
+	}
 
 		/* Cleaning */
-	cairo_pattern_destroy(pat);
 	cairo_destroy(cr);
 
 	if(icn)
@@ -495,7 +499,7 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_stroke(cr);
 
 		/* Draw Altitude curve */
-	if(!this->forcegpx)
+	if(!this->forcegpx && !this->nogfx)
 		this->drawGPMF(cr, 0, index);
 
 		/* Display the label */
@@ -504,25 +508,27 @@ void AltitudeGfx::generateOneGfx(const char *fulltarget, char *filename, int ind
 	cairo_select_font_face(cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(cr, 35);
 
-	cairo_set_source_rgba(cr, 0,0,0, 0.55);
+	cairo_set_source_rgba(cr, 0,0,0, 0.55);	// Background shadow
 	cairo_move_to(cr, this->posLabel+2, this->offy+2);
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 1,1,1);	/* Set white color */
+	cairo_set_source_rgb(cr, 1,1,1);	// Forground, set white color
 	cairo_move_to(cr, this->posLabel, this->offy);
 	cairo_show_text(cr, t);
 	cairo_stroke(cr);
 
-		/* Display the spot */
-	cairo_set_line_width(cr, 5);
-	cairo_arc(cr,
-		(this->soffx ? this->soffx : this->offx) + index*(this->soffx ? this->sscale_w : this->scale_w),
-		this->SY - (current.getAltitude() - this->min_h)*this->scale_h,
-	8, 0, 2 * M_PI);
-	cairo_stroke_preserve(cr);
-	cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
-	cairo_fill(cr);
+	if(!this->nogfx){
+			/* Display the spot */
+		cairo_set_line_width(cr, 5);
+		cairo_arc(cr,
+			(this->soffx ? this->soffx : this->offx) + index*(this->soffx ? this->sscale_w : this->scale_w),
+			this->SY - (current.getAltitude() - this->min_h)*this->scale_h,
+		8, 0, 2 * M_PI);
+		cairo_stroke_preserve(cr);
+		cairo_set_source_rgb(cr, 0.8, 0.2, 0.2);
+		cairo_fill(cr);
+	}
 
 		/* Writing the image */
 	sprintf(filename, "alt%07d.png", index);

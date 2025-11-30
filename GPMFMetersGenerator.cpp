@@ -39,8 +39,9 @@
 #include "Version.h"
 
 	/* Which gfx to generate */
-static char gfx_speed = 0;	/* 0,2,3,b */
-static char gfx_altitude = 0;
+static char gfx_speed = 0;		/* 0,2,3,b */
+static char gfx_altitude = 0;	/* A or a */
+static bool gfx_maltitude = false;
 static bool gfx_path = false;
 static char gfx_strk = 0;	/* 0,2,3 */
 static bool gfx_GPX = false;
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]){
 
 		/* Reading arguments */
 	int opt;
-	while(( opt = getopt(argc, argv, ":vdhFs:aApk:VXKG:S:qtTQ")) != -1) {
+	while(( opt = getopt(argc, argv, ":vdhFs:aAlpk:VXKG:S:qtTQ")) != -1) {
 		switch(opt){
 		case 'F':
 			force = true;
@@ -85,6 +86,9 @@ int main(int argc, char *argv[]){
 			break;
 		case 'A':
 			gfx_altitude = 'A';
+			break;
+		case 'l':
+			gfx_maltitude = true;
 			break;
 		case 'p':
 			gfx_path = true;
@@ -155,6 +159,7 @@ int main(int argc, char *argv[]){
 				"-k[2|3] : enable speed tracker gfx (default 2d, 3: 3d)\n"
 				"-a : enable altitude gfx and draw curve from GoPro video\n"
 				"-A : enable altitude gfx and draw curve from GPX/story\n"
+				"-l : enable altitude metric only generation (with -a or -A)\n"
 				"-p : enable path gfx\n"
 				"-q : enable quality gfx\n"
 				"-t : enable Trekking statistics (HH:MM)\n"
@@ -254,7 +259,7 @@ int main(int argc, char *argv[]){
 			exit(EXIT_FAILURE);
 		}
 
-		AltitudeGfx gfx( video, hiking, gfx_altitude=='A' );
+		AltitudeGfx gfx( video, hiking, gfx_altitude=='A', gfx_maltitude );
 		gfx.GenerateAllGfx(targetDir, targetFile);
 	}
 

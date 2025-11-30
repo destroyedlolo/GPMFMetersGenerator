@@ -24,6 +24,7 @@ Known options :
 -k[2|3] : enable speed tracker gfx (default 2d, 3: 3d)
 -a : enable altitude gfx and draw curve from GoPro video
 -A : enable altitude gfx and draw curve from GPX/story
+-l : enable altitude metric only generation
 -p : enable path gfx
 -q : enable quality gfx
 -t : enable Trekking statistics (HH:MM)
